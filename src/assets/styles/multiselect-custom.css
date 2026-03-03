@@ -1,0 +1,212 @@
+/* Estilos personalizados reutilizables para Multiselect */
+:root {
+  --multiselect-radius: 10px;
+}
+
+.multiselect-custom {
+  border-radius: var(--multiselect-radius) !important;
+  border: 1px solid #dee2e6 !important;
+  transition: border-color 0.15s ease-in-out !important;
+}
+
+.multiselect-custom:hover {
+  border-color: #adb5bd !important;
+}
+
+.multiselect-custom.multiselect--active {
+  border-color: #86b7fe !important;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+}
+
+.multiselect-custom .multiselect__tags {
+  border: none !important;
+  border-radius: var(--multiselect-radius) !important;
+  padding: 0.5rem 1rem !important;
+  min-height: 2.5rem !important;
+  background: #fff !important;
+}
+
+.multiselect-custom .multiselect__placeholder {
+  color: #6c757d !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+}
+
+.multiselect-custom .multiselect__single {
+  color: #212529 !important;
+  margin-bottom: 0 !important;
+  padding-top: 0 !important;
+  font-size: 1rem !important;
+}
+
+.multiselect-custom .multiselect__select {
+  height: 2.5rem !important;
+  width: 2.5rem !important;
+  background: none !important;
+}
+
+.multiselect-custom .multiselect__select:before {
+  border-color: #6c757d transparent transparent !important;
+  border-width: 5px 5px 0 5px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+}
+
+.multiselect-custom .multiselect__content-wrapper {
+  border: 1px solid #dee2e6 !important;
+  border-radius: 0.5rem !important;
+  margin-top: 0.25rem !important;
+  background: #fff !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  z-index: 9999 !important;
+}
+
+.multiselect-custom .multiselect__content {
+  border-radius: 0.5rem !important;
+}
+
+.multiselect-custom .multiselect__option {
+  padding: 0.75rem 1rem !important;
+  color: #212529 !important;
+  font-size: 1rem !important;
+  transition: all 0.15s ease-in-out !important;
+  border-bottom: 1px solid #f8f9fa !important;
+  background: #fff !important;
+  min-height: auto !important;
+  line-height: 1.4 !important;
+  white-space: normal !important;
+  display: block !important;
+}
+
+.multiselect-custom .multiselect__option:last-child {
+  border-bottom: none !important;
+}
+
+.multiselect-custom .multiselect__option--highlight {
+  background: #f8f9fa !important;
+  color: #212529 !important;
+}
+
+.multiselect-custom .multiselect__option--selected {
+  background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%) !important;
+  color: #fff !important;
+  font-weight: 500 !important;
+  position: relative !important;
+}
+
+.multiselect-custom .multiselect__option--selected::after {
+  content: '' !important;
+  display: none !important;
+}
+
+.multiselect-custom .multiselect__option--selected.multiselect__option--highlight {
+  background: linear-gradient(135deg, #0b5ed7 0%, #084298 100%) !important;
+  color: #fff !important;
+}
+
+/* Ocultar el texto "Press enter to select" */
+.multiselect-custom .multiselect__option--highlight::after,
+.multiselect-custom .multiselect__option::after {
+  content: '' !important;
+  display: none !important;
+  background: transparent !important;
+}
+
+/* Estilos para las opciones personalizadas con iconos */
+.multiselect-custom .multiselect__option .d-flex {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+.multiselect-custom .multiselect__option .me-3 {
+  margin-right: 0.75rem !important;
+  flex-shrink: 0 !important;
+}
+
+.multiselect-custom .multiselect__option .flex-grow-1 {
+  flex-grow: 1 !important;
+  min-width: 0 !important;
+}
+
+.multiselect-custom .multiselect__option .text-primary {
+  color: #0d6efd !important;
+}
+
+.multiselect-custom .multiselect__option--selected .text-primary {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.multiselect-custom .multiselect__option--highlight .text-primary {
+  color: #0b5ed7 !important;
+}
+
+.multiselect-custom .multiselect__option .fw-medium,
+.multiselect-custom .multiselect__option .text-dark {
+  font-weight: 500 !important;
+  margin-bottom: 0.125rem !important;
+  display: block !important;
+  color: #212529 !important;
+}
+
+.multiselect-custom .multiselect__option--selected .fw-medium,
+.multiselect-custom .multiselect__option--selected .text-dark {
+  color: #fff !important;
+}
+
+.multiselect-custom .multiselect__option .text-muted {
+  font-size: 0.8rem !important;
+  opacity: 0.7 !important;
+  display: block !important;
+  color: #6c757d !important;
+}
+
+.multiselect-custom .multiselect__option--selected .text-muted {
+  color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Icono en las opciones */
+.multiselect-custom .multiselect__option .fs-5 {
+  font-size: 1.25rem !important;
+}
+
+/* Variantes de color para diferentes tipos de multiselect */
+.multiselect-success {
+  border-color: #198754 !important;
+}
+
+.multiselect-success.multiselect--active {
+  border-color: #198754 !important;
+  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25) !important;
+}
+
+.multiselect-success .multiselect__option--selected {
+  background: linear-gradient(135deg, #198754 0%, #157347 100%) !important;
+}
+
+.multiselect-warning {
+  border-color: #ffc107 !important;
+}
+
+.multiselect-warning.multiselect--active {
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
+}
+
+.multiselect-warning .multiselect__option--selected {
+  background: linear-gradient(135deg, #ffc107 0%, #ffca2c 100%) !important;
+  color: #000 !important;
+}
+
+.multiselect-danger {
+  border-color: #dc3545 !important;
+}
+
+.multiselect-danger.multiselect--active {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.multiselect-danger .multiselect__option--selected {
+  background: linear-gradient(135deg, #dc3545 0%, #bb2d3b 100%) !important;
+}
