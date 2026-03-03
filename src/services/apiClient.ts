@@ -69,7 +69,7 @@ apiClient.interceptors.response.use(
 
     if (status) {
       switch (status) {
-        case 401:
+        /* case 401:
           // Sesión expirada o no autorizado: alerta y desloguear
           const confirm = await showConfirm(
             'Sesión expirada',
@@ -87,7 +87,7 @@ apiClient.interceptors.response.use(
 
           // Se resuelve la promesa falsamente para evitar que el `catch` del store/componente
           // sobreescriba esta alerta con otro SweetAlert, y permita apagar los loadings.
-          return Promise.resolve({ data: { code: 401, message: 'Unauthorized' } })
+          return Promise.resolve({ data: { code: 401, message: 'Unauthorized' } })*/
         case 422:
           // Manejo específico del objeto de errores de validación
           handleValidationError(data.errors, showError)
@@ -99,8 +99,8 @@ apiClient.interceptors.response.use(
           showError('Error interno del servidor. Inténtalo más tarde.')
           break
         default:
-          // Muestra el mensaje de error de la API o un genérico
-          showError(`Error del sistema (${status}).`)
+        // Muestra el mensaje de error de la API o un genérico
+        //showError(`Error del sistema (${status}).`)
       }
     } else {
       // Fallo de red/timeout

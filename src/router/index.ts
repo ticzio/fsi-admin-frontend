@@ -45,7 +45,7 @@ const router = createRouter({
   ],
 })
 
-// Navigation guards
+/* Navigation guards
 router.beforeEach((to, from, next) => {
   const roleId = getRoleIdFromCookie()
   const isAuthenticated = roleId !== null && roleId > 0
@@ -84,6 +84,6 @@ router.beforeEach((to, from, next) => {
 
   // Todo OK
   next()
-})
+})*/
 
 export default router

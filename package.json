@@ -1,6 +1,6 @@
 {
-  "name": "changan-admin-frontend",
-  "version": "0.13.0",
+  "name": "fsi-admin-frontend",
+  "version": "0.0.2",
   "private": true,
   "type": "module",
   "scripts": {

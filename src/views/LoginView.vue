@@ -7,6 +7,9 @@ import { useSwalToast } from '@/composables/useSwalToast'
 import { ERROR } from '@/const/errorConst'
 import { getEnvironmentAlert } from '@/services/initApi'
 import packageJson from '../../package.json'
+import BaseInput from '@/components/common/BaseInput.vue'
+import { normalizeEmail, isValidEmail } from '@/utils/funcEmails'
+import { getPasswordErrors } from '@/utils/funcPassword'
 
 const APP_VERSION = packageJson.version
 const showNetworkError = ref(false)
@@ -20,14 +23,16 @@ const credentials = reactive({
   password: '',
 })
 
-const errors = reactive({
-  email: '',
-  password: '',
-})
+const emailRules = [
+  (v: string) => !!v || 'El correo es requerido',
+  (v: string) => (isValidEmail(v) ? true : 'Formato de correo electrónico inválido'),
+]
 
-const showPassword = ref(false)
+const passwordRules = [(v: string) => !!v || 'La contraseña es requerida']
 
 const handleLogin = async () => {
+  credentials.email = normalizeEmail(credentials.email)
+
   if (!credentials.email || !credentials.password) {
     swalToast.showError('Por favor, completa todos los campos')
     return
@@ -75,74 +80,62 @@ onMounted(() => {
 
 <template>
   <div class="login-background">
+    <!-- Contenedor padre general (en blanco / transparente por ahora) -->
     <div
-      id="login-container"
-      class="container-fluid d-flex flex-column justify-content-center align-items-center min-vh-100"
+      class="container-fluid min-vh-100 d-flex align-items-center justify-content-center px-3 px-md-5"
     >
-      <img src="/changan-icon.png" alt="Changan Icon" class="changan-icon mb-4" />
-      <div class="login-card p-4 p-md-5">
-        <h3 class="text-center text-white mb-4">Panel administrativo</h3>
-        <h5 class="text-center text-white-50 mb-4 fw-light">
-          Ingresa tus datos para iniciar sesión
-        </h5>
-        <form @submit.prevent="handleLogin">
-          <div class="mb-3">
-            <label for="emailLogin" class="form-label text-white-50 fw-light">Correo</label>
-            <input
-              type="email"
-              class="form-control form-control-lg"
-              id="emailLogin"
-              v-model="credentials.email"
-              :class="{ 'is-invalid': errors.email }"
-              placeholder="Ingrese su correo"
-              :disabled="showNetworkError"
-            />
-          </div>
+      <div class="row w-100 layout-container">
+        <!-- Contenedor 1: Logo -->
+        <div
+          class="col-lg-6 d-flex justify-content-center align-items-center mb-5 mb-lg-0 logo-container"
+        >
+          <!-- Sustituir esta imagen por defecto con el logo final cuando se tenga -->
+          <img
+            src="@/assets/images/login/login_logo_FSI.png"
+            alt="Logo FSI Placeholder"
+            class="main-logo"
+          />
+        </div>
 
-          <div class="mb-3">
-            <label for="passwordLogin" class="form-label text-white-50 fw-light">Contraseña</label>
-            <div class="input-group">
-              <input
-                :type="showPassword ? 'text' : 'password'"
-                class="form-control form-control-lg"
-                placeholder="Ingrese su contraseña"
+        <!-- Contenedor 2: Formulario -->
+        <div class="col-lg-6 d-flex justify-content-center align-items-center form-container">
+          <div class="login-card p-4 p-sm-5">
+            <h2 class="text-center mb-3 form-title">Bienvenido Al Panel<br />Administrativo</h2>
+            <p class="text-center mb-4 pb-3 form-subtitle">Ingresa tus datos para iniciar sesión</p>
+            <form @submit.prevent="handleLogin">
+              <BaseInput
+                id="emailLogin"
+                type="email"
+                label="Correo"
+                placeholder="Ingresar correo electrónico"
+                v-model="credentials.email"
+                :disabled="showNetworkError"
+                :rules="emailRules"
+              />
+
+              <BaseInput
+                id="passwordLogin"
+                type="password"
+                label="Contraseña"
+                placeholder="Ingresar contraseña"
                 v-model="credentials.password"
                 :disabled="showNetworkError"
+                :rules="passwordRules"
+                class="mb-4"
               />
-              <button
-                class="btn btn-outline-secondary"
-                type="button"
-                @click="showPassword = !showPassword"
-                tabindex="-1"
-                :disabled="showNetworkError"
-              >
-                <i :class="showPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-              </button>
-            </div>
-          </div>
-          <!-- 
-       <div class="d-flex justify-content-between align-items-center mb-4">
-            <div class="form-check">
-              <input class="form-check-input" type="checkbox" id="rememberUserCheck" />
-              <label class="form-check-label text-white-50 fw-light" for="rememberUserCheck">
-                Recordar usuario
-              </label>
-            </div>
-            <a href="#" class="text-white-50 text-decoration-none fw-light">Olvidé mi contraseña</a>
-          </div>    
 
--->
+              <div class="d-grid mt-4">
+                <button type="submit" :disabled="loading" class="btn btn-primary btn-lg custom-btn">
+                  {{ loading ? 'Iniciando...' : 'Entrar' }}
+                </button>
+              </div>
 
-          <div class="d-grid mb-3">
-            <button type="submit" :disabled="loading" class="btn btn-primary btn-lg">
-              {{ loading ? 'Iniciando...' : 'Entrar' }}
-            </button>
+              <div class="text-center mt-4">
+                <small class="text-muted">Versión {{ APP_VERSION }}</small>
+              </div>
+            </form>
           </div>
-
-          <div class="d-flex justify-content-center mt-2">
-            <span class="text-white text-center">v{{ APP_VERSION }}</span>
-          </div>
-        </form>
+        </div>
       </div>
     </div>
   </div>
@@ -150,115 +143,75 @@ onMounted(() => {
 
 <style scoped>
 .login-background {
-  background-image: url('@/assets/images/login/background-login.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  /* Contenedor central en blanco por ahora, preparado para el background posterior */
+  background-color: transparent;
   min-height: 100vh;
   width: 100%;
 }
 
-.changan-icon {
-  width: 150px;
-  height: auto;
+.layout-container {
+  max-width: 1200px; /* Ancho máximo para mantener los contenedores proporcionados */
 }
 
+/* --- Contenedor 1: Logo --- */
+.main-logo {
+  max-width: 100%;
+  width: 380px; /* Espacio estimado que ocupará el logo grande circular de la izquierda */
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Efecto opcional para destacar el espacio */
+}
+
+/* --- Contenedor 2: Formulario --- */
 .login-card {
   width: 100%;
-  max-width: 600px;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    /* Borde de brillo superior (fijo) */ inset 0 -1px 0 rgba(255, 255, 255, 0.1),
-    /* Sombra de borde inferior (fijo) */ inset 0 0 10px 7px rgba(255, 255, 255, 0.1); /* Brillo interno (EDITABLE) */
-  position: relative;
-  overflow: hidden;
+  max-width: 500px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
 }
 
-.login-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent);
+/* Tipografía de los títulos y textos */
+.form-title {
+  color: #333333;
+  font-weight: 800;
+  font-style: italic;
+  font-size: 1.95rem;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
 }
 
-.login-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 1px;
-  height: 100%;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.8),
-    transparent,
-    rgba(255, 255, 255, 0.3)
-  );
+.form-subtitle {
+  color: #9ca3af;
+  font-size: 0.95rem;
 }
 
-.form-control {
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
+/* Estilo del botón */
+.custom-btn {
+  background-color: #1d4ed8;
+  border: none;
+  border-radius: 50rem; /* Botón bien redondeado estilo "pill" */
+  font-weight: 600;
+  padding: 0.8rem;
+  font-size: 1.05rem;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(29, 78, 216, 0.25);
 }
 
-.form-control::placeholder {
-  color: rgba(255, 255, 255, 0.7);
+.custom-btn:hover {
+  background-color: #1e40af;
+  box-shadow: 0 6px 15px rgba(29, 78, 216, 0.35);
 }
 
-.form-control:focus {
-  background-color: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
-  color: white;
-  box-shadow: none;
+.custom-btn:focus {
+  box-shadow: 0 0 0 0.25rem rgba(37, 99, 235, 0.5);
 }
 
-.btn-primary {
-  background-color: #0055a5; /* Color azul Changan */
-  border-color: #0055a5;
-}
-
-.btn-primary:hover {
-  background-color: #004488;
-  border-color: #004488;
-}
-
-.input-group .btn {
-  background-color: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-}
-
-.input-group .btn:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-.form-check-input {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.form-check-input:checked {
-  background-color: #0055a5;
-  border-color: #0055a5;
-}
-
-@media (max-width: 576px) {
-  .login-card {
-    margin: 0 1rem;
-    padding: 1.5rem !important;
-  }
-  .changan-icon {
-    width: 120px;
+/* Ajustes responsivos */
+@media (max-width: 991px) {
+  .main-logo {
+    width: 250px;
   }
 }
 </style>
