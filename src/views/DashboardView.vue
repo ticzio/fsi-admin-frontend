@@ -3,8 +3,11 @@ import { ref } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import TitleSection from '@/components/common/titleSection.vue'
 import StatisticCards from '@/components/Home/StatisticCards.vue'
-import LineChart from '@/components/common/LineChart.vue'
+import LineChart from '@/components/common/Charts/LineChart.vue'
+import AreaChart from '@/components/common/Charts/AreaChart.vue'
+import StackedBarChart from '@/components/common/Charts/StackedBarChart.vue'
 import LatestUsers from '@/components/Home/LatestUsers.vue'
+import { useDashboardCharts } from '@/composables/useDashboardCharts'
 
 const users = ref([
   { id: 1, name: 'Gabriel Correa', email: 'gabriel@example.com' },
@@ -24,79 +27,13 @@ const statisticItems = ref([
   { value: 96, label: 'Cupones canjeados' },
 ])
 
-const chart1Data = {
-  labels: ['FEB', 'MAR', 'ABRIL', 'MAY', 'JUN', 'JUL'],
-  datasets: [
-    {
-      label: 'Descuentos',
-      data: [90, 25, 120, 50, 115, 50],
-      borderColor: '#1e3888',
-      backgroundColor: '#1e3888',
-      tension: 0.4,
-      pointRadius: 0,
-    },
-    {
-      label: 'Beneficios',
-      data: [45, 75, 30, 110, 20, 105],
-      borderColor: '#00d500',
-      backgroundColor: '#00d500',
-      tension: 0.4,
-      pointRadius: 0,
-    },
-  ],
-}
-
-const chart1Options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
-  scales: {
-    y: { display: true, min: 10, max: 100, ticks: { stepSize: 40 }, border: { display: false } },
-    x: {
-      display: true,
-      grid: { display: false },
-      ticks: { color: '#999', font: { size: 10 } },
-      border: { display: false },
-    },
-  },
-}
-
-const chart2Data = {
-  labels: ['Feb', 'Mar', 'Abril', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic', 'Ene'],
-  datasets: [
-    {
-      label: 'Usuarios registrados',
-      data: [200, 250, 300, 400, 500, 643, 600, 750, 800, 850, 1000, 1200],
-      borderColor: '#1e3888',
-      backgroundColor: 'rgba(30, 56, 136, 0.1)',
-      fill: true,
-      tension: 0.4,
-      pointRadius: [0, 0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0],
-      pointBackgroundColor: '#1e3888',
-    },
-  ],
-}
-
-const chart2Options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
-  scales: {
-    y: { display: false },
-    x: {
-      display: true,
-      grid: { display: false },
-      ticks: { color: '#999', font: { size: 10 } },
-      border: { display: false },
-    },
-  },
-}
+const { chart1Series, chart1Options, chart2Series, chart2Options } = useDashboardCharts()
 </script>
 
 <template>
   <DashboardLayout>
     <div
-      class="dashboard-wrapper bg-white shadow-sm p-4 m-0 d-flex flex-column gap-4"
+      class="dashboard-wrapper bg-white shadow-sm p-3 p-md-4 m-0 d-flex flex-column gap-3 gap-md-4"
       style="border-radius: 20px"
     >
       <!-- HEADER -->
@@ -112,10 +49,12 @@ const chart2Options = {
       <!-- MAIN CONTENT -->
       <div class="row g-4 flex-grow-1">
         <!-- LEFT COLUMN: Charts -->
-        <div class="col-lg-8 d-flex flex-column gap-4">
+        <div class="col-12 col-lg-8 d-flex flex-column gap-3 gap-md-4">
           <!-- Top Chart -->
-          <div class="card border border-light shadow-sm rounded-4 p-4 flex-grow-1 min-h-300">
-            <div class="d-flex justify-content-between align-items-start mb-4">
+          <div class="card border border-light shadow-sm rounded-4 p-3 p-md-4 flex-grow-1">
+            <div
+              class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3"
+            >
               <div>
                 <h3 class="fw-bold mb-0 italic-numbers" style="color: #4a148c; font-size: 2rem">
                   4760
@@ -144,24 +83,43 @@ const chart2Options = {
                 </div>
               </div>
             </div>
-            <div class="flex-grow-1 position-relative" style="height: 220px">
-              <LineChart :chart-data="chart1Data" :chart-options="chart1Options" />
+            <div class="flex-grow-1 position-relative" style="min-height: 250px">
+              <!-- Desktop Chart -->
+              <div class="d-none d-md-block position-absolute w-100 h-100 top-0 start-0">
+                <LineChart :series="chart1Series" :options="chart1Options" />
+              </div>
+              <!-- Mobile Chart (Stacked Bar) -->
+              <div class="d-block d-md-none position-absolute w-100 h-100 top-0 start-0">
+                <StackedBarChart :series="chart1Series" :options="chart1Options" />
+              </div>
             </div>
           </div>
 
           <!-- Bottom Chart -->
-          <div class="card border border-light shadow-sm rounded-4 p-4 h-100 min-h-200">
-            <h6 class="fw-bold text-dark mb-4" style="font-size: 1rem">Usuarios registrados</h6>
-            <div class="position-relative flex-grow-1 mt-2" style="height: 140px">
-              <!-- Tooltip Mockup -->
+          <div
+            class="card border border-light shadow-sm rounded-4 p-3 p-md-4 pb-5 pb-md-5 h-100 min-h-200"
+          >
+            <h6 class="fw-bold text-dark mb-4 text-center text-md-start" style="font-size: 1rem">
+              Usuarios registrados
+            </h6>
+            <div class="position-relative flex-grow-1 mt-2" style="min-height: 250px">
+              <!-- Tooltip Mockup (Desktop only) -->
               <div
-                class="position-absolute translate-middle-x bg-white border border-light shadow-sm rounded-2 d-flex flex-column align-items-center justify-content-center p-2 z-1"
+                class="position-absolute translate-middle-x bg-white border border-light shadow-sm rounded-2 d-none d-md-flex flex-column align-items-center justify-content-center p-2 z-2"
                 style="left: 45.4%; top: 5%; width: 80px"
               >
                 <span class="text-muted" style="font-size: 0.65rem">Junio 2026</span>
                 <span class="fw-bold text-dark lh-1 mt-1" style="font-size: 0.9rem">643</span>
               </div>
-              <LineChart :chart-data="chart2Data" :chart-options="chart2Options" />
+
+              <!-- Desktop Chart -->
+              <div class="d-none d-md-block position-absolute w-100 h-100 top-0 start-0 z-1">
+                <LineChart type="area" :series="chart2Series" :options="chart2Options" />
+              </div>
+              <!-- Mobile Chart (Intelligent Markers) -->
+              <div class="d-block d-md-none position-absolute w-100 h-100 top-0 start-0 z-1">
+                <AreaChart :series="chart2Series" :options="chart2Options" />
+              </div>
             </div>
           </div>
         </div>
@@ -198,11 +156,5 @@ const chart2Options = {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: #c8c8c8;
-}
-.min-h-300 {
-  min-height: 300px;
-}
-.min-h-200 {
-  min-height: 200px;
 }
 </style>

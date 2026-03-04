@@ -13,9 +13,9 @@ defineProps<TitleSectionProps>()
 
 <template>
   <div
-    class="mb-4 pb-3 d-flex flex-column flex-lg-row justify-content-between align-items-start align-items-lg-center"
+    class="mb-3 mb-lg-4 pb-2 pb-lg-3 d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3"
   >
-    <div class="d-flex align-items-center gap-3">
+    <div class="d-flex flex-column flex-sm-row align-items-center gap-3 text-center text-sm-start">
       <img
         v-if="showLogo"
         :src="fsiLogoImage"
@@ -58,10 +58,10 @@ defineProps<TitleSectionProps>()
         </div>
       </div>
     </div>
-    <div>
+    <div class="mt-2 mt-lg-0">
       <!-- arrow back -->
       <button
-        class="btn btn-outline-secondary border-radius-left border-radius-right px-4 mt-2"
+        class="btn btn-outline-secondary border-radius-left border-radius-right px-4"
         @click="$router.go(-1)"
       >
         <i class="bi bi-arrow-left"></i> Volver

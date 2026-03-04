@@ -7,9 +7,9 @@ defineProps<{
 </script>
 
 <template>
-  <div class="col-lg-4">
-    <div class="card border border-light shadow-sm rounded-4 p-4 h-100">
-      <div class="d-flex justify-content-between align-items-start mb-4">
+  <div class="col-12 col-lg-4">
+    <div class="card border border-light shadow-sm rounded-4 p-3 p-md-4 h-100">
+      <div class="d-flex flex-row justify-content-between align-items-start mb-4 gap-2">
         <div>
           <h6 class="fw-bold text-dark mb-0 pe-2">Ultimos usuarios</h6>
           <p class="text-muted small mb-0 lh-sm" style="font-size: 0.75rem">
