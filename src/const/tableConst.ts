@@ -11,116 +11,54 @@ function maybeId(key: string = 'id') {
 }
 
 export const TITLE_SECTION_COMPONENT = {
-  concessionaire: {
-    title: 'Concesionario',
-    description: 'Lista de concesionarios',
-    details: 'Detalles del concesionario',
-    new: 'Nuevo concesionario',
-    newDescription: 'Aquí puedes crear un nuevo concesionario con toda la información necesaria.',
+  pharmacy: {
+    title: 'Farmacia',
+    description: 'Lista de farmacias',
+    details: 'Detalles de la farmacia',
+    new: 'Nueva farmacia',
+    newDescription: 'Aquí puedes crear una nueva farmacia con toda la información necesaria.',
   },
-  company: {
-    title: 'Empresas',
-    description: 'Lista de empresas',
-    details: 'Detalles de la empresa',
-    stepOne: 'Datos de la empresa',
-    stepOneDetails: 'Aquí podras agregar los datos de la empresa',
-    new: 'Nueva empresa',
-    newDescription: 'Aquí puedes crear una nueva empresa con toda la información necesaria.',
-  },
-  administrator: {
-    title: 'Administradores',
-    description: 'Podrás gestionar los administradores de la plataforma',
-  },
-  client: {
-    title: 'Clientes',
-    description: 'Lista de clientes',
-    edit: 'Editar cliente',
-    editDescription: 'Aquí puedes editar la información del cliente.',
-  },
-  vehicle: {
-    title: 'Vehículos',
-    description: 'Lista de vehículos',
-  },
-  exhibition: {
-    title: 'Vehículos de exhibición',
-    description: 'Lista de vehículos de exhibición',
-    new: 'Nuevo vehículo de exhibición',
-    newDescription:
-      'Aquí puedes crear un nuevo vehículo de exhibición con toda la información necesaria.',
-    edit: 'Editar vehículo de exhibición',
-    editDescription: 'Aquí puedes editar la información de un vehículo de exhibición.',
+  coupons: {
+    title: 'Cupones',
+    description: 'Lista de cupones',
+    details: 'Detalles del cupón',
+    new: 'Nuevo cupón',
+    newDescription: 'Aquí puedes crear un nuevo cupón con toda la información necesaria.',
   },
   news: {
     title: 'Noticias',
     description: 'Lista de noticias',
+    details: 'Detalles de la noticia',
     new: 'Nueva noticia',
     newDescription: 'Aquí puedes crear una nueva noticia con toda la información necesaria.',
-    edit: 'Editar noticia',
-    editDescription: 'Aquí puedes editar la información de la noticia.',
   },
-  notification: {
+  notifications: {
     title: 'Notificaciones',
     description: 'Lista de notificaciones',
+    details: 'Detalles de la notificación',
+    new: 'Nueva notificación',
+    newDescription: 'Aquí puedes crear una nueva notificación con toda la información necesaria.',
   },
-  settings: {
-    title: 'Configuración',
-    description: 'Podrás gestionar los items de la plataforma',
+  users: {
+    title: 'Usuarios',
+    description: 'Lista de usuarios',
+    details: 'Detalles del usuario',
+    new: 'Nuevo usuario',
+    newDescription: 'Aquí puedes crear un nuevo usuario con toda la información necesaria.',
   },
-  states: {
-    title: 'Estados',
-    description: 'Podrás gestionar los estados',
+  operators: {
+    title: 'Operadores',
+    description: 'Lista de operadores',
+    details: 'Detalles del operador',
+    new: 'Nuevo operador',
+    newDescription: 'Aquí puedes crear un nuevo operador con toda la información necesaria.',
   },
-  cities: {
-    title: 'Ciudades',
-    description: 'Podrás gestionar las ciudades',
-  },
-  roles: {
-    title: 'Roles',
-    description: 'Podrás gestionar los roles',
-  },
-  typeEnvironment: {
-    title: 'Tipo de entorno',
-    description: 'Podrás gestionar los tipos de entorno',
-  },
-  typeFuel: {
-    title: 'Tipo de combustible',
-    description: 'Gestionar tipos de combustible',
-  },
-  typeTransmission: {
-    title: 'Tipo de transmisión',
-    description: 'Gestionar tipos de transmisión',
-  },
-  typeService: {
-    title: 'Tipo de servicio',
-    description: 'Gestionar tipos de servicio',
-  },
-  typeNotification: {
-    title: 'Tipo de notificación',
-    description: 'Gestionar tipos de notificación',
-  },
-  typeEngine: {
-    title: 'Tipo de motor',
-    description: 'Gestionar tipos de motor',
-  },
-  typeColor: {
-    title: 'Colores de vehículos',
-    description: 'Gestionar colores de vehículos',
-  },
-  typeBrake: {
-    title: 'Tipo de freno',
-    description: 'Gestionar tipos de freno',
-  },
-  typeVehicle: {
-    title: 'Tipo de vehículo',
-    description: 'Gestionar tipos de vehículo',
-  },
-  typePurchase: {
-    title: 'Tipo de compra',
-    description: 'Gestionar tipos de compra',
-  },
-  concessionaireService: {
-    title: 'Servicios por concesionario',
-    description: 'Gestionar los servicios disponibles en el concesionario',
+  administrators: {
+    title: 'Administradores',
+    description: 'Lista de administradores',
+    details: 'Detalles del administrador',
+    new: 'Nuevo administrador',
+    newDescription: 'Aquí puedes crear un nuevo administrador con toda la información necesaria.',
   },
 }
 

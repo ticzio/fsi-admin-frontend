@@ -80,9 +80,31 @@ export function useSwal() {
     return result.isConfirmed
   }
 
+  /**
+   * Muestra un modal de información con una lista de textos.
+   * @param {string} title El título del modal.
+   * @param {string[]} texts Array de textos a mostrar en forma de lista.
+   */
+  const showInfoList = (title: string, texts: string[]) => {
+    const html =
+      `<ul class="text-start mb-0">` +
+      texts.map((t) => `<li class="mb-1">${t}</li>`).join('') +
+      `</ul>`
+    return StyledSwal.fire({
+      icon: 'info',
+      title: title,
+      html: html,
+      showConfirmButton: true,
+      confirmButtonText: 'Entendido',
+      timer: undefined,
+      timerProgressBar: false,
+    })
+  }
+
   return {
     showSuccess,
     showError,
     showConfirm,
+    showInfoList,
   }
 }

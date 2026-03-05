@@ -1,6 +1,9 @@
 <template>
-  <div>
-    <div class="content_table position-relative border-radius-left border-radius-right">
+  <div class="d-flex flex-column h-100 w-100">
+    <div
+      class="content_table flex-grow-1 position-relative border-radius-left border-radius-right order-2 order-md-1"
+    >
+      <!-- Overlay de carga -->
       <div
         v-if="isTableLoading"
         class="position-absolute top-50 start-50 translate-middle d-flex justify-content-center align-items-center"
@@ -11,113 +14,74 @@
         </div>
       </div>
 
-      <div class="table-responsive">
+      <!-- Versión Desktop: Tabla Original -->
+      <div class="table-responsive d-none d-md-block">
         <table class="table" :class="{ 'opacity-50': isTableLoading }">
-          <thead class="bg-white">
-            <tr>
-              <th v-for="header in headers" :key="header.key" class="text-center text-nowrap">
-                <div class="fw-bold py-2 text-nowrap">{{ header.label }}</div>
-              </th>
-              <th
-                v-if="hasActions"
-                class="text-center fw-bold py-2 text-nowrap"
-                style="vertical-align: middle; min-width: 120px"
-              >
-                Acciones
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-if="data.length === 0">
-              <td :colspan="headers.length + (hasActions ? 1 : 0)" class="text-center py-5">
-                No hay datos para mostrar
-              </td>
-            </tr>
-            <tr v-for="item in data" :key="item.id" @click="$emit('row-click', item)">
-              <td
-                v-for="header in headers"
-                :key="header.key"
-                :class="['text-center py-3']"
-                style="vertical-align: middle"
-              >
-                <slot
-                  :name="`cell(${header.key})`"
-                  :item="item"
-                  :value="getNestedValue(item, header.key)"
-                >
-                  <!-- NO ES NECESARIO MODIFICAR LINEAS PARA CUSTOMIZAR COLUMNAS -->
-                  <!-- Ver documentación para más detalles. Ejemplo en la línea 272 -->
+          <!-- Encabezado -->
+          <TableHeader :headers="headers" :has-actions="hasActions" />
 
-                  {{ getNestedValue(item, header.key) }}
-                </slot>
-              </td>
-              <td
-                v-if="getActionsForItem(item).length > 0"
-                class="text-center py-2 text-nowrap"
-                style="vertical-align: middle; min-width: 120px"
-              >
-                <div class="d-flex justify-content-center w-100 gap-2">
-                  <button
-                    v-for="action in getActionsForItem(item)"
-                    :key="`action-${action.name}-${item.id}`"
-                    :class="action.class"
-                    @click.stop="handleActionClick(action.name, item)"
-                    :data-title="action.tooltip"
-                    data-tooltip-pos="bottom"
-                  >
-                    <i :class="action.icon"></i>
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
+          <!-- Cuerpo -->
+          <TableBody
+            :data="data"
+            :headers="headers"
+            :has-actions="hasActions"
+            :is-table-loading="isTableLoading"
+            :get-actions-for-item="getActionsForItem"
+            :get-nested-value="getNestedValue"
+            @row-click="(item) => $emit('row-click', item)"
+            @action-click="(payload) => $emit('action-click', payload)"
+          >
+            <!-- Reenvío de slots de celda al consumidor -->
+            <template v-for="(_, name) in $slots" #[name]="slotProps">
+              <slot :name="name" v-bind="slotProps ?? {}" />
+            </template>
+          </TableBody>
         </table>
+      </div>
+
+      <!-- Versión Móvil: Card Stack -->
+      <div class="d-block d-md-none p-3 pt-0" :class="{ 'opacity-50': isTableLoading }">
+        <CardStack
+          :data="data"
+          :headers="headers"
+          :has-actions="hasActions"
+          :is-table-loading="isTableLoading"
+          :get-actions-for-item="getActionsForItem"
+          :get-nested-value="getNestedValue"
+          @row-click="(item) => $emit('row-click', item)"
+          @action-click="(payload) => $emit('action-click', payload)"
+        >
+          <!-- Reenvío de slots de celda al consumidor -->
+          <template v-for="(_, name) in $slots" #[name]="slotProps">
+            <slot :name="name" v-bind="slotProps ?? {}" />
+          </template>
+        </CardStack>
       </div>
     </div>
 
-    <nav v-if="totalPages >= 1 && !hidePagination" aria-label="Page navigation">
-      <ul class="pagination justify-content-center py-2">
-        <li class="page-item mx-1" :class="{ disabled: currentPage === 1 }">
-          <a
-            class="page-link border-radius-left border-radius-right bg-light text-dark"
-            href="#"
-            @click.prevent="changePage(currentPage - 1)"
-          >
-            <i class="bi-arrow-left"></i>
-          </a>
-        </li>
-        <li class="page-item mx-1" v-for="page in pagesToShow" :key="page">
-          <a
-            class="page-link border-radius-left border-radius-right"
-            :class="{
-              'bg-dark text-white': page === currentPage,
-              'bg-light text-dark': page !== currentPage,
-            }"
-            href="#"
-            @click.prevent="changePage(page)"
-          >
-            {{ page }}
-          </a>
-        </li>
-        <li class="page-item mx-1" v-if="showEllipsis">
-          <span class="page-link border-0 fw-bold">...</span>
-        </li>
-        <li class="page-item mx-1" :class="{ disabled: currentPage === totalPages }">
-          <a
-            class="page-link border-radius-left border-radius-right bg-light text-dark"
-            href="#"
-            @click.prevent="changePage(currentPage + 1)"
-          >
-            <i class="bi-arrow-right"></i>
-          </a>
-        </li>
-      </ul>
-    </nav>
+    <!-- Paginación -->
+    <div class="order-1 order-md-2">
+      <TablePagination
+        :current-page="currentPage"
+        :total-pages="totalPages"
+        :pages-to-show="pagesToShow"
+        :show-left-ellipsis="showLeftEllipsis"
+        :show-right-ellipsis="showRightEllipsis"
+        :show-first-page="showFirstPage"
+        :show-last-page="showLastPage"
+        :hide-pagination="hidePagination"
+        @change-page="changePage"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, toRefs, ref, watch } from 'vue'
+import TableHeader from './CustomTable/TableHeader.vue'
+import TableBody from './CustomTable/TableBody.vue'
+import TablePagination from './CustomTable/TablePagination.vue'
+import CardStack from './CustomTable/CardStack.vue'
 
 // --- Type Definitions (Interfaces) ---
 
@@ -194,19 +158,43 @@ const { currentPage, totalPages, maxPagesToShow } = toRefs(props)
 
 const pagesToShow = computed(() => {
   const pages: number[] = []
-  const startPage = Math.max(1, currentPage.value - Math.floor(maxPagesToShow.value / 2))
-  const endPage = Math.min(totalPages.value, startPage + maxPagesToShow.value - 1)
+  const half = Math.floor(maxPagesToShow.value / 2)
+  let startPage = Math.max(1, currentPage.value - half)
+  let endPage = Math.min(totalPages.value, startPage + maxPagesToShow.value - 1)
 
-  for (let i = startPage; i <= endPage; i++) {
+  // Ajustar si llegamos al final
+  if (endPage - startPage < maxPagesToShow.value - 1) {
+    startPage = Math.max(1, endPage - maxPagesToShow.value + 1)
+  }
+
+  // Excluir la primera y última página (se renderizan por separado)
+  const firstToShow = totalPages.value > maxPagesToShow.value ? Math.max(2, startPage) : startPage
+  const lastToShow =
+    totalPages.value > maxPagesToShow.value ? Math.min(totalPages.value - 1, endPage) : endPage
+
+  for (let i = firstToShow; i <= lastToShow; i++) {
     pages.push(i)
   }
   return pages
 })
 
-const showEllipsis = computed(() => {
+// Mostrar página 1 como botón separado si no está en la ventana
+const showFirstPage = computed(() => totalPages.value > maxPagesToShow.value)
+
+// Mostrar última página como botón separado si no está en la ventana
+const showLastPage = computed(() => totalPages.value > maxPagesToShow.value)
+
+// Elipsis izquierda: hay páginas ocultas entre la página 1 y la ventana visible
+const showLeftEllipsis = computed(() => {
+  return showFirstPage.value && pagesToShow.value.length > 0 && pagesToShow.value[0] > 2
+})
+
+// Elipsis derecha: hay páginas ocultas entre la ventana y la última página
+const showRightEllipsis = computed(() => {
   return (
-    totalPages.value > maxPagesToShow.value &&
-    pagesToShow.value[pagesToShow.value.length - 1] < totalPages.value
+    showLastPage.value &&
+    pagesToShow.value.length > 0 &&
+    pagesToShow.value[pagesToShow.value.length - 1] < totalPages.value - 1
   )
 })
 
@@ -214,12 +202,6 @@ const changePage = (page: number) => {
   if (page >= 1 && page <= totalPages.value) {
     emit('change-page', page)
   }
-}
-
-// --- Lógica de Acciones ---
-
-const handleActionClick = (actionName: string, item: EntityItem) => {
-  emit('action-click', { actionName, item })
 }
 
 // --- Funciones de Utilidad ---

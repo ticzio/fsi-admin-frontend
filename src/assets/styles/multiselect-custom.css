@@ -3,57 +3,86 @@
   --multiselect-radius: 10px;
 }
 
+/* ── Base container ──────────────────────────────────────────────────────── */
 .multiselect-custom {
   border-radius: var(--multiselect-radius) !important;
-  border: 1px solid #dee2e6 !important;
-  transition: border-color 0.15s ease-in-out !important;
-}
-
-.multiselect-custom:hover {
-  border-color: #adb5bd !important;
-}
-
-.multiselect-custom.multiselect--active {
-  border-color: #86b7fe !important;
-  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
-}
-
-.multiselect-custom .multiselect__tags {
-  border: none !important;
-  border-radius: var(--multiselect-radius) !important;
-  padding: 0.5rem 1rem !important;
-  min-height: 2.5rem !important;
+  border: 1px solid #e5e7eb !important; /* matches SearchInput */
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease !important;
   background: #fff !important;
 }
 
+.multiselect-custom:hover:not(.multiselect--disabled) {
+  border-color: #d1d5db !important; /* matches SearchInput hover */
+}
+
+.multiselect-custom.multiselect--active {
+  border-color: #3b82f6 !important; /* matches SearchInput focus */
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.12) !important;
+}
+
+/* ── Tags area ───────────────────────────────────────────────────────────── */
+.multiselect-custom .multiselect__tags {
+  border: none !important;
+  border-radius: var(--multiselect-radius) !important;
+  padding: 0.65rem 1rem !important; /* matches SearchInput vertical padding */
+  min-height: 2.5rem !important;
+  background: transparent !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.multiselect-custom .multiselect__tags-wrap {
+  display: flex !important;
+  align-items: center !important;
+}
+
+/* ── Placeholder ─────────────────────────────────────────────────────────── */
 .multiselect-custom .multiselect__placeholder {
-  color: #6c757d !important;
+  color: #9ca3af !important; /* matches SearchInput placeholder */
+  font-size: 0.93rem !important;
   margin-bottom: 0 !important;
   padding-top: 0 !important;
+  transition: color 0.3s ease !important;
 }
 
+.multiselect-custom.multiselect--active .multiselect__placeholder {
+  color: #cdd4df !important; /* matches SearchInput focused placeholder */
+}
+
+/* ── Selected / single value ─────────────────────────────────────────────── */
 .multiselect-custom .multiselect__single {
-  color: #212529 !important;
+  color: #111827 !important; /* matches SearchInput text color */
   margin-bottom: 0 !important;
   padding-top: 0 !important;
-  font-size: 1rem !important;
+  font-size: 0.95rem !important; /* matches SearchInput font size */
+  background: transparent !important;
 }
 
+/* ── Caret / arrow ───────────────────────────────────────────────────────── */
 .multiselect-custom .multiselect__select {
   height: 2.5rem !important;
   width: 2.5rem !important;
   background: none !important;
+  transition: color 0.3s ease !important;
 }
 
 .multiselect-custom .multiselect__select:before {
-  border-color: #6c757d transparent transparent !important;
+  border-color: #9ca3af transparent transparent !important;
   border-width: 5px 5px 0 5px !important;
   top: 50% !important;
   transform: translateY(-50%) !important;
+  transition: border-color 0.3s ease !important;
 }
 
+.multiselect-custom.multiselect--active .multiselect__select:before {
+  border-color: #3b82f6 transparent transparent !important;
+}
+
+/* ── Dropdown panel ──────────────────────────────────────────────────────── */
 .multiselect-custom .multiselect__content-wrapper {
-  border: 1px solid #dee2e6 !important;
+  border: 1px solid #e5e7eb !important;
   border-radius: 0.5rem !important;
   margin-top: 0.25rem !important;
   background: #fff !important;
@@ -65,10 +94,11 @@
   border-radius: 0.5rem !important;
 }
 
+/* ── Options ─────────────────────────────────────────────────────────────── */
 .multiselect-custom .multiselect__option {
   padding: 0.75rem 1rem !important;
   color: #212529 !important;
-  font-size: 1rem !important;
+  font-size: 0.95rem !important;
   transition: all 0.15s ease-in-out !important;
   border-bottom: 1px solid #f8f9fa !important;
   background: #fff !important;
@@ -112,7 +142,18 @@
   background: transparent !important;
 }
 
-/* Estilos para las opciones personalizadas con iconos */
+/* ── Disabled state ──────────────────────────────────────────────────────── */
+.multiselect-custom.multiselect--disabled {
+  opacity: 0.65 !important;
+  pointer-events: none !important;
+  background: #f9fafb !important;
+}
+
+.multiselect-custom.multiselect--disabled .multiselect__tags {
+  background: transparent !important;
+}
+
+/* ── Icon options ────────────────────────────────────────────────────────── */
 .multiselect-custom .multiselect__option .d-flex {
   display: flex !important;
   align-items: center !important;
@@ -165,19 +206,31 @@
   color: rgba(255, 255, 255, 0.7) !important;
 }
 
-/* Icono en las opciones */
 .multiselect-custom .multiselect__option .fs-5 {
   font-size: 1.25rem !important;
 }
 
-/* Variantes de color para diferentes tipos de multiselect */
+/* ── Variantes de color ──────────────────────────────────────────────────── */
+.multiselect-primary.multiselect--active {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.12) !important;
+}
+
+.multiselect-primary .multiselect__option--selected {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+}
+
+.multiselect-primary.multiselect--active .multiselect__select:before {
+  border-color: #3b82f6 transparent transparent !important;
+}
+
 .multiselect-success {
   border-color: #198754 !important;
 }
 
 .multiselect-success.multiselect--active {
   border-color: #198754 !important;
-  box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25) !important;
+  box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.15) !important;
 }
 
 .multiselect-success .multiselect__option--selected {
@@ -190,7 +243,7 @@
 
 .multiselect-warning.multiselect--active {
   border-color: #ffc107 !important;
-  box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25) !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.2) !important;
 }
 
 .multiselect-warning .multiselect__option--selected {
@@ -204,7 +257,7 @@
 
 .multiselect-danger.multiselect--active {
   border-color: #dc3545 !important;
-  box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25) !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.15) !important;
 }
 
 .multiselect-danger .multiselect__option--selected {

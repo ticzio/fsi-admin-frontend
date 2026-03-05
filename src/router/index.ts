@@ -4,14 +4,13 @@ import { getRoleIdFromCookie } from '@/composables/useAccessControl'
 import { roleHasAllPermissions } from '@/const/rolePermissions'
 
 import dashboardRoutes from './routes/dashboard'
-import concessionaireRoutes from './routes/concessionaire'
-import administratorsRoutes from './routes/administrators'
-import clientsRoutes from './routes/clients'
-import exhibitionRoutes from './routes/exhibition'
+import pharmacyRoutes from './routes/pharmacy'
+import couponsRoutes from './routes/coupons'
 import newsRoutes from './routes/news'
-import companiesRoutes from './routes/companies'
-import settingsRoutes from './routes/settings'
 import notificationsRoutes from './routes/notifications'
+import usersRoutes from './routes/users'
+import operatorsRoutes from './routes/operators'
+import administratorsRoutes from './routes/administrators'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -27,14 +26,13 @@ const router = createRouter({
       meta: { requiresGuest: true },
     },
     ...dashboardRoutes,
-    ...concessionaireRoutes,
-    ...administratorsRoutes,
-    ...clientsRoutes,
-    ...exhibitionRoutes,
+    ...pharmacyRoutes,
+    ...couponsRoutes,
     ...newsRoutes,
-    ...companiesRoutes,
-    ...settingsRoutes,
     ...notificationsRoutes,
+    ...usersRoutes,
+    ...operatorsRoutes,
+    ...administratorsRoutes,
     // Catch-all 404 route (must be last)
     {
       path: '/:pathMatch(.*)*',

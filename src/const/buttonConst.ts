@@ -4,6 +4,7 @@ export type ButtonConfig = {
 
 // 1. Mapa de contextos -> texto del tooltip
 const BUTTON_TOOLTIPS = {
+  pharmacy: 'Nueva farmacia',
   filter: 'Limpiar filtros y recargar tabla',
   concessionaire: 'Nuevo concesionario',
   company: 'Nueva empresa',

@@ -1,4 +1,4 @@
-// Settings routes
+// Notifications routes
 export default [
   {
     path: '/notifications',

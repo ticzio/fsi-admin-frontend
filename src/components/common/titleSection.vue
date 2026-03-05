@@ -58,8 +58,9 @@ defineProps<TitleSectionProps>()
         </div>
       </div>
     </div>
+    <!-- 
+   
     <div class="mt-2 mt-lg-0">
-      <!-- arrow back -->
       <button
         class="btn btn-outline-secondary border-radius-left border-radius-right px-4"
         @click="$router.go(-1)"
@@ -67,5 +68,6 @@ defineProps<TitleSectionProps>()
         <i class="bi bi-arrow-left"></i> Volver
       </button>
     </div>
+      -->
   </div>
 </template>
