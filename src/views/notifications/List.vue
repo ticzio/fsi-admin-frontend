@@ -6,6 +6,8 @@ import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import Modal from '@/components/common/Modal.vue'
+import NotificationForm from '@/components/Notifications/NotificationForm.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -20,6 +22,8 @@ interface Item {
   id: string | number
   [key: string]: any
 }
+
+const newNotificationModalRef = ref<InstanceType<typeof Modal> | null>(null)
 
 const router = useRouter()
 const swalToast = useSwalToast()
@@ -72,12 +76,17 @@ const handleTablePagination = (page: number) => {
 }
 
 const goToNew = () => {
-  router.push({ name: 'Nueva Notificación' })
+  newNotificationModalRef.value?.openModal()
 }
 
 const fetchData = () => {
   // TODO: Lógica para hacer la petición GET
   search.value = ''
+}
+
+const handleNotificationSubmit = () => {
+  fetchData()
+  newNotificationModalRef.value?.closeModal()
 }
 
 onMounted(() => {
@@ -137,6 +146,17 @@ onMounted(() => {
           @action-click="handleTableAction"
         />
       </div>
+      <Modal
+        ref="newNotificationModalRef"
+        id="newNotificationModal"
+        title="Nueva Notificación"
+        size="lg"
+      >
+        <NotificationForm
+          @close="newNotificationModalRef?.closeModal()"
+          @submit="handleNotificationSubmit"
+        />
+      </Modal>
     </div>
   </DashboardLayout>
 </template>
