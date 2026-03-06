@@ -156,7 +156,7 @@ const handleTablePagination = (page: number) => {
 }
 
 const goToNew = () => {
-  router.push({ name: 'Nuevo Concesionario' })
+  router.push({ name: 'Nueva Farmacia' })
 }
 
 const fetchData = () => {
