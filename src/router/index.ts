@@ -11,6 +11,7 @@ import notificationsRoutes from './routes/notifications'
 import usersRoutes from './routes/users'
 import operatorsRoutes from './routes/operators'
 import administratorsRoutes from './routes/administrators'
+import settingsRoutes from './routes/settings'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -33,6 +34,7 @@ const router = createRouter({
     ...usersRoutes,
     ...operatorsRoutes,
     ...administratorsRoutes,
+    ...settingsRoutes,
     // Catch-all 404 route (must be last)
     {
       path: '/:pathMatch(.*)*',

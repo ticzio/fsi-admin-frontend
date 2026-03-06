@@ -60,6 +60,34 @@ export const TITLE_SECTION_COMPONENT = {
     new: 'Nuevo administrador',
     newDescription: 'Aquí puedes crear un nuevo administrador con toda la información necesaria.',
   },
+  missions: {
+    title: 'Misiones',
+    description: 'Lista de misiones',
+    details: 'Detalles de la misión',
+    new: 'Nueva misión',
+    newDescription: 'Aquí puedes crear una nueva misión con toda la información necesaria.',
+  },
+  levels: {
+    title: 'Niveles',
+    description: 'Lista de niveles',
+    details: 'Detalles del nivel',
+    new: 'Nuevo nivel',
+    newDescription: 'Aquí puedes crear un nuevo nivel con toda la información necesaria.',
+  },
+  banners: {
+    title: 'Banners Publicitarios',
+    description: 'Lista de banners',
+    details: 'Detalles del banner',
+    new: 'Nuevo banner',
+    newDescription: 'Aquí puedes crear un nuevo banner con toda la información necesaria.',
+  },
+  cities: {
+    title: 'Ciudades',
+    description: 'Lista de ciudades',
+    details: 'Detalles de la ciudad',
+    new: 'Nueva ciudad',
+    newDescription: 'Aquí puedes crear una nueva ciudad con toda la información necesaria.',
+  },
 }
 
 export type TitleSectionKey = keyof typeof TITLE_SECTION_COMPONENT
@@ -212,6 +240,24 @@ export const TABLE_HEADERS = {
   ],
 
   // Nuevas secciones de settings
+  missions: [
+    ...maybeId('id'),
+    { key: 'name', label: 'Nombre' },
+    { key: 'description', label: 'Descripción' },
+    { key: 'active', label: 'Estatus' },
+  ],
+  levels: [
+    ...maybeId('id'),
+    { key: 'name', label: 'Nombre' },
+    { key: 'required_points', label: 'Puntos Requeridos' },
+    { key: 'active', label: 'Estatus' },
+  ],
+  banners: [
+    ...maybeId('id'),
+    { key: 'url_image', label: 'Imagen' },
+    { key: 'title', label: 'Título' },
+    { key: 'active', label: 'Estatus' },
+  ],
   vehicle_type: [
     ...maybeId('id'),
     { key: 'name', label: 'Nombre' },

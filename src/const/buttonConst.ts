@@ -15,6 +15,9 @@ const BUTTON_TOOLTIPS = {
   notification: 'Nueva notificación',
   // Nuevos contextos de settings
   cities: 'Nueva ciudad',
+  missions: 'Nueva misión',
+  levels: 'Nuevo nivel',
+  banners: 'Nuevo banner',
   role: 'Nuevo rol',
   state: 'Nuevo estado',
   typeEnvironment: 'Nuevo tipo de entorno',
