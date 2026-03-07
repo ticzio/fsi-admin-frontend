@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import fsiLogoImage from '@/assets/images/login/login_logo_FSI.png'
 
 interface TitleSectionProps {
@@ -9,11 +11,18 @@ interface TitleSectionProps {
   showLogo?: boolean
 }
 defineProps<TitleSectionProps>()
+
+const route = useRoute()
+
+const showBackButton = computed(() => {
+  const pathSegments = route.path.toLowerCase().split('/')
+  return pathSegments.includes('edit') || pathSegments.includes('new')
+})
 </script>
 
 <template>
   <div
-    class="mb-3 mb-lg-4 pb-2 pb-lg-3 d-flex flex-column flex-lg-row justify-content-between align-items-center gap-3"
+    class="w-100 mb-3 mb-lg-4 pb-2 pb-lg-3 d-flex flex-column flex-lg-row justify-content-between align-items-start gap-4"
   >
     <div class="d-flex flex-column flex-sm-row align-items-center gap-3 text-center text-sm-start">
       <img
@@ -58,9 +67,8 @@ defineProps<TitleSectionProps>()
         </div>
       </div>
     </div>
-    <!-- 
-   
-    <div class="mt-2 mt-lg-0">
+
+    <div v-if="showBackButton" class="mt-2 mt-lg-0">
       <button
         class="btn btn-outline-secondary border-radius-left border-radius-right px-4"
         @click="$router.go(-1)"
@@ -68,6 +76,5 @@ defineProps<TitleSectionProps>()
         <i class="bi bi-arrow-left"></i> Volver
       </button>
     </div>
-      -->
   </div>
 </template>
