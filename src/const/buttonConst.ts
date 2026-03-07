@@ -6,14 +6,11 @@ export type ButtonConfig = {
 const BUTTON_TOOLTIPS = {
   pharmacy: 'Nueva farmacia',
   filter: 'Limpiar filtros y recargar tabla',
-  client: 'Nuevo cliente',
-  vehicle: 'Nuevo vehículo',
-  administrator: 'Nuevo gerente',
+  administrator: 'Nuevo administrador',
   news: 'Nueva noticia',
   notification: 'Nueva notificación',
   user: 'Nuevo usuario',
   operator: 'Nuevo operador',
-
   // Nuevos contextos de settings
   cities: 'Nueva ciudad',
   missions: 'Nueva misión',
