@@ -26,9 +26,28 @@ export default [
       },
       {
         path: 'operators-pharmacies',
-        name: 'Operadores de la Farmacia',
-        component: () => import('../../views/pharmacies/operators-pharmacies/List.vue'),
+        component: () => import('../../views/pharmacies/operators-pharmacies/Orchestrator.vue'), // Assuming an orchestrator or simple router-view
         meta: { requiresAuth: true },
+        children: [
+          {
+            path: '',
+            name: 'Operadores de la Farmacia',
+            component: () => import('../../views/pharmacies/operators-pharmacies/List.vue'),
+            meta: { requiresAuth: true },
+          },
+          {
+            path: 'new',
+            name: 'Nuevo Operador de la Farmacia',
+            component: () => import('../../views/pharmacies/operators-pharmacies/New.vue'),
+            meta: { requiresAuth: true },
+          },
+          {
+            path: 'edit/:id',
+            name: 'Editar Operador de la Farmacia',
+            component: () => import('../../views/pharmacies/operators-pharmacies/Edit.vue'),
+            meta: { requiresAuth: true },
+          },
+        ],
       },
       {
         path: 'template-pharmacies',
