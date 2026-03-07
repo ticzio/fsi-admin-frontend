@@ -6,6 +6,8 @@ import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import Modal from '@/components/common/Modal.vue'
+import NewsForm from '@/components/News/NewsForm.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -55,9 +57,29 @@ const pagination = reactive({
   limit: TABLE_PAGINATION.limit,
 })
 
-const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
+// === Modal & Form Logic ===
+const formModal = ref<InstanceType<typeof Modal> | null>(null)
+const isEditingForm = ref(false)
+const formData = ref<any>(null)
+
+const openModal = (isEdit = false, data = null) => {
+  isEditingForm.value = isEdit
+  formData.value = data
+  formModal.value?.openModal()
+}
+
+const handleFormSubmit = (data: any) => {
+  console.log('Form data to submit:', data)
+  // TODO: Agregar lógica real para POST/PUT cuando esté disponible
+  swalToast.showSuccess(
+    isEditingForm.value ? 'Noticia actualizada correctamente' : 'Noticia creada correctamente',
+  )
+  formModal.value?.closeModal()
+}
+
+const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
-    router.push(`/news/edit/${item.id}`)
+    openModal(true, item)
   }
 }
 
@@ -74,7 +96,7 @@ const handleTablePagination = (page: number) => {
 }
 
 const goToNew = () => {
-  router.push({ name: 'Nueva Noticia' })
+  openModal(false, null)
 }
 
 const fetchData = () => {
@@ -136,6 +158,23 @@ onMounted(() => {
           @action-click="handleTableAction"
         />
       </div>
+
+      <!-- Componente Modal para el Formulario de Noticia -->
+      <Modal
+        id="newsFormModal"
+        ref="formModal"
+        size="xl"
+        :title="isEditingForm ? 'Editar Noticia' : 'Crear Nueva Noticia'"
+        :scrollable="true"
+      >
+        <NewsForm
+          v-if="formModal"
+          :is-editing="isEditingForm"
+          :initial-data="formData"
+          @submit="handleFormSubmit"
+          @cancel="formModal?.closeModal()"
+        />
+      </Modal>
     </div>
   </DashboardLayout>
 </template>

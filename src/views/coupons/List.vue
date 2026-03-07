@@ -32,19 +32,25 @@ const items = ref<Item[]>([
   {
     id: 1,
     code: 'CUP-001',
-    title: 'Descuento 10%',
+    name: 'Descuento 10%',
     description: 'Cupón de descuento del 10%',
-    discount: '10%',
-    expiration_date: '2026-12-31',
+    id_level: 1,
+    url_img: 'https://via.placeholder.com/150',
+    start_date: '2026-01-01',
+    finish_date: '2026-12-31',
+    timestamp: '2026-01-01T12:00:00Z',
     active: true,
   },
   {
     id: 2,
     code: 'CUP-002',
-    title: 'Descuento 20%',
+    name: 'Descuento 20%',
     description: 'Cupón de descuento del 20%',
-    discount: '20%',
-    expiration_date: '2026-06-30',
+    id_level: 2,
+    url_img: 'https://via.placeholder.com/150',
+    start_date: '2026-06-01',
+    finish_date: '2026-06-30',
+    timestamp: '2026-06-01T12:00:00Z',
     active: false,
   },
 ])
@@ -105,9 +111,9 @@ onMounted(() => {
             id="coupons-search"
             v-model="search"
             label="Buscar por:"
-            placeholder="Código o título del cupón"
+            placeholder="Código o nombre del cupón"
             :loading="loading"
-            :infoTexts="['Puedes buscar por código', 'Puedes buscar por título del cupón']"
+            :infoTexts="['Puedes buscar por código', 'Puedes buscar por nombre del cupón']"
           />
         </div>
 
@@ -130,7 +136,7 @@ onMounted(() => {
       >
         <CustomTable
           :data="items"
-          :headers="TABLE_HEADERS.concessionaire"
+          :headers="TABLE_HEADERS.coupons"
           :actions="getTableActions"
           :is-loading="loading"
           :current-page="pagination.currentPage"

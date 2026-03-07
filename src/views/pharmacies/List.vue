@@ -53,45 +53,72 @@ const loading = ref(false)
 const concessionaires = ref<Item[]>([
   {
     id: 1,
+    name: 'Farmatodo',
+    ubication: 'Caracas, Distrito Capital',
+    id_type_city: 1,
+    url_image: '',
+    description: 'Cadena de farmacias líder en Venezuela',
+    url_instagram: 'https://instagram.com/farmatodo',
+    url_google_map: 'https://maps.google.com/?q=10.4806,-66.9036',
+    lat: 10.4806,
+    lon: -66.9036,
+    opening_week: '07:00 AM',
+    close_week: '10:00 PM',
+    opening_saturday: '08:00 AM',
+    close_saturday: '09:00 PM',
+    opening_sunday: '08:00 AM',
+    close_sunday: '08:00 PM',
+    url_whatsapp: 'https://wa.me/581234567890',
     code: 'FARM-001',
-    url_logo: '',
-    business_name: 'Farmatodo C.A',
-    trade_name: 'Farmatodo',
-    rif: 'J-00000001-1',
     phone: '+58 212 123 4567',
-    address: 'Caracas, Distrito Capital',
-    id_city: 1,
-    latitude: 10.4806,
-    longitude: -66.9036,
     active: true,
+    timestamp: '2023-10-01T12:00:00Z',
   },
   {
     id: 2,
+    name: 'Locatel',
+    ubication: 'Chacao, Miranda',
+    id_type_city: 2,
+    url_image: '',
+    description: 'Farmacia y equipos médicos',
+    url_instagram: 'https://instagram.com/locatel',
+    url_google_map: 'https://maps.google.com/?q=10.4916,-66.8524',
+    lat: 10.4916,
+    lon: -66.8524,
+    opening_week: '08:00 AM',
+    close_week: '09:00 PM',
+    opening_saturday: '09:00 AM',
+    close_saturday: '08:00 PM',
+    opening_sunday: '09:00 AM',
+    close_sunday: '06:00 PM',
+    url_whatsapp: 'https://wa.me/581234567891',
     code: 'FARM-002',
-    url_logo: '',
-    business_name: 'Locatel C.A',
-    trade_name: 'Locatel',
-    rif: 'J-00000002-2',
     phone: '+58 212 987 6543',
-    address: 'Chacao, Miranda',
-    id_city: 2,
-    latitude: 10.4916,
-    longitude: -66.8524,
     active: false,
+    timestamp: '2023-10-02T12:00:00Z',
   },
   {
     id: 3,
+    name: 'Farmahorro',
+    ubication: 'Baruta, Miranda',
+    id_type_city: 3,
+    url_image: '',
+    description: 'Red de farmacias con excelentes precios',
+    url_instagram: 'https://instagram.com/farmahorro',
+    url_google_map: 'https://maps.google.com/?q=10.4447,-66.8687',
+    lat: 10.4447,
+    lon: -66.8687,
+    opening_week: '07:30 AM',
+    close_week: '08:30 PM',
+    opening_saturday: '08:30 AM',
+    close_saturday: '07:30 PM',
+    opening_sunday: '08:30 AM',
+    close_sunday: '05:00 PM',
+    url_whatsapp: 'https://wa.me/581234567892',
     code: 'FARM-003',
-    url_logo: '',
-    business_name: 'Farmahorro C.A',
-    trade_name: 'Farmahorro',
-    rif: 'J-00000003-3',
     phone: '+58 212 111 2222',
-    address: 'Baruta, Miranda',
-    id_city: 3,
-    latitude: 10.4447,
-    longitude: -66.8687,
     active: true,
+    timestamp: '2023-10-03T12:00:00Z',
   },
 ])
 const selectedCity = ref<Item | null>(null)
@@ -130,16 +157,16 @@ const handleStateChange = async () => {
 }
 
 const showAddressInfo = async (item: any) => {
-  const address = item.address || 'Sin dirección registrada'
-  const idCity = item.id_city
+  const address = item.ubication || 'Sin ubicación registrada'
+  const idCity = item.id_type_city
 
   await showLocationInfo({
     idCity,
-    title: 'Ubicación del concesionario',
+    title: 'Ubicación de la farmacia',
     subtitle: 'Revisa la información de ubicación:',
     address,
-    latitude: item.latitude,
-    longitude: item.longitude,
+    latitude: item.lat,
+    longitude: item.lon,
     showAddress: true,
     showMapsLink: true,
     enableCopy: true,
@@ -256,7 +283,7 @@ watch(selectedState, () => {
       >
         <CustomTable
           :data="concessionaires"
-          :headers="TABLE_HEADERS.concessionaire"
+          :headers="TABLE_HEADERS.pharmacy"
           :actions="getTableActions"
           :is-loading="loading"
           :current-page="pagination.currentPage"
@@ -266,7 +293,7 @@ watch(selectedState, () => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
-          <template #cell(url_logo)="{ value }">
+          <template #cell(url_image)="{ value }">
             <img
               :src="value || defaultProfileImage"
               :alt="value || 'imagen'"
@@ -278,7 +305,7 @@ watch(selectedState, () => {
           <template #cell(active)="{ value }">
             <StatusBadge :value="value" />
           </template>
-          <template #cell(address)="{ item }">
+          <template #cell(ubication)="{ item }">
             <button
               class="btn btn-sm btn-primary border-0 rounded-pill"
               @click="showAddressInfo(item)"

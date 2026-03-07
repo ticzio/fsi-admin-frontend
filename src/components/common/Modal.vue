@@ -19,6 +19,10 @@ const props = defineProps({
     type: String,
     default: '', // e.g. 'bg-light', 'bg-dark', 'bg-primary'
   },
+  scrollable: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 // Mapeo de tamaños de Bootstrap
@@ -72,7 +76,10 @@ defineExpose({ openModal, closeModal })
     :aria-labelledby="`${id}Label`"
     aria-hidden="true"
   >
-    <div class="modal-dialog modal-dialog-centered" :class="sizeClass">
+    <div
+      class="modal-dialog modal-dialog-centered"
+      :class="[sizeClass, { 'modal-dialog-scrollable': scrollable }]"
+    >
       <div class="modal-content border-0 shadow-lg rounded-4" :class="background">
         <div class="modal-header border-bottom-0 pb-0">
           <h5 class="modal-title fw-bold" :id="`${id}Label`" v-if="title">
