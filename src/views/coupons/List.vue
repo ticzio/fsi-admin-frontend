@@ -6,6 +6,8 @@ import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import Modal from '@/components/common/Modal.vue'
+import CouponForm from '@/components/Coupons/CouponForm.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -63,9 +65,19 @@ const pagination = reactive({
   limit: TABLE_PAGINATION.limit,
 })
 
+const couponModalDialog = ref<InstanceType<typeof Modal> | null>(null)
+const selectedCoupon = ref<Item | null>(null)
+const isModalReadOnly = ref(true) // Start read-only when viewing
+
 const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
-  if (actionName === 'edit') {
-    router.push(`/coupons/edit/${item.id}`)
+  if (actionName === 'edit' || actionName === 'view') {
+    // Support generic view or edit
+    selectedCoupon.value = { ...item }
+    isModalReadOnly.value = actionName === 'view'
+    couponModalDialog.value?.openModal()
+  } else if (actionName === 'edit') {
+    // Optional: router.push(`/coupons/edit/${item.id}`) if a different flow exists.
+    // Using modal for now
   }
 }
 
@@ -121,10 +133,11 @@ onMounted(() => {
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
           <FetchButton @fetch="fetchData" />
-          <RedirectButton
+          <!--  <RedirectButton
             :tooltip-title="BUTTONS_TOOLTIPS.concessionaire.tooltipTitle"
             @redirect="goToNew"
           />
+           -->
         </div>
       </div>
 
@@ -147,6 +160,16 @@ onMounted(() => {
           @action-click="handleTableAction"
         />
       </div>
+
+      <!-- Modal Detalles de Cupón -->
+      <Modal
+        id="couponDetailsModal"
+        ref="couponModalDialog"
+        :title="'Detalles del Cupón'"
+        size="lg"
+      >
+        <CouponForm :initial-data="selectedCoupon" :readOnly="isModalReadOnly" />
+      </Modal>
     </div>
   </DashboardLayout>
 </template>

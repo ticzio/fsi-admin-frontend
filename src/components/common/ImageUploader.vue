@@ -31,33 +31,89 @@
       <i
         v-if="!imageUrl"
         :class="[
-          'text-black text-opacity-50 bi-file-earmark-arrow-up  w-100 h-100 d-flex align-items-center justify-content-center rounded-4',
+          'text-black text-opacity-50 bi-file-earmark-arrow-up w-100 h-100 d-flex align-items-center justify-content-center rounded-4',
           { border: !props.round },
         ]"
         style="font-size: 3rem"
       ></i>
-      <div v-else class="image-upload-preview">
-        <div v-if="props.round">
-          <img :src="imageUrl" alt="Selected Image" class="circular-image" />
+      <div v-else class="image-upload-preview w-100 h-100">
+        <div v-if="props.round" class="w-100 h-100">
+          <img
+            :src="imageUrl"
+            alt="Selected Image"
+            class="circular-image"
+            @error="imageError = true"
+            v-show="!imageError"
+          />
+          <div
+            v-if="imageError"
+            class="circular-image d-flex align-items-center justify-content-center bg-light border"
+          >
+            <i class="bi bi-image text-secondary" style="font-size: 2rem"></i>
+          </div>
         </div>
-        <div v-else class="rectangular-image-container flex-column pb-2">
-          <img :src="imageUrl" alt="Selected Image" class="rectangular-image" v-if="!isDisabled" />
+        <div v-else class="rectangular-image-container flex-column pb-2 w-100 h-100">
+          <img
+            :src="imageUrl"
+            alt="Selected Image"
+            class="rectangular-image"
+            v-if="!isDisabled"
+            @error="imageError = true"
+            v-show="!imageError"
+          />
+          <div
+            v-if="imageError"
+            class="d-flex flex-column align-items-center justify-content-center w-100 h-100 text-black text-opacity-50"
+          >
+            <i class="bi bi-image" style="font-size: 3rem"></i>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Cuando está deshabilitado, mostramos solo la vista previa -->
-    <div v-else>
-      <div v-if="imageUrl" class="image-upload-preview w-100">
-        <div v-if="props.round">
-          <img :src="imageUrl" alt="Selected Image" class="circular-image" />
+    <div v-else class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+      <div v-if="imageUrl" class="image-upload-preview w-100 h-100">
+        <div v-if="props.round" class="w-100 h-100">
+          <img
+            :src="imageUrl"
+            alt="Selected Image"
+            class="circular-image"
+            @error="imageError = true"
+            v-show="!imageError"
+          />
+          <div
+            v-if="imageError"
+            class="circular-image d-flex align-items-center justify-content-center bg-transparent"
+          >
+            <i class="bi bi-image text-secondary" style="font-size: 2rem"></i>
+          </div>
         </div>
-        <div v-else class="rectangular-image-container pb-2">
-          <img :src="imageUrl" alt="Selected Image" class="rectangular-image" />
+        <div
+          v-else
+          class="rectangular-image-container pb-2 h-100 d-flex flex-column align-items-center justify-content-center"
+        >
+          <img
+            :src="imageUrl"
+            alt="Selected Image"
+            class="rectangular-image"
+            @error="imageError = true"
+            v-show="!imageError"
+          />
+          <div
+            v-if="imageError"
+            class="d-flex flex-column align-items-center justify-content-center w-100 h-100 text-black text-opacity-50"
+          >
+            <i class="bi bi-image" style="font-size: 4rem; opacity: 0.5"></i>
+          </div>
         </div>
       </div>
-      <div v-else class="text-center text-black text-opacity-50" style="font-size: 0.8rem">
-        <p>Imagen deshabilitada</p>
+      <div
+        v-else
+        class="text-center text-black text-opacity-50 d-flex flex-column align-items-center justify-content-center w-100 h-100"
+        style="font-size: 0.8rem"
+      >
+        <i class="bi bi-image" style="font-size: 4rem; opacity: 0.5; margin-bottom: 0.5rem"></i>
       </div>
     </div>
 
@@ -70,11 +126,19 @@
     </button>
 
     <div
-      v-else-if="imageUrl || !props.inputDisabled"
+      v-else-if="!props.inputDisabled || !imageUrl || imageError"
       class="text-center text-black text-opacity-50"
-      style="font-size: 0.8rem"
+      style="font-size: 0.8rem; margin-top: 0.2rem"
     >
-      <p>{{ props.placeholder }}</p>
+      <p class="mb-0">
+        {{
+          (!imageUrl || imageError) && props.inputDisabled
+            ? props.placeholder
+            : !props.inputDisabled
+              ? props.placeholder
+              : ''
+        }}
+      </p>
     </div>
 
     <div
@@ -118,7 +182,7 @@ const props = withDefaults(
     acceptedFormats: 'image/png, image/jpeg, image/jpg',
     maxSizeMB: 3,
     placeholder: 'Haz click para subir una imagen',
-  }
+  },
 )
 const emit = defineEmits<(e: 'update:modelValue', value: File | null) => void>()
 
@@ -130,6 +194,14 @@ const imageUrl = ref<string | null>(props.initialImageUrl || null)
 const uniqueId = ref<string>(generateUniqueId())
 const instanceId = ref<string>(generateUniqueId())
 const errorMsg = ref<string | null>(null)
+const imageError = ref<boolean>(false)
+
+watch(
+  () => imageUrl.value,
+  () => {
+    imageError.value = false
+  },
+)
 
 const loading = computed(() => store.state.request?.loading)
 const isDisabled = ref(false)
@@ -162,14 +234,14 @@ watch(
     } else if (!newVal) {
       imageUrl.value = props.initialImageUrl || null
     }
-  }
+  },
 )
 
 watch(
   () => props.initialImageUrl,
   () => {
     setImageFromProps()
-  }
+  },
 )
 
 onMounted(() => {
