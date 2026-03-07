@@ -88,6 +88,13 @@ export const TITLE_SECTION_COMPONENT = {
     new: 'Nueva ciudad',
     newDescription: 'Aquí puedes crear una nueva ciudad con toda la información necesaria.',
   },
+  template_pharmacies: {
+    title: 'Plantillas de Farmacias',
+    description: 'Lista de plantillas de farmacias',
+    details: 'Detalles de la plantilla',
+    new: 'Nueva plantilla',
+    newDescription: 'Aquí puedes crear una nueva plantilla con toda la información necesaria.',
+  },
 }
 
 export type TitleSectionKey = keyof typeof TITLE_SECTION_COMPONENT
@@ -187,6 +194,12 @@ export const TABLE_HEADERS = {
     ...maybeId('id'),
     { key: 'url_image', label: 'Imagen' },
     { key: 'title', label: 'Título' },
+    { key: 'active', label: 'Estatus' },
+  ],
+  template_pharmacies: [
+    ...maybeId('id'),
+    { key: 'title', label: 'Título' },
+    { key: 'description', label: 'Descripción' },
     { key: 'active', label: 'Estatus' },
   ],
 }

@@ -132,14 +132,14 @@ const pagination = reactive({
   limit: TABLE_PAGINATION.limit,
 })
 
-const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
+const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
     if (!item.active) {
       swalToast.showError(ERROR.errorEdited)
       return
     }
 
-    router.push(`/concessionaire/edit/${item.id}/detail-concessionaire`)
+    router.push(`/pharmacy/edit/${item.id}/detail-pharmacies`)
   }
 }
 
