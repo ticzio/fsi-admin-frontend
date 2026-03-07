@@ -120,7 +120,7 @@ onMounted(() => {
         >
           <FetchButton @fetch="fetchData" />
           <RedirectButton
-            :tooltip-title="BUTTONS_TOOLTIPS.administrator.tooltipTitle"
+            :tooltip-title="BUTTONS_TOOLTIPS.operator.tooltipTitle"
             @redirect="goToNew"
           />
         </div>

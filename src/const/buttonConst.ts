@@ -6,13 +6,14 @@ export type ButtonConfig = {
 const BUTTON_TOOLTIPS = {
   pharmacy: 'Nueva farmacia',
   filter: 'Limpiar filtros y recargar tabla',
-  concessionaire: 'Nuevo concesionario',
-  company: 'Nueva empresa',
   client: 'Nuevo cliente',
   vehicle: 'Nuevo vehículo',
   administrator: 'Nuevo gerente',
   news: 'Nueva noticia',
   notification: 'Nueva notificación',
+  user: 'Nuevo usuario',
+  operator: 'Nuevo operador',
+
   // Nuevos contextos de settings
   cities: 'Nueva ciudad',
   missions: 'Nueva misión',
@@ -20,17 +21,6 @@ const BUTTON_TOOLTIPS = {
   banners: 'Nuevo banner',
   role: 'Nuevo rol',
   state: 'Nuevo estado',
-  typeEnvironment: 'Nuevo tipo de entorno',
-  typeFuel: 'Nuevo tipo de combustible',
-  typeTransmission: 'Nuevo tipo de transmisión',
-  typeEngine: 'Nuevo tipo de motor',
-  typeColor: 'Nuevo color',
-  typeBrake: 'Nuevo tipo de freno',
-  typeVehicle: 'Nuevo tipo de vehículo',
-  typePurchase: 'Nuevo tipo de compra',
-  typeService: 'Nuevo tipo de servicio',
-  typeNotification: 'Nuevo tipo de notificación',
-  concessionaireService: 'Nuevo servicio',
 } as const
 
 export type ButtonKey = keyof typeof BUTTON_TOOLTIPS
