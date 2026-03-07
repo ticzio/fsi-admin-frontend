@@ -1,17 +1,15 @@
 <script setup lang="ts">
 // ScrollableTabs.vue - Componente reutilizable de tabs con scroll horizontal y centrado automático
-// Props:
-// - tabs: Array<{ label: string, path: string }>
-// - activeTab: number (índice del tab activo)
-// Emits:
-// - tab-change: (index: number) => void
-// Uso:
-// <ScrollableTabs
-//   :tabs="tabRoutes"
-//   :activeTab="activeTab"
-//   @tab-change="selectTab"
-// />
-import { ref, nextTick, watch, type ComponentPublicInstance } from 'vue'
+// Rediseñado con estética premium y animación de slider tipo AnalyticsTabs.vue
+import {
+  ref,
+  nextTick,
+  watch,
+  computed,
+  onMounted,
+  onBeforeUnmount,
+  type ComponentPublicInstance,
+} from 'vue'
 
 const props = defineProps<{
   tabs: { label: string; path: string }[]
@@ -26,8 +24,29 @@ const emit = defineEmits<{
 const tabRefs = ref<(HTMLElement | null)[]>([])
 const tabListRef = ref<HTMLElement | null>(null)
 
+// Slider state
+const sliderStyle = ref({
+  width: '0px',
+  transform: 'translateX(0px)',
+  opacity: 0,
+})
+
 function setTabRef(el: Element | ComponentPublicInstance | null, index: number) {
   tabRefs.value[index] = el instanceof Element ? (el as HTMLElement) : null
+}
+
+function updateSlider() {
+  nextTick(() => {
+    const activeElement = tabRefs.value[props.activeTab]
+    if (!activeElement || !tabListRef.value) return
+
+    const { offsetLeft, offsetWidth } = activeElement
+    sliderStyle.value = {
+      width: `${offsetWidth}px`,
+      transform: `translateX(${offsetLeft}px)`,
+      opacity: 1,
+    }
+  })
 }
 
 function scrollToActiveTab() {
@@ -35,6 +54,7 @@ function scrollToActiveTab() {
     const activeElement = tabRefs.value[props.activeTab]
     const container = tabListRef.value
     if (!activeElement || !container) return
+
     const containerRect = container.getBoundingClientRect()
     const activeElementRect = activeElement.getBoundingClientRect()
     const offset =
@@ -43,6 +63,8 @@ function scrollToActiveTab() {
       containerRect.width / 2 +
       activeElementRect.width / 2
     container.scrollBy({ left: offset, behavior: 'smooth' })
+
+    updateSlider()
   })
 }
 
@@ -51,96 +73,116 @@ watch(
   () => {
     scrollToActiveTab()
   },
-  { immediate: true }
+  { immediate: true },
 )
+
+// Re-calculate slider on window resize
+onMounted(() => {
+  window.addEventListener('resize', updateSlider)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateSlider)
+})
 </script>
 
 <template>
-  <!-- Ejemplo de uso y documentación:
-    <ScrollableTabs
-      :tabs="tabRoutes"
-      :activeTab="activeTab"
-      @tab-change="selectTab"
-    />
-  -->
-  <ul
-    class="nav nav-tabs mb-3 flex-nowrap overflow-auto"
-    role="tablist"
-    ref="tabListRef"
-    id="tabs-scroll"
-    style="white-space: nowrap"
+  <div
+    class="tabs-container bg-white p-1 rounded-pill shadow-sm border mb-3 position-relative overflow-hidden"
   >
-    <!-- Skeleton de carga -->
-    <template v-if="isLoading">
-      <li
-        class="nav-item placeholder-glow"
-        v-for="n in skeletonCount || 4"
-        :key="'skeleton-' + n"
-        style="display: inline-block"
-      >
-        <span
-          class="placeholder rounded-pill bg-secondary d-inline-block mx-3"
-          style="width: 190px; height: 36px"
-        ></span>
-      </li>
-    </template>
-    <!-- Tabs reales -->
-    <template v-else>
-      <li
-        class="nav-item"
-        v-for="(tab, index) in tabs"
-        :key="tab.path"
-        role="presentation"
-        :ref="(el) => setTabRef(el, index)"
-        style="display: inline-block"
-      >
-        <button
-          class="nav-link text-opacity-50 fw-normal fs-5"
-          :class="activeTab === index ? 'active fw-bold' : 'text-dark'"
-          @click="$emit('tab-change', index)"
-          type="button"
-          role="tab"
+    <ul
+      class="nav nav-pills flex-nowrap overflow-auto position-relative"
+      role="tablist"
+      ref="tabListRef"
+      id="tabs-scroll"
+      style="white-space: nowrap"
+    >
+      <!-- Active Tab Slider (Indicador animado) -->
+      <div class="nav-slider-bg" :style="sliderStyle"></div>
+
+      <!-- Skeleton de carga -->
+      <template v-if="isLoading">
+        <li
+          class="nav-item placeholder-glow"
+          v-for="n in skeletonCount || 4"
+          :key="'skeleton-' + n"
+          style="display: inline-block; z-index: 2"
         >
-          {{ tab.label }}
-        </button>
-      </li>
-    </template>
-  </ul>
+          <span
+            class="placeholder rounded-pill bg-secondary d-inline-block mx-2"
+            style="width: 150px; height: 38px"
+          ></span>
+        </li>
+      </template>
+
+      <!-- Tabs reales -->
+      <template v-else>
+        <li
+          class="nav-item"
+          v-for="(tab, index) in tabs"
+          :key="tab.path"
+          role="presentation"
+          :ref="(el) => setTabRef(el, index)"
+          style="display: inline-block; z-index: 2"
+        >
+          <button
+            class="nav-link rounded-pill py-2 px-4 fw-bold border-0 bg-transparent w-100 fs-6 transition-all"
+            :class="activeTab === index ? 'active text-white' : 'text-secondary'"
+            @click="$emit('tab-change', index)"
+            type="button"
+            role="tab"
+          >
+            {{ tab.label }}
+          </button>
+        </li>
+      </template>
+    </ul>
+  </div>
 </template>
 
 <style scoped>
-.nav-link {
-  color: var(--bs-primary);
-  border: none;
-  padding-bottom: 0;
-  padding-left: 0;
-  padding-right: 0;
-  margin-left: 1rem;
-  margin-right: 1rem;
-  margin-bottom: 2px;
-  font-weight: 400;
+.tabs-container {
+  max-width: 100%;
 }
-.nav-link.active {
-  color: var(--bs-primary) !important;
-  border: none !important;
-  padding-bottom: 0;
+
+.nav-pills .nav-link {
+  color: #6c757d;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  box-shadow: none !important;
 }
-.nav-link.active::after {
-  content: '';
-  display: block;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  position: relative;
-  z-index: 3;
-  width: 100%;
-  height: 5px;
-  background-color: var(--bs-secondary);
-  bottom: -2px;
+
+.nav-pills .nav-link.active {
+  background: transparent !important;
+}
+
+.nav-pills .nav-link:not(.active):hover {
+  color: #0d6efd;
+}
+
+/* Slider Background */
+.nav-slider-bg {
+  position: absolute;
+  top: 0;
   left: 0;
+  height: 100%;
+  background-color: #0d6efd;
+  border-radius: 50rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 10px rgba(13, 110, 253, 0.2);
+  z-index: 1;
 }
 
 #tabs-scroll {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE 10+ */
+}
+
+#tabs-scroll::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+.transition-all {
+  transition: all 0.3s ease;
 }
 </style>
