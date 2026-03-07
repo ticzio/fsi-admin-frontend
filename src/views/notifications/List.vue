@@ -8,6 +8,7 @@ import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
 import Modal from '@/components/common/Modal.vue'
 import NotificationForm from '@/components/Notifications/NotificationForm.vue'
+import NotificationDetails from '@/components/Notifications/NotificationDetails.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -20,10 +21,17 @@ import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
 
 interface Item {
   id: string | number
+  title: string
+  description: string
+  type_notification?: string
+  type?: string
+  active?: boolean
   [key: string]: any
 }
 
 const newNotificationModalRef = ref<InstanceType<typeof Modal> | null>(null)
+const modalMode = ref<'create' | 'view'>('create')
+const selectedNotification = ref<Item | null>(null)
 
 const router = useRouter()
 const swalToast = useSwalToast()
@@ -37,14 +45,14 @@ const items = ref<Item[]>([
     id: 1,
     title: 'Notificación de ejemplo 1',
     description: 'Descripción de la notificación 1',
-    scheduled_date: '2026-04-01',
+    type_notification: 'email',
     active: true,
   },
   {
     id: 2,
     title: 'Notificación de ejemplo 2',
     description: 'Descripción de la notificación 2',
-    scheduled_date: '2026-05-15',
+    type_notification: 'email',
     active: false,
   },
 ])
@@ -57,9 +65,11 @@ const pagination = reactive({
   limit: TABLE_PAGINATION.limit,
 })
 
-const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
+const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
-    router.push(`/notifications/edit/${item.id}`)
+    modalMode.value = 'view'
+    selectedNotification.value = item
+    newNotificationModalRef.value?.openModal()
   }
 }
 
@@ -76,6 +86,7 @@ const handleTablePagination = (page: number) => {
 }
 
 const goToNew = () => {
+  modalMode.value = 'create'
   newNotificationModalRef.value?.openModal()
 }
 
@@ -149,12 +160,18 @@ onMounted(() => {
       <Modal
         ref="newNotificationModalRef"
         id="newNotificationModal"
-        title="Nueva Notificación"
+        :title="modalMode === 'create' ? 'Nueva Notificación' : 'Detalles de Notificación'"
         size="lg"
       >
         <NotificationForm
+          v-if="modalMode === 'create'"
           @close="newNotificationModalRef?.closeModal()"
           @submit="handleNotificationSubmit"
+        />
+        <NotificationDetails
+          v-else-if="modalMode === 'view'"
+          :notification="selectedNotification"
+          @close="newNotificationModalRef?.closeModal()"
         />
       </Modal>
     </div>
