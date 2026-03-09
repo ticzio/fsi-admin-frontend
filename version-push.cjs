@@ -4,6 +4,13 @@ const { execSync } = require('child_process')
 const readline = require('readline')
 
 const packagePath = './package.json'
+
+// 1. VALIDACIÓN: Existencia del package.json
+if (!fs.existsSync(packagePath)) {
+  console.error('\n❌ ERROR: No se encontró el archivo package.json en el directorio actual.')
+  process.exit(1)
+}
+
 const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf-8'))
 // Dejamos la lectura del entorno/package.json por si Git no tiene tags.
 let currentVersion = process.env.CURRENT_VERSION || packageJson.version
@@ -39,7 +46,7 @@ function askQuestion(query) {
     rl.question(query, (ans) => {
       rl.close()
       resolve(ans)
-    })
+    }),
   )
 }
 
@@ -133,6 +140,48 @@ function isAnythingStaged() {
 }
 
 async function run() {
+  // --- 🛡️ Validaciones Iniciales ---
+  console.log('\n--- 🛡️ **Validaciones Pre-Ejecución** ---')
+
+  // 2. VALIDACIÓN: Identidad en Git
+  try {
+    const name = execSync('git config user.name', { encoding: 'utf8', stdio: 'pipe' }).trim()
+    const email = execSync('git config user.email', { encoding: 'utf8', stdio: 'pipe' }).trim()
+    if (!name || !email) throw new Error('Identidad incompleta')
+  } catch (e) {
+    console.error('\n❌ ERROR: Tu identidad de Git (user.name o user.email) no está configurada.')
+    console.error('Ejecuta: git config --global user.name "Tu Nombre"')
+    console.error('         git config --global user.email "tu@email.com"')
+    process.exit(1)
+  }
+
+  // 3. VALIDACIÓN: Conexión Remota
+  try {
+    console.log('🔄 Validando conexión con el remoto origin...')
+    execSync('git ls-remote --exit-code origin', { stdio: 'ignore' })
+  } catch (e) {
+    console.error(
+      '\n❌ ERROR: No se pudo conectar con origin. Verifica tu conexión a internet o credenciales SSH/HTTPS.',
+    )
+    process.exit(1)
+  }
+
+  // 4. VALIDACIÓN: Estado del Remoto (Up-to-date)
+  try {
+    console.log('🔄 Verificando estado respecto al remoto origin...')
+    execSync('git fetch origin', { stdio: 'ignore' })
+    const status = execSync('git status -uno', { encoding: 'utf8', stdio: 'pipe' })
+    if (status.includes('Your branch is behind')) {
+      console.error('\n❌ ERROR: Tu rama local está por detrás del remoto (behind origin).')
+      console.error('Ejecuta "git pull" para actualizar antes de intentar publicar una versión.')
+      process.exit(1)
+    }
+  } catch (e) {
+    // Si falla por ser una rama que no tiene upstream u otro motivo menor, se ignora
+  }
+
+  console.log('✅ Validaciones iniciales superadas.\n')
+
   // 💡 CAPTURA DE VERSIÓN PARA ROLLBACK Y BASE
   const versionToRevertTo = process.env.CURRENT_VERSION || packageJson.version
   let currentVersion = versionToRevertTo
@@ -174,7 +223,7 @@ async function run() {
     console.log(`✅ **Versión base de Git:** ${currentVersion}`)
   } catch (e) {
     console.log(
-      `❌ **ADVERTENCIA:** No se encontraron tags en Git. Usando versión inicial: ${currentVersion}`
+      `❌ **ADVERTENCIA:** No se encontraron tags en Git. Usando versión inicial: ${currentVersion}`,
     )
   }
 
@@ -183,19 +232,63 @@ async function run() {
     process.exit(1)
   }
 
-  // 🆕 MENÚ DE RAMIFICACIÓN DEL FLUJO CON 3 OPCIONES
+  // 🆕 MENÚ DE RAMIFICACIÓN DEL FLUJO CON 5 OPCIONES
   console.log('\n======================================================')
   console.log('✨ **Elige el Flujo de Publicación** ✨')
   console.log('  1) 🚀 **Subir Versión (Push/Tag)**')
   console.log('  2) 📤 **Commit y Push**')
   console.log('  3) 💾 **Solo Commit Local**')
-  console.log('  4) 🚫 **Cancelar**')
-  const flowChoice = await askQuestion('👉 Ingresa el número de la opción (1, 2, 3 o 4): ')
+  console.log('  4) ⏮️ **Retroceder versión a último Tag remoto**')
+  console.log('  5) 🚫 **Cancelar**')
+  const flowChoice = await askQuestion('👉 Ingresa el número de la opción (1, 2, 3, 4 o 5): ')
   console.log('======================================================')
 
-  if (flowChoice.trim() === '4') {
+  if (flowChoice.trim() === '5') {
     console.log('❌ **Proceso cancelado** por el usuario.')
     return
+  }
+
+  if (flowChoice.trim() === '4') {
+    // NUEVO FLUJO 4: Rollback de versión
+    console.log('\n⏩ **FLUJO SELECCIONADO**: Retroceder versión a último Tag remoto.')
+    try {
+      console.log('🔄 Consultando último tag del remoto...')
+      const remoteTags = execSync('git ls-remote --tags --refs --sort="v:refname" origin', {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      }).trim()
+
+      if (!remoteTags) {
+        console.error('❌ No se encontraron tags en el repositorio remoto.')
+        process.exit(1)
+      }
+
+      const lines = remoteTags.split('\n')
+      const lastLine = lines[lines.length - 1]
+      const lastTagFull = lastLine.split('\t')[1]
+      const lastTag = lastTagFull.replace('refs/tags/', '')
+
+      console.log(`\n🏷️ Último tag remoto encontrado: **${lastTag}**`)
+      const confirmRollback = await askQuestion(
+        `¿Estás seguro de que deseas retroceder el package.json a esta versión? (y/N): `,
+      )
+
+      if (confirmRollback.toLowerCase() === 'y') {
+        const strippedVersion = lastTag.startsWith('v') ? lastTag.substring(1) : lastTag
+        packageJson.version = strippedVersion
+        fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2) + '\n')
+        console.log(`\n✅ ¡package.json actualizado exitosamente a la versión ${strippedVersion}!`)
+        console.log(
+          '💡 La versión ha sido cambiada localmente. Revisa los cambios y haz commit cuando estés listo.',
+        )
+      } else {
+        console.log('⏩ Rollback cancelado.')
+      }
+      return
+    } catch (e) {
+      console.error('\n❌ Error al intentar obtener el último tag del remoto origin.')
+      process.exit(1)
+    }
   }
 
   if (flowChoice.trim() === '2' || flowChoice.trim() === '3') {
@@ -215,7 +308,7 @@ async function run() {
 
       if (hasStagedChanges) {
         const nonVersionCommitMessage = await askQuestion(
-          '💬 Ingresa un **mensaje** para el Commit (obligatorio): '
+          '💬 Ingresa un **mensaje** para el Commit (obligatorio): ',
         )
 
         if (!nonVersionCommitMessage.trim()) {
@@ -228,7 +321,7 @@ async function run() {
         console.log('✅ **Commit completado exitosamente**.')
       } else {
         console.log(
-          'ℹ️ No se detectaron nuevos cambios en el área de trabajo para commitear. Saltando el `git commit`.'
+          'ℹ️ No se detectaron nuevos cambios en el área de trabajo para commitear. Saltando el `git commit`.',
         )
       }
 
@@ -250,6 +343,43 @@ async function run() {
     // ----------------------------------------------------
     // FLUJO 1: Versionado y Publicación (Robustez OK, siempre hay package.json modificado)
     // ----------------------------------------------------
+
+    // 5. VALIDACIÓN: Rama de Trabajo
+    try {
+      const currentBranch = execSync('git rev-parse --abbrev-ref HEAD', {
+        encoding: 'utf8',
+        stdio: 'pipe',
+      }).trim()
+      const allowedBranches = ['main', 'master', 'develop']
+      if (!allowedBranches.includes(currentBranch)) {
+        console.error(`\n❌ ERROR: No puedes publicar versiones desde la rama "${currentBranch}".`)
+        console.error(`Ramas permitidas: ${allowedBranches.join(', ')}`)
+        process.exit(1)
+      }
+    } catch (e) {
+      // Ignorar si falla lectura de rama por estar en detached HEAD, aunque debería fallar el push después.
+    }
+
+    // 6. VALIDACIÓN: Área de Trabajo Limpia
+    try {
+      const statusOut = execSync('git status -s', { encoding: 'utf-8', stdio: 'pipe' }).trim()
+      if (statusOut) {
+        console.log(
+          '\n⚠️ ADVERTENCIA: Tienes archivos modificados o sin seguimiento en tu área de trabajo (ver arriba).',
+        )
+        const proceed = await askQuestion(
+          '¿Seguro que quieres forzarlos TODOS en el commit de la versión? (y/N): ',
+        )
+        if (proceed.toLowerCase() !== 'y') {
+          console.log(
+            '\n❌ Proceso cancelado por el usuario. Limpia tu área de trabajo e inténtalo de nuevo.',
+          )
+          process.exit(0)
+        }
+      }
+    } catch (e) {
+      // Ignorar
+    }
 
     // 2-4. Lógica de incremento y escritura de package.json
     const newMajorP = incrementCustomVersion(currentVersion, 'P')
@@ -288,7 +418,7 @@ async function run() {
     // LÓGICA DE COMMIT FLEXIBLE
     const defaultCommitMessage = `chore: Release ${newVersion}`
     const commitHeader = await askQuestion(
-      `\n💬 Ingresa el **Encabezado del Commit** (Dejar vacío para usar: "${defaultCommitMessage}"): `
+      `\n💬 Ingresa el **Encabezado del Commit** (Dejar vacío para usar: "${defaultCommitMessage}"): `,
     )
     const finalCommitMessage = commitHeader.trim() || defaultCommitMessage
 
@@ -308,7 +438,7 @@ async function run() {
       console.log(`Commit Creado: **${finalCommitMessage}**`)
 
       const confirmPush = await askQuestion(
-        `\n🚀 ¿**Confirmas el Push y Tagueo** (v${newVersion}) para publicar la versión? (y/N): `
+        `\n🚀 ¿**Confirmas el Push y Tagueo** (v${newVersion}) para publicar la versión? (y/N): `,
       )
       console.log('======================================================')
 
@@ -320,12 +450,12 @@ async function run() {
         if (tagExists) {
           console.log(`\n⚠️ El tag **${tagName}** ya existe.`)
           const overwriteTag = await askQuestion(
-            '¿Deseas **sobrescribirlo**? (Esto borrará el tag local y tratará de borrarlo en remoto) (y/N): '
+            '¿Deseas **sobrescribirlo**? (Esto borrará el tag local y tratará de borrarlo en remoto) (y/N): ',
           )
 
           if (overwriteTag.toLowerCase() !== 'y') {
             console.log(
-              '⏩ Push y tagueo **cancelados** porque el tag ya existe. Commit guardado localmente.'
+              '⏩ Push y tagueo **cancelados** porque el tag ya existe. Commit guardado localmente.',
             )
             return
           }
@@ -360,7 +490,7 @@ async function run() {
       // La clave es revertir el package.json que se modificó
       fs.writeFileSync(
         packagePath,
-        JSON.stringify({ ...packageJson, version: versionToRevertTo }, null, 2) + '\n'
+        JSON.stringify({ ...packageJson, version: versionToRevertTo }, null, 2) + '\n',
       )
       process.exit(1)
     }
