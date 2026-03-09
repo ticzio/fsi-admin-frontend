@@ -76,8 +76,20 @@ watch(
   { immediate: true },
 )
 
+watch(
+  () => props.tabs,
+  () => {
+    scrollToActiveTab()
+  },
+  { deep: true },
+)
+
 // Re-calculate slider on window resize
 onMounted(() => {
+  // Inicializar en el montaje
+  scrollToActiveTab()
+  // Forzar un update un momento después para asegurar que los anchos sean correctos tras renderizar
+  setTimeout(updateSlider, 100)
   window.addEventListener('resize', updateSlider)
 })
 
@@ -103,7 +115,7 @@ onBeforeUnmount(() => {
       <!-- Skeleton de carga -->
       <template v-if="isLoading">
         <li
-          class="nav-item placeholder-glow"
+          class="nav-item placeholder-glow position-relative"
           v-for="n in skeletonCount || 4"
           :key="'skeleton-' + n"
           style="display: inline-block; z-index: 2"
@@ -118,7 +130,7 @@ onBeforeUnmount(() => {
       <!-- Tabs reales -->
       <template v-else>
         <li
-          class="nav-item"
+          class="nav-item position-relative"
           v-for="(tab, index) in tabs"
           :key="tab.path"
           role="presentation"
