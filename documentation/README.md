@@ -17,7 +17,8 @@ documentation/
 ├── 01-constants/                # Base: sin dependencias externas
 ├── 02-composables/              # Dependen de constantes y otros composables
 ├── 03-components/               # Dependen de composables y constantes
-└── 04-modules_vuex/             # Store global (Vuex)
+├── 04-modules_vuex/             # Store global (Vuex)
+└── 05-scripts/                  # Scripts de automatización y CI/CD
 ```
 
 ---
@@ -59,6 +60,12 @@ documentation/
 | Archivo                                          | Descripción                    |
 | ------------------------------------------------ | ------------------------------ |
 | [pagination.md](./04-modules_vuex/pagination.md) | Módulo de paginación del store |
+
+### 5. Scripts (`05-scripts/`)
+
+| Archivo                                         | Descripción                                                  |
+| ----------------------------------------------- | ------------------------------------------------------------ |
+| [version-push.md](./05-scripts/version-push.md) | Documentación sobre el script de versionamiento automatizado |
 
 ---
 
@@ -102,4 +109,5 @@ Lista de archivos que lo importan.
 1. Al crear un nuevo **composable**, documéntalo en `02-composables/`.
 2. Al crear un nuevo **componente**, documéntalo en `03-components/`.
 3. Al agregar **constantes**, documéntalas en `01-constants/`.
-4. Siempre incluye la sección **Dependencias** y **Usado por**.
+4. Al agregar **scripts automáticos**, documéntalos en `05-scripts/`.
+5. Siempre incluye la sección **Dependencias** y **Usado por**.

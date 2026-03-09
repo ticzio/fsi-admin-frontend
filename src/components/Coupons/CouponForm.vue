@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, computed } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseTextarea from '@/components/common/BaseTextarea.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
+import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 
 interface CouponData {
   id?: number | string
@@ -91,6 +92,29 @@ watch(
   },
 )
 
+// Niveles disponibles para el Multiselect (Ejemplo de opciones)
+const levelOptions = [
+  { id: 1, name: 'Nivel 1' },
+  { id: 2, name: 'Nivel 2' },
+  { id: 3, name: 'Nivel 3' },
+  { id: 4, name: 'Nivel 4' },
+  { id: 5, name: 'Nivel 5' },
+]
+
+// Computed para manejar el valor del Multiselect (que espera un objeto) basado en id_level
+const selectedLevel = computed({
+  get: () => {
+    return formData.value.id_level
+      ? levelOptions.find((lvl) => lvl.id === Number(formData.value.id_level)) || null
+      : null
+  },
+  set: (val: any) => {
+    formData.value.id_level = val ? val.id : ''
+  },
+})
+
+const isCreationMode = computed(() => !props.initialData || !props.initialData.id)
+
 // Helper methods validación en caso de ser no readOnly
 </script>
 
@@ -124,6 +148,7 @@ watch(
         </div>
 
         <div
+          v-if="!isCreationMode"
           class="d-flex align-items-center justify-content-between p-3 bg-light rounded-3 border"
         >
           <div>
@@ -163,7 +188,7 @@ watch(
         </h6>
 
         <div class="row g-3 mb-1">
-          <div class="col-12 col-sm-4">
+          <div class="col-12 col-sm-4" v-if="!isCreationMode">
             <BaseInput
               id="couponCode"
               v-model="formData.code"
@@ -172,7 +197,7 @@ watch(
               :disabled="readOnly"
             />
           </div>
-          <div class="col-12 col-sm-8">
+          <div :class="isCreationMode ? 'col-12' : 'col-12 col-sm-8'">
             <BaseInput
               id="couponName"
               v-model="formData.name"
@@ -185,12 +210,16 @@ watch(
 
         <div class="row g-3 mb-1">
           <div class="col-12 col-sm-4">
-            <BaseInput
-              id="couponLevel"
-              type="number"
-              v-model="formData.id_level"
+            <MultiselectCustom
+              v-model="selectedLevel"
+              :options="levelOptions"
               label="Nivel Requerido"
-              placeholder="Ej: 1"
+              placeholder="Seleccione un nivel"
+              labelKey="name"
+              iconKey="id"
+              helperType="custom"
+              :showIcons="false"
+              :clearable="true"
               :disabled="readOnly"
             />
           </div>

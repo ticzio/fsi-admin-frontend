@@ -196,6 +196,18 @@ export const TABLE_HEADERS = {
     { key: 'title', label: 'Título' },
     { key: 'active', label: 'Estatus' },
   ],
+  benefitsBanners: [
+    ...maybeId('id'),
+    { key: 'url_image', label: 'Imagen' },
+    { key: 'title', label: 'Título' },
+    { key: 'active', label: 'Estatus' },
+  ],
+  couponsBanners: [
+    ...maybeId('id'),
+    { key: 'url_image', label: 'Imagen' },
+    { key: 'title', label: 'Título' },
+    { key: 'active', label: 'Estatus' },
+  ],
   template_pharmacies: [
     ...maybeId('id'),
     { key: 'title', label: 'Título' },

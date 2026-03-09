@@ -16,6 +16,8 @@ const BUTTON_TOOLTIPS = {
   missions: 'Nueva misión',
   levels: 'Nuevo nivel',
   banners: 'Nuevo banner',
+  benefitsBanners: 'Nuevo banner de beneficio',
+  couponsBanners: 'Nuevo banner de cupón',
   role: 'Nuevo rol',
   state: 'Nuevo estado',
 } as const
