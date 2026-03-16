@@ -51,7 +51,7 @@ export async function InitializeConfig() {
 
     const response = await axios.get(configUrl)
     if (response.status === 200) {
-      configUrl = `${configUrl}api/1.0`
+      configUrl = `${configUrl}api/0.7`
       isApiConnected = true
       console.log(
         `Conectado con el backend.\n${configUrl}\n%cRespuesta: ${JSON.stringify(response.data)}`,
