@@ -14,19 +14,17 @@ import { useTableActions } from '@/composables/useTableActions'
 
 import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
-
-interface Item {
-  id: string | number
-  [key: string]: any
-}
+import { useSwalToast } from '@/composables/useSwalToast'
+import { URLS } from '@/const/api'
 
 const router = useRouter()
 const store = useStore()
+const swalToast = useSwalToast()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
 const loading = ref(false)
-const items = ref<Item[]>([])
+const levels = ref<any[]>([])
 const search = ref('')
 
 const paginationKey = 'levels-list'
@@ -36,9 +34,9 @@ const pagination = reactive({
   limit: TABLE_PAGINATION.limit,
 })
 
-const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
+const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
-    // router.push(`/settings/levels/edit/${item.id}`)
+    router.push(`/settings/levels/edit/${item.id}`)
   }
 }
 
@@ -52,20 +50,44 @@ const handleTablePagination = (page: number) => {
     key: paginationKey,
     currentPage: page,
   })
+  getDataLevels(page)
 }
 
 const goToNew = () => {
   // router.push({ name: 'Nuevo Nivel' })
 }
 
-const fetchData = () => {
-  search.value = ''
+const getDataLevels = async (page = 1) => {
+  loading.value = true
+  try {
+    const response: any = await store.dispatch('getData', {
+      url: URLS.level.getAll,
+      params: {
+        page: page,
+        limit: pagination.limit,
+      },
+    })
+
+    if (response.code === 200) {
+      levels.value = response.data
+      pagination.totalPages = response.meta.last_page
+      pagination.currentPage = response.meta.current_page
+    } else {
+      swalToast.showError(response.message || 'Error al obtener los niveles')
+    }
+  } catch (error: any) {
+    console.error('Error fetching levels:', error)
+    swalToast.showError(error.message || 'Error de conexión al obtener los niveles')
+  } finally {
+    loading.value = false
+  }
 }
 
 onMounted(() => {
   const savedPageGetter = store.getters['pagination/getPage']
-  pagination.currentPage = savedPageGetter(paginationKey)
-  fetchData()
+  const savedPage = savedPageGetter(paginationKey)
+  pagination.currentPage = savedPage || 1
+  getDataLevels(pagination.currentPage)
 })
 </script>
 
@@ -93,7 +115,7 @@ onMounted(() => {
         <div
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
-          <FetchButton @fetch="fetchData" />
+          <FetchButton @fetch="getDataLevels" />
           <RedirectButton
             :tooltip-title="BUTTONS_TOOLTIPS.levels.tooltipTitle"
             @redirect="goToNew"
@@ -108,7 +130,7 @@ onMounted(() => {
         }"
       >
         <CustomTable
-          :data="items"
+          :data="levels"
           :headers="TABLE_HEADERS.levels"
           :actions="getTableActions"
           :is-loading="loading"

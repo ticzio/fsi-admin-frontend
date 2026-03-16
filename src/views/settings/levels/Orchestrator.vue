@@ -6,28 +6,32 @@ import ScrollableTabs from '@/components/common/ScrollableTabs.vue'
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
 
 import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { useCookies } from '@/composables/useCookies'
 import { decodeRole } from '@/composables/useAccessControl'
 
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
+import { URLS } from '@/const/api'
 
 const route = useRoute()
 const router = useRouter()
+const store = useStore()
 
 const isLoading = ref(false)
+const levelName = ref('')
 
 const prevTab = ref(0)
 const transitionName = ref('slide-left')
 
 const allTabRoutes = [
   {
-    label: 'Banners de Beneficios',
-    path: 'benefits',
+    label: 'Cupones',
+    path: 'coupons',
     allowedRoles: [1, 2, 3, 4, 5],
   },
   {
-    label: 'Banners de Cupones',
-    path: 'coupons',
+    label: 'Beneficios y progreso',
+    path: 'benefits',
     allowedRoles: [1, 2, 3, 4, 5],
   },
 ]
@@ -51,13 +55,30 @@ const determineVisibleTabs = async () => {
   }
 }
 
+const getDataLevel = async () => {
+  isLoading.value = true
+  try {
+    const response: any = await store.dispatch('getData', {
+      url: `${URLS.level.prefix}/${route.params.id_level}`,
+    })
+
+    if (response.code === 200) {
+      levelName.value = response.data.name
+    }
+  } catch (error) {
+    console.error('Error fetching level details:', error)
+  } finally {
+    isLoading.value = false
+  }
+}
+
 const activeTab = computed(() => {
   const currentPath = route.path
   const tabs = filteredTabRoutes.value || []
   let bestMatchIndex = -1
 
   tabs.forEach((tab, idx) => {
-    const tabPath = `/settings/banners/${tab.path}`
+    const tabPath = `/settings/levels/edit/${route.params.id_level}/${tab.path}`
     if (currentPath.includes(tabPath)) {
       bestMatchIndex = idx
     }
@@ -72,7 +93,7 @@ const activeTab = computed(() => {
 function selectTab(index: number) {
   const tabs = filteredTabRoutes.value || []
   if (tabs[index]) {
-    router.replace(`/settings/banners/${tabs[index].path}`)
+    router.replace(`/settings/levels/edit/${route.params.id_level}/${tabs[index].path}`)
   }
 }
 
@@ -88,6 +109,7 @@ watch(
 
 onMounted(async () => {
   await determineVisibleTabs()
+  await getDataLevel()
 })
 </script>
 
@@ -95,8 +117,8 @@ onMounted(async () => {
   <DashboardLayout>
     <div class="d-flex flex-column h-100">
       <titleSection
-        :title="TITLE_SECTION_COMPONENT.banners?.title || 'Banners Publicitarios'"
-        :description="TITLE_SECTION_COMPONENT.banners?.description || 'Lista de banners'"
+        :title="levelName || TITLE_SECTION_COMPONENT.levels?.title || 'Niveles'"
+        :description="TITLE_SECTION_COMPONENT.levels?.description || 'Detalles del nivel'"
         :is-loading="isLoading"
         :show-logo="true"
       />

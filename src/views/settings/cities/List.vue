@@ -14,11 +14,7 @@ import { useTableActions } from '@/composables/useTableActions'
 
 import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
-
-interface Item {
-  id: string | number
-  [key: string]: any
-}
+import { URLS } from '@/const/api'
 
 const router = useRouter()
 const store = useStore()
@@ -26,7 +22,7 @@ const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
 const loading = ref(false)
-const items = ref<Item[]>([])
+const cities = ref<any>([])
 const search = ref('')
 
 const paginationKey = 'cities-list'
@@ -36,9 +32,8 @@ const pagination = reactive({
   limit: TABLE_PAGINATION.limit,
 })
 
-const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
+const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
-    // router.push(`/settings/cities/edit/${item.id}`)
   }
 }
 
@@ -58,14 +53,29 @@ const goToNew = () => {
   // router.push({ name: 'Nueva Ciudad' })
 }
 
-const fetchData = () => {
-  search.value = ''
+const getDataCities = () => {
+  loading.value = true
+  store
+    .dispatch('getData', {
+      url: URLS.city.getAll,
+      params: {
+        page: pagination.currentPage,
+        limit: pagination.limit,
+      },
+    })
+    .then((response: any) => {
+      cities.value = response.data
+      pagination.totalPages = response.last_page
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
 onMounted(() => {
   const savedPageGetter = store.getters['pagination/getPage']
   pagination.currentPage = savedPageGetter(paginationKey)
-  fetchData()
+  getDataCities()
 })
 </script>
 
@@ -93,7 +103,7 @@ onMounted(() => {
         <div
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
-          <FetchButton @fetch="fetchData" />
+          <FetchButton @fetch="getDataCities" />
           <RedirectButton
             :tooltip-title="BUTTONS_TOOLTIPS.cities.tooltipTitle"
             @redirect="goToNew"
@@ -108,7 +118,7 @@ onMounted(() => {
         }"
       >
         <CustomTable
-          :data="items"
+          :data="cities"
           :headers="TABLE_HEADERS.cities"
           :actions="getTableActions"
           :is-loading="loading"

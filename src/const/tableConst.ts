@@ -187,7 +187,8 @@ export const TABLE_HEADERS = {
   levels: [
     ...maybeId('id'),
     { key: 'name', label: 'Nombre' },
-    { key: 'required_points', label: 'Puntos Requeridos' },
+    { key: 'min_points', label: 'Puntos Mínimos' },
+    { key: 'max_points', label: 'Puntos Máximos' },
     { key: 'active', label: 'Estatus' },
   ],
   banners: [
