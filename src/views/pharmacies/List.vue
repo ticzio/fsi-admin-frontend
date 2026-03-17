@@ -14,7 +14,6 @@ import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
 import { useLocationInfo } from '@/composables/useLocationInfo'
 import { useTableActions } from '@/composables/useTableActions'
-import { useMasters } from '@/composables/Masters/useMasters'
 import defaultProfileImage from '@/assets/images/default-profile.png'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
@@ -36,18 +35,16 @@ const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
-// Masters composable para states y cities
-const {
-  states,
-  customIconMapState,
-  customDescriptionMapState,
-  getStates,
-  cities,
-  customIconMapCity,
-  customDescriptionMapCity,
-  getCities,
-  clearCities,
-} = useMasters()
+// TODO: Implementar nueva lógica para estados y ciudades si es necesario
+const states = ref<Item[]>([])
+const cities = ref<Item[]>([])
+const customIconMapState = {}
+const customDescriptionMapState = {}
+const customIconMapCity = {}
+const customDescriptionMapCity = {}
+const getStates = async () => {}
+const getCities = async (id: number) => {}
+const clearCities = () => {}
 
 const loading = ref(false)
 const concessionaires = ref<Item[]>([
@@ -149,11 +146,7 @@ const getTableActions = async (item: any) => {
 
 const handleStateChange = async () => {
   selectedCity.value = null
-  if (selectedState.value?.id) {
-    await getCities(Number(selectedState.value.id))
-  } else {
-    clearCities()
-  }
+  // Lógica de ciudades eliminada temporalmente
 }
 
 const showAddressInfo = async (item: any) => {
@@ -188,8 +181,6 @@ const goToNew = () => {
 
 const fetchData = () => {
   // TODO: Lógica para hacer la petición GET
-  selectedState.value = null
-  selectedCity.value = null
   search.value = ''
 }
 

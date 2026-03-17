@@ -12,34 +12,29 @@ import NewsForm from '@/components/News/NewsForm.vue'
 //Composables
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { useSwalToast } from '@/composables/useSwalToast'
 import { useTableActions } from '@/composables/useTableActions'
+import { useNewsModel } from '@/composables/Models/useNewsModel'
 
-import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
+import { TITLE_SECTION_COMPONENT, TABLE_HEADERS } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
-import { URLS } from '@/const/api'
-
-interface Item {
-  id: string | number
-  [key: string]: any
-}
 
 const router = useRouter()
-const swalToast = useSwalToast()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
-const loading = ref(false)
-const news = ref<any>([])
-const search = ref('')
+const {
+  loading,
+  news,
+  pagination,
+  paginationKey,
+  getDataNews,
+  saveNews,
+  deactivateNews,
+  deleteNews,
+} = useNewsModel()
 
-const paginationKey = 'news-list'
-const pagination = reactive({
-  currentPage: TABLE_PAGINATION.currentPage,
-  totalPages: TABLE_PAGINATION.totalPages,
-  limit: TABLE_PAGINATION.limit,
-})
+const search = ref('')
 
 // === Modal & Form Logic ===
 const formModal = ref<InstanceType<typeof Modal> | null>(null)
@@ -54,54 +49,21 @@ const openModal = (isEdit = false, data = null) => {
 }
 
 const handleFormSubmit = async (data: any) => {
-  await saveNewOrUpdate(data)
-}
-
-const saveNewOrUpdate = async (data: any) => {
-  loading.value = true
-  try {
-    const formDataToSend = new FormData()
-    formDataToSend.append('title', data.title)
-    formDataToSend.append('body', data.content)
-
-    if (data.imageFile) {
-      formDataToSend.append('url_image', data.imageFile)
-    }
-
-    let response: any
-    if (isEditingForm.value && formData.value?.id) {
-      response = await store.dispatch('updateData', {
-        url: URLS.news.update,
-        id: formData.value.id,
-        data: formDataToSend,
-      })
-    } else {
-      response = await store.dispatch('createData', {
-        url: URLS.news.save,
-        data: formDataToSend,
-      })
-    }
-
-    if (response.code === 200 || response.code === 201) {
-      swalToast.showSuccess(
-        isEditingForm.value ? 'Noticia actualizada correctamente' : 'Noticia creada correctamente',
-      )
-      formModal.value?.closeModal()
-      getDataNews(pagination.currentPage)
-    } else {
-      swalToast.showError(response.message || 'Error al guardar la noticia')
-    }
-  } catch (error: any) {
-    console.error('Error saving news:', error)
-    swalToast.showError(error.message || 'Error de conexión al guardar la noticia')
-  } finally {
-    loading.value = false
+  const success = await saveNews(data, isEditingForm.value, formData.value?.id)
+  if (success) {
+    formModal.value?.closeModal()
   }
 }
 
 const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
     openModal(true, item)
+  }
+  if (actionName === 'delete') {
+    deleteNews(item)
+  }
+  if (actionName === 'deactivate') {
+    deactivateNews(item)
   }
 }
 
@@ -115,49 +77,22 @@ const handleTablePagination = (page: number) => {
     key: paginationKey,
     currentPage: page,
   })
-  getDataNews(page)
+  getDataNews(page, search.value)
 }
 
 const goToNew = () => {
   openModal(false, null)
 }
 
-const getDataNews = async (page = 1) => {
-  loading.value = true
-  try {
-    const response: any = await store.dispatch('getData', {
-      url: URLS.news.getAll,
-      params: {
-        page: page,
-        limit: pagination.limit,
-        //search: search.value,
-      },
-    })
-
-    if (response.code === 200) {
-      news.value = response.data
-      pagination.totalPages = response.meta.last_page
-      pagination.currentPage = response.meta.current_page
-    } else {
-      swalToast.showError(response.message || 'Error al obtener las noticias')
-    }
-  } catch (error: any) {
-    console.error('Error fetching news:', error)
-    swalToast.showError(error.message || 'Error de conexión al obtener las noticias')
-  } finally {
-    loading.value = false
-  }
-}
-
 const fetchData = () => {
-  getDataNews(1)
+  getDataNews(1, search.value)
 }
 
 onMounted(() => {
   const savedPageGetter = store.getters['pagination/getPage']
   const savedPage = savedPageGetter(paginationKey)
   pagination.currentPage = savedPage || 1
-  getDataNews(pagination.currentPage)
+  getDataNews(pagination.currentPage, search.value)
 })
 </script>
 
@@ -179,6 +114,8 @@ onMounted(() => {
             placeholder="Título de la noticia"
             :loading="loading"
             :infoTexts="['Puedes buscar por título', 'O por descripción de la noticia']"
+            @search="fetchData"
+            only-on-enter
           />
         </div>
 

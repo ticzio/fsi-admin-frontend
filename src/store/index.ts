@@ -125,7 +125,7 @@ const store = createStore({
           .then((response) => {
             if (response.data.code === 200) {
               const userData = response.data.data
-              setCookie('fsi_admin_token', userData.token)
+              setCookie('fsi_admin_token', userData.auth.token)
               setCookie('fsi_admin_full_name', userData.full_name)
               const id_role_hashing = btoa(userData.id_type_rol_user.toString())
               setCookie('fsi_admin_id_role', id_role_hashing)
