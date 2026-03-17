@@ -57,4 +57,10 @@ export default [
     component: () => import('../../views/settings/cities/List.vue'),
     meta: { requiresAuth: true },
   },
+  {
+    path: '/settings/states',
+    name: 'settings.estados',
+    component: () => import('../../views/settings/states/List.vue'),
+    meta: { requiresAuth: true },
+  },
 ]

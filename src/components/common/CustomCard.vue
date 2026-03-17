@@ -31,34 +31,44 @@ const getNestedValue = (obj: any, key: string): any => {
 }
 
 const title = computed(() => {
-  return getNestedValue(props.item, props.titleKey || 'name') || 
-         getNestedValue(props.item, 'title') || 
-         getNestedValue(props.item, 'label')
+  return (
+    getNestedValue(props.item, props.titleKey || 'name') ||
+    getNestedValue(props.item, 'title') ||
+    getNestedValue(props.item, 'label')
+  )
 })
 
 const description = computed(() => {
-  return getNestedValue(props.item, props.descriptionKey || 'description') || 
-         getNestedValue(props.item, 'desc') || 
-         getNestedValue(props.item, 'body_only_text')
+  return (
+    getNestedValue(props.item, props.descriptionKey || 'description') ||
+    getNestedValue(props.item, 'desc') ||
+    getNestedValue(props.item, 'body_only_text')
+  )
 })
 
 const imageUrl = computed(() => {
-  return getNestedValue(props.item, props.imageKey || 'url_img') || 
-         getNestedValue(props.item, 'url_image') || 
-         getNestedValue(props.item, 'image')
+  return (
+    getNestedValue(props.item, props.imageKey || 'url_img') ||
+    getNestedValue(props.item, 'url_image') ||
+    getNestedValue(props.item, 'image')
+  )
 })
 
 const startDate = computed(() => {
-  return getNestedValue(props.item, props.startDateKey || 'start_date') || 
-         getNestedValue(props.item, 'startDate') || 
-         getNestedValue(props.item, 'fecha_inicio')
+  return (
+    getNestedValue(props.item, props.startDateKey || 'start_date') ||
+    getNestedValue(props.item, 'startDate') ||
+    getNestedValue(props.item, 'fecha_inicio')
+  )
 })
 
 const finishDate = computed(() => {
-  return getNestedValue(props.item, props.finishDateKey || 'finish_date') || 
-         getNestedValue(props.item, 'finishDate') || 
-         getNestedValue(props.item, 'finish_at') ||
-         getNestedValue(props.item, 'fecha_fin')
+  return (
+    getNestedValue(props.item, props.finishDateKey || 'finish_date') ||
+    getNestedValue(props.item, 'finishDate') ||
+    getNestedValue(props.item, 'finish_at') ||
+    getNestedValue(props.item, 'fecha_fin')
+  )
 })
 
 const status = computed(() => {
@@ -69,7 +79,7 @@ const status = computed(() => {
 
 const formatDate = (dateValue: any) => {
   if (!dateValue || dateValue === '-') return ''
-  
+
   try {
     const date = new Date(dateValue)
     if (isNaN(date.getTime())) {
@@ -80,7 +90,7 @@ const formatDate = (dateValue: any) => {
       }
       return dateValue
     }
-    
+
     return date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
@@ -107,46 +117,55 @@ const statusClass = computed(() => {
 </script>
 
 <template>
-  <div class="custom-card card h-100 border-0 shadow-sm rounded-4 overflow-hidden" @click="$emit('card-click', item)">
+  <div
+    class="custom-card card h-100 border-0 shadow-sm rounded-4 overflow-hidden"
+    @click="$emit('card-click', item)"
+  >
     <div class="card-body p-3 d-flex flex-column">
       <div class="d-flex justify-content-between align-items-start mb-3">
         <!-- Coupon/Image Side -->
-        <div class="coupon-badge-container d-flex align-items-center justify-content-center bg-primary rounded-3 text-white" style="width: 80px; height: 80px;">
+        <div
+          class="coupon-badge-container d-flex align-items-center justify-content-center bg-primary rounded-3 text-white"
+          style="width: 80px; height: 80px"
+        >
           <template v-if="imageUrl">
-             <img :src="imageUrl" class="w-100 h-100 object-fit-cover rounded-3" alt="Coupon">
+            <img :src="imageUrl" class="w-100 h-100 object-fit-cover rounded-3" alt="Coupon" />
           </template>
           <template v-else>
             <div class="text-center">
-              <div class="fw-bold" style="font-size: 0.8rem;">DCTO</div>
+              <div class="fw-bold" style="font-size: 0.8rem">DCTO</div>
               <div class="fw-bold h4 mb-0">30%</div>
-              <div class="small" style="font-size: 0.6rem;">OFF</div>
+              <div class="small" style="font-size: 0.6rem">OFF</div>
             </div>
           </template>
         </div>
 
         <!-- Action Button -->
-        <div v-if="actions && actions.length > 0" class="actions-container">
-           <button 
-             v-for="action in actions" 
-             :key="action.name"
-             :class="['btn btn-link p-0 text-dark opacity-75 hover-opacity-100', action.class]"
-             @click.stop="$emit('action-click', { actionName: action.name, item })"
-             :title="action.tooltip"
-           >
-             <i :class="action.icon || 'bi bi-arrow-right-circle fs-4'"></i>
-           </button>
+        <div v-if="actions && actions.length > 0" class="d-flex gap-2">
+          <button
+            v-for="action in actions"
+            :key="action.name"
+            :class="action.class"
+            @click.stop="$emit('action-click', { actionName: action.name, item })"
+            :data-title="action.tooltip"
+            data-tooltip-pos="bottom"
+          >
+            <i :class="action.icon"></i>
+          </button>
         </div>
         <div v-else class="actions-container">
-           <button class="btn btn-link p-0 text-dark opacity-50">
-             <i class="bi bi-arrow-right-circle fs-4"></i>
-           </button>
+          <button class="btn btn-light" style="border-radius: 10px" disabled>
+            <i class="bi bi-arrow-right-circle fs-5"></i>
+          </button>
         </div>
       </div>
 
       <!-- Info Area -->
       <div class="info-container mb-3 flex-grow-1">
         <h6 class="card-title fw-bold mb-1 line-clamp-2">{{ title }}</h6>
-        <p class="card-text text-muted small line-clamp-2 mb-0" v-if="description">{{ description }}</p>
+        <p class="card-text text-muted small line-clamp-2 mb-0" v-if="description">
+          {{ description }}
+        </p>
       </div>
 
       <!-- Divider -->
@@ -167,7 +186,9 @@ const statusClass = computed(() => {
 
 <style scoped>
 .custom-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   cursor: pointer;
   border: 1px solid #f0f0f0 !important;
 }
@@ -180,10 +201,6 @@ const statusClass = computed(() => {
 .border-dashed {
   border-style: dashed !important;
   opacity: 0.3;
-}
-
-.hover-opacity-100:hover {
-  opacity: 1 !important;
 }
 
 .line-clamp-2 {

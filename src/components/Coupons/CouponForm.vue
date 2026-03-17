@@ -4,6 +4,7 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import BaseTextarea from '@/components/common/BaseTextarea.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
 import { useRoute } from 'vue-router'
+import { useMoment } from '@/composables/useMoment'
 
 interface CouponData {
   id?: number | string
@@ -29,6 +30,7 @@ const props = defineProps({
 })
 
 const route = useRoute()
+const { formatToSQL } = useMoment()
 
 const formData = ref<CouponData>({
   code: '',
@@ -60,8 +62,8 @@ const initForm = () => {
       name: props.initialData.name || '',
       description: props.initialData.description || '',
       id_level: props.initialData.id_level || '',
-      start_date: props.initialData.start_date,
-      finish_date: props.initialData.finish_date,
+      start_date: formatToSQL(props.initialData.start_date) || '',
+      finish_date: formatToSQL(props.initialData.finish_date) || '',
       active: props.initialData.active !== undefined ? props.initialData.active : true,
       url_img: props.initialData.url_img || '',
     }

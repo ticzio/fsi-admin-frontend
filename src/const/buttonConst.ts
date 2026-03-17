@@ -19,7 +19,7 @@ const BUTTON_TOOLTIPS = {
   benefitsBanners: 'Nuevo banner de beneficio',
   couponsBanners: 'Nuevo banner de cupón',
   role: 'Nuevo rol',
-  state: 'Nuevo estado',
+  states: 'Nuevo estado',
 } as const
 
 export type ButtonKey = keyof typeof BUTTON_TOOLTIPS

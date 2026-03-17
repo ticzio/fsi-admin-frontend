@@ -88,6 +88,13 @@ export const TITLE_SECTION_COMPONENT = {
     new: 'Nueva ciudad',
     newDescription: 'Aquí puedes crear una nueva ciudad con toda la información necesaria.',
   },
+  states: {
+    title: 'Estados',
+    description: 'Lista de estados',
+    details: 'Detalles del estado',
+    new: 'Nuevo estado',
+    newDescription: 'Aquí puedes crear un nuevo estado con toda la información necesaria.',
+  },
   template_pharmacies: {
     title: 'Plantillas de Farmacias',
     description: 'Lista de plantillas de farmacias',
@@ -175,6 +182,12 @@ export const TABLE_HEADERS = {
     { key: 'name', label: 'Nombre' },
     { key: 'active', label: 'Estatus' },
   ],
+  states: [
+    ...maybeId('id'),
+    { key: 'url_image', label: 'Imagen' },
+    { key: 'name', label: 'Nombre' },
+    { key: 'active', label: 'Estatus' },
+  ],
 
   // Nuevas secciones de settings
   missions: [
@@ -193,19 +206,20 @@ export const TABLE_HEADERS = {
   banners: [
     ...maybeId('id'),
     { key: 'url_image', label: 'Imagen' },
-    { key: 'title', label: 'Título' },
+    { key: 'name', label: 'Título' },
+    { key: 'id_app_ubication.name', label: 'Ubicación en la App' },
     { key: 'active', label: 'Estatus' },
   ],
   benefitsBanners: [
     ...maybeId('id'),
     { key: 'url_image', label: 'Imagen' },
-    { key: 'title', label: 'Título' },
+    { key: 'name', label: 'Título' },
     { key: 'active', label: 'Estatus' },
   ],
   couponsBanners: [
     ...maybeId('id'),
     { key: 'url_image', label: 'Imagen' },
-    { key: 'title', label: 'Título' },
+    { key: 'name', label: 'Título' },
     { key: 'active', label: 'Estatus' },
   ],
   template_pharmacies: [

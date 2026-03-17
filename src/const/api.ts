@@ -20,6 +20,9 @@ const RESOURCES = {
   news: 'news',
   level: 'level',
   coupon: 'coupon',
+  banner: 'banner',
+  mission: 'missions',
+  appUbication: 'app_ubication',
 }
 
 // 3. Genera el objeto URLS final de forma dinámica

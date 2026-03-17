@@ -116,7 +116,7 @@ const handlePageChange = (page: number) => {
       </div>
 
       <!-- Empty State -->
-      <div v-if="data.length === 0 && !isLoading" class="text-center py-5">
+      <div v-if="data.length === 0 && !isLoading" class="text-center py-5 d-flex flex-column align-items-center justify-content-center h-100">
         <i class="bi bi-inbox text-muted opacity-50 mb-3" style="font-size: 3rem"></i>
         <h5 class="text-muted">No se encontraron resultados</h5>
       </div>

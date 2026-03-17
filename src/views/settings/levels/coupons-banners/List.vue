@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import CustomCardGrid from '@/components/common/CustomCardGrid.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
@@ -8,28 +8,32 @@ import Modal from '@/components/common/Modal.vue'
 import CouponForm from '@/components/Coupons/CouponForm.vue'
 
 //Composables
-import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useTableActions } from '@/composables/useTableActions'
+import { useCoupons } from '@/composables/Models/useCoupons'
 
-import { TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
-import { useSwalToast } from '@/composables/useSwalToast'
-import { URLS } from '@/const/api'
 
 interface Item {
   id: string | number
   [key: string]: any
 }
 
-const router = useRouter()
 const store = useStore()
-const swalToast = useSwalToast()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
-const loading = ref(false)
-const coupons = ref<any>([])
+const {
+  loading,
+  coupons,
+  pagination,
+  paginationKey,
+  getDataCoupons,
+  saveCoupon,
+  deactivateCoupon,
+  deleteCoupon,
+} = useCoupons()
+
 const search = ref('')
 
 const couponModalRef = ref<InstanceType<typeof Modal> | null>(null)
@@ -37,18 +41,15 @@ const selectedCoupon = ref<Item | null>(null)
 const isReadOnly = ref(false)
 const couponFormRef = ref<InstanceType<typeof CouponForm> | null>(null)
 
-const paginationKey = 'coupons-banners-list'
-const pagination = reactive({
-  currentPage: TABLE_PAGINATION.currentPage,
-  totalPages: TABLE_PAGINATION.totalPages,
-  limit: TABLE_PAGINATION.limit,
-})
-
-const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
+const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit' || actionName === 'view') {
     selectedCoupon.value = item
-    isReadOnly.value = false
+    isReadOnly.value = actionName === 'view'
     couponModalRef.value?.openModal()
+  } else if (actionName === 'deactivate') {
+    await deactivateCoupon(item)
+  } else if (actionName === 'delete') {
+    await deleteCoupon(item)
   }
 }
 
@@ -68,7 +69,11 @@ const handleTablePagination = (page: number) => {
     key: paginationKey,
     currentPage: page,
   })
-  getDataCoupons(page)
+  getDataCoupons(page, search.value)
+}
+
+const fetchData = () => {
+  getDataCoupons(1, search.value)
 }
 
 const goToNew = () => {
@@ -78,78 +83,9 @@ const goToNew = () => {
 }
 
 const handleFormSubmit = async (data: any) => {
-  await saveCoupon(data)
-}
-
-const saveCoupon = async (data: any) => {
-  loading.value = true
-  try {
-    const formDataToSend = new FormData()
-    formDataToSend.append('name', data.name)
-    formDataToSend.append('description', data.description)
-    formDataToSend.append('id_level', data.id_level)
-    formDataToSend.append('start_date', data.start_date)
-    formDataToSend.append('finish_date', data.finish_date)
-    formDataToSend.append('active', data.active ? '1' : '0')
-
-    if (data.imageFile) {
-      formDataToSend.append('url_img', data.imageFile)
-    }
-
-    let response: any
-    if (selectedCoupon.value?.id) {
-      response = await store.dispatch('updateData', {
-        url: URLS.coupon.update,
-        id: selectedCoupon.value.id,
-        data: formDataToSend,
-      })
-    } else {
-      response = await store.dispatch('createData', {
-        url: URLS.coupon.save,
-        data: formDataToSend,
-      })
-    }
-
-    if (response.code === 200 || response.code === 201) {
-      swalToast.showSuccess(
-        selectedCoupon.value ? 'Cupón actualizado correctamente' : 'Cupón creado correctamente',
-      )
-      couponModalRef.value?.closeModal()
-      getDataCoupons(pagination.currentPage)
-    } else {
-      swalToast.showError(response.message || 'Error al guardar el cupón')
-    }
-  } catch (error: any) {
-    console.error('Error saving coupon:', error)
-    swalToast.showError(error.message || 'Error de conexión al guardar el cupón')
-  } finally {
-    loading.value = false
-  }
-}
-
-const getDataCoupons = async (page = 1) => {
-  loading.value = true
-  try {
-    const response: any = await store.dispatch('getData', {
-      url: URLS.coupon.getAll,
-      params: {
-        page: page,
-        limit: pagination.limit,
-      },
-    })
-
-    if (response.code === 200) {
-      coupons.value = response.data
-      pagination.totalPages = response.meta.last_page
-      pagination.currentPage = response.meta.current_page
-    } else {
-      swalToast.showError(response.message || 'Error al obtener los cupones')
-    }
-  } catch (error: any) {
-    console.error('Error fetching coupons:', error)
-    swalToast.showError(error.message || 'Error de conexión al obtener los cupones')
-  } finally {
-    loading.value = false
+  const success = await saveCoupon(data, !!selectedCoupon.value, selectedCoupon.value?.id)
+  if (success) {
+    couponModalRef.value?.closeModal()
   }
 }
 
@@ -157,7 +93,7 @@ onMounted(() => {
   const savedPageGetter = store.getters['pagination/getPage']
   const savedPage = savedPageGetter(paginationKey)
   pagination.currentPage = savedPage || 1
-  getDataCoupons(pagination.currentPage)
+  getDataCoupons(pagination.currentPage, search.value)
 })
 </script>
 
@@ -173,13 +109,15 @@ onMounted(() => {
           placeholder="Nombre o descripción"
           :loading="loading"
           :infoTexts="['Puedes buscar por título', 'O por descripción']"
+          @search="fetchData"
+          only-on-enter
         />
       </div>
 
       <div
         class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
       >
-        <FetchButton @fetch="getDataCoupons" />
+        <FetchButton @fetch="fetchData" />
         <RedirectButton
           :tooltip-title="BUTTONS_TOOLTIPS.couponsBanners?.tooltipTitle || 'Nuevo banner de cupón'"
           @redirect="goToNew"
