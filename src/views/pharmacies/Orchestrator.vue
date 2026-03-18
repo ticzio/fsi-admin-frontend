@@ -10,6 +10,7 @@ import { useStore } from 'vuex'
 import { useLogger } from '@/composables/useLogger'
 import { useCookies } from '@/composables/useCookies'
 import { decodeRole } from '@/composables/useAccessControl'
+import { usePharmacy } from '@/composables/Models/usePharmacy'
 
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 import { URLS } from '@/const/api'
@@ -119,7 +120,7 @@ const startLoadingTimeout = () => {
   loadingTimeout = setTimeout(() => {
     if (isLoading.value) {
       console.warn('Loading timeout alcanzado, cargando datos directamente...')
-      //loadPharmacyData()
+      loadPharmacyData()
     }
   }, 3000) // 3 segundos de espera máxima
 }
@@ -131,34 +132,23 @@ const clearLoadingTimeout = () => {
   }
 }
 
-// Cargar datos de la farmacia directamente si es necesario (ej: recarga de página)
-/*
+// Cargar datos de la farmacia usando el composable
+const { getPharmacy } = usePharmacy()
+
 const loadPharmacyData = async () => {
+  isLoading.value = true
   try {
-    const response = await store.dispatch('getData', {
-      url: `${URLS.pharmacy?.prefix || 'pharmacy'}/${route.params.id_pharmacy}`,
-    })
-    if (response.code === 200) {
-      const data = response.data
-      logger.logRequest(
-        (URLS.pharmacy?.prefix || 'pharmacy') + '/' + route.params.id_pharmacy,
-        {},
-        data,
-      )
+    const data = await getPharmacy(route.params.id_pharmacy as string)
+    if (data) {
       localTitle.value = data.name || data.trade_name || ''
       store.dispatch('utils/setIsItem', localTitle.value)
     }
   } catch (error) {
-    logger.logRequest(
-      (URLS.pharmacy?.prefix || 'pharmacy') + '/' + route.params.id_pharmacy,
-      {},
-      error,
-    )
+    console.error('Error fetching pharmacy for Orchestrator:', error)
   } finally {
     isLoading.value = false
   }
 }
-*/
 
 watch(
   () => activeTab.value,
@@ -186,7 +176,7 @@ onMounted(async () => {
     startLoadingTimeout()
   } else {
     // Si no está cargando, cargamos los datos inmediatamente
-    //loadPharmacyData()
+    loadPharmacyData()
   }
 })
 

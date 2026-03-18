@@ -6,6 +6,7 @@ import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
 import { TABLE_PAGINATION } from '@/const/tableConst'
+import { ICONS_MULTISELECT } from '@/const/multiselectConst'
 
 export function useStates() {
   const store = useStore()
@@ -193,5 +194,6 @@ export function useStates() {
     saveState,
     deactivateState,
     deleteState,
+    customIconState: ICONS_MULTISELECT.state,
   }
 }

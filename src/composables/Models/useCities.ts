@@ -6,6 +6,7 @@ import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
 import { TABLE_PAGINATION } from '@/const/tableConst'
+import { ICONS_MULTISELECT } from '@/const/multiselectConst'
 
 export function useCities() {
   const store = useStore()
@@ -40,6 +41,32 @@ export function useCities() {
         cities.value = response.data
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
+      } else {
+        swalToast.showError(response.message || 'Error al obtener las ciudades')
+      }
+    } catch (error: any) {
+      console.error('Error fetching cities:', error)
+      swalToast.showError(error.message || 'Error de conexión al obtener las ciudades')
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const getCities = async (id_state?: string | number) => {
+    loading.value = true
+    try {
+      const params: any = { limit: 100 }
+      if (id_state) {
+        params.id_state = id_state
+      }
+
+      const response: any = await store.dispatch('getData', {
+        url: URLS.city.getAll,
+        params,
+      })
+
+      if (response.code === 200) {
+        cities.value = response.data
       } else {
         swalToast.showError(response.message || 'Error al obtener las ciudades')
       }
@@ -165,8 +192,10 @@ export function useCities() {
     cities,
     pagination,
     getDataCities,
+    getCities,
     saveCity,
     deactivateCity,
     deleteCity,
+    customIconCity: ICONS_MULTISELECT.city,
   }
 }

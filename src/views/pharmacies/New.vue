@@ -3,6 +3,7 @@ import { reactive, ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
+import { usePharmacy } from '@/composables/Models/usePharmacy'
 
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
@@ -15,7 +16,8 @@ const router = useRouter()
 const swalToast = useSwalToast()
 const store = useStore()
 
-const loading = ref(false)
+const { savePharmacy: savePharmacyApi, loading } = usePharmacy()
+
 const currentStep = ref(1)
 const transitionName = ref('slide-left')
 
@@ -36,6 +38,7 @@ const cityOptions = ref([
 ])
 
 const form = reactive({
+  id: 0,
   name: '',
   code: '',
   description: '',
@@ -60,16 +63,22 @@ const form = reactive({
 const phoneError = ref('')
 
 const calculateProgress = computed(() => {
-  const fields = [
+  const step1Fields = [
     form.name,
-    form.code,
     form.description,
     form.id_type_city,
     form.ubication,
     form.url_google_map,
     form.phone,
-    form.url_instagram,
-    form.url_whatsapp,
+    form.url_image,
+  ]
+  const step1Filled = step1Fields.filter((f) => {
+    if (f === null || f === undefined) return false
+    if (typeof f === 'string' && f.trim() === '') return false
+    return true
+  })
+
+  const step2Fields = [
     form.opening_week,
     form.close_week,
     form.opening_saturday,
@@ -77,12 +86,16 @@ const calculateProgress = computed(() => {
     form.opening_sunday,
     form.close_sunday,
   ]
-  const filledFields = fields.filter((f) => {
+  const step2Filled = step2Fields.filter((f) => {
     if (f === null || f === undefined) return false
     if (typeof f === 'string' && f.trim() === '') return false
     return true
   })
-  return Math.round((filledFields.length / fields.length) * 100)
+
+  const step1Progress = (step1Filled.length / step1Fields.length) * 50
+  const step2Progress = (step2Filled.length / step2Fields.length) * 50
+
+  return Math.round(step1Progress + step2Progress)
 })
 
 const handlePhoneError = (error: string) => {
@@ -91,24 +104,14 @@ const handlePhoneError = (error: string) => {
 
 const savePharmacy = async () => {
   // Validate basic requirements before sending
-  if (!form.name || !form.code || phoneError.value) {
-    swalToast.showError('Por favor, completa los campos obligatorios correctamente.')
+  if (phoneError.value) {
+    swalToast.showError('Por favor, ingresa un número de teléfono válido.')
     return
   }
 
-  loading.value = true
-  try {
-    // Aquí iría el dispatch al action de Vuex o llamada API
-    // await store.dispatch('pharmacies/createFarmacia', form)
-    console.log('Guardando formulario:', form)
-
-    swalToast.showSuccess('Farmacia creada exitosamente')
+  const success = await savePharmacyApi(form, false)
+  if (success) {
     router.push('/pharmacy')
-  } catch (error) {
-    console.error('Error al guardar:', error)
-    swalToast.showError('Ocurrió un error al intentar guardar la farmacia.')
-  } finally {
-    loading.value = false
   }
 }
 </script>
