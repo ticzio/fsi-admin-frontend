@@ -24,6 +24,7 @@ const RESOURCES = {
   benefit: 'benefit',
   mission: 'mission',
   appUbication: 'app_ubication',
+  template_message: 'templates',
 }
 
 // 3. Genera el objeto URLS final de forma dinámica

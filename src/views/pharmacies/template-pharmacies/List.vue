@@ -5,16 +5,17 @@ import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
 import Modal from '@/components/common/Modal.vue'
-import TemplateForm from '@/components/Pharmacies/TemplateForm.vue'
+import TemplateForm from '@/components/Templates/TemplateForm.vue'
+
+import { useTemplateMessage } from '@/composables/Models/useTemplateMessage'
 
 //Composables
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useTableActions } from '@/composables/useTableActions'
 
 import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
-import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
 
 interface Item {
   id: string | number
@@ -31,40 +32,35 @@ const modalMode = ref<'create' | 'edit'>('create')
 const selectedTemplate = ref<Item | null>(null)
 
 const router = useRouter()
+const route = useRoute()
+const idPharmacy = route.params.id_pharmacy as string
 const swalToast = useSwalToast()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
-const loading = ref(false)
-const items = ref<Item[]>([
-  {
-    id: 1,
-    title: 'Plantilla de bienvenida',
-    description: '<p>Mensaje de bienvenida para usuarios</p>',
-    active: true,
-  },
-  {
-    id: 2,
-    title: 'Plantilla de promociones',
-    description: '<p>Descuentos del fin de semana</p>',
-    active: false,
-  },
-])
 const search = ref('')
 
-const paginationKey = 'templates-list'
-const pagination = reactive({
-  currentPage: TABLE_PAGINATION.currentPage,
-  totalPages: TABLE_PAGINATION.totalPages,
-  limit: TABLE_PAGINATION.limit,
-})
+const {
+  loading,
+  templates: items,
+  pagination,
+  paginationKey,
+  getDataTemplates,
+  saveTemplate,
+  deactivateTemplate,
+} = useTemplateMessage()
 
-const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
+const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
     modalMode.value = 'edit'
     selectedTemplate.value = item
     templateModalRef.value?.openModal()
+  } else if (actionName === 'deactivate') {
+    const success = await deactivateTemplate(item)
+    if (success) {
+      await fetchData()
+    }
   }
 }
 
@@ -72,12 +68,13 @@ const getTableActions = async (item: any) => {
   return getDefaultActions(item)
 }
 
-const handleTablePagination = (page: number) => {
+const handleTablePagination = async (page: number) => {
   pagination.currentPage = page
   store.dispatch('pagination/updatePagination', {
     key: paginationKey,
     currentPage: page,
   })
+  await getDataTemplates(page, search.value, idPharmacy)
 }
 
 const goToNew = () => {
@@ -86,19 +83,29 @@ const goToNew = () => {
   templateModalRef.value?.openModal()
 }
 
-const fetchData = () => {
-  // TODO: Lógica para hacer la petición GET
-  search.value = ''
+const fetchData = async () => {
+  await getDataTemplates(pagination.currentPage, search.value, idPharmacy)
 }
 
-const handleTemplateSubmit = () => {
-  fetchData()
-  templateModalRef.value?.closeModal()
+const handleTemplateSubmit = async (formData: any) => {
+  const isEditing = modalMode.value === 'edit'
+  const payload = { ...formData, id_pharmacy: idPharmacy }
+  const idToEdit = selectedTemplate.value?.id
+
+  const success = await saveTemplate(payload, isEditing, idToEdit)
+  if (success) {
+    templateModalRef.value?.closeModal()
+    fetchData()
+  }
 }
 
 onMounted(() => {
   const savedPageGetter = store.getters['pagination/getPage']
-  pagination.currentPage = savedPageGetter(paginationKey)
+  const savedPage = savedPageGetter(paginationKey)
+  if (savedPage) {
+    pagination.currentPage = savedPage
+  }
+  fetchData()
 })
 </script>
 

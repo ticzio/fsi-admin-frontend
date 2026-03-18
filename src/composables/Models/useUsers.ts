@@ -44,10 +44,15 @@ export function useUsers() {
     limit: TABLE_PAGINATION.limit,
   })
 
+  const currentSearch = ref('')
+  const currentExtraParams = ref<any>({})
+
   /**
    * Obtiene la lista de usuarios paginada y filtrada.
    */
-  const getDataUsers = async (page = 1, search = '') => {
+  const getDataUsers = async (page = 1, search = '', extraParams: any = {}) => {
+    currentSearch.value = search
+    currentExtraParams.value = extraParams
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -57,6 +62,7 @@ export function useUsers() {
           limit: pagination.limit,
           query: search || null,
           active: null,
+          ...extraParams,
         },
       })
 
@@ -121,7 +127,7 @@ export function useUsers() {
       formData.append('first_name', data.first_name)
       formData.append('last_name', data.last_name)
       formData.append('phone', data.phone)
-      formData.append('id_pharmacy', String(0))
+      formData.append('id_pharmacy', data.id_pharmacy ? String(data.id_pharmacy) : String(0))
 
       if (data.password) formData.append('password', data.password)
 
@@ -147,7 +153,7 @@ export function useUsers() {
         swalToast.showSuccess(
           isEditing ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente',
         )
-        await getDataUsers(pagination.currentPage)
+        await getDataUsers(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       } else {
         swalToast.showError(response.message || 'Error al guardar el usuario')
@@ -188,7 +194,7 @@ export function useUsers() {
       if (response.code === 200 || response.code === 201) {
         logger.logRequest(URLS.user.changeStatus, {}, response)
         swal.showSuccess('Usuario ' + (isActive ? 'desactivado' : 'activado') + ' exitosamente')
-        await getDataUsers(pagination.currentPage)
+        await getDataUsers(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       }
       return false
@@ -225,7 +231,7 @@ export function useUsers() {
       if (response.code == 200 || response.code == 201) {
         logger.logRequest(URLS.user.changeStatus, {}, response)
         swal.showSuccess('Usuario eliminado exitosamente')
-        await getDataUsers(pagination.currentPage)
+        await getDataUsers(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       }
       return false

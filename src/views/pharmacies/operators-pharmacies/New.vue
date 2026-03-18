@@ -1,19 +1,17 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useSwalToast } from '@/composables/useSwalToast'
+import { useUsers } from '@/composables/Models/useUsers'
 
 import OperatorForm from '@/components/Operators/OperatorForm.vue'
 
 const router = useRouter()
+const route = useRoute()
 const swalToast = useSwalToast()
+const { loading, saveUser } = useUsers()
 
-const loading = ref(false)
-
-const roleOptions = ref([
-  { id: 1, name: 'Operador Principal' },
-  { id: 2, name: 'Soporte Técnico' },
-])
+const roleOptions = ref<any[]>([])
 
 const form = reactive({
   url_image: null as File | null,
@@ -27,7 +25,7 @@ const form = reactive({
 })
 
 const saveOperator = async () => {
-  if (!form.first_name || !form.last_name || !form.email || !form.role_id) {
+  if (!form.first_name || !form.last_name || !form.email) {
     swalToast.showError('Por favor, completa los campos obligatorios.')
     return
   }
@@ -36,18 +34,20 @@ const saveOperator = async () => {
     return
   }
 
-  loading.value = true
   try {
-    console.log('Guardando operador:', form)
-    // Aquí iría el dispatch al action de Vuex o llamada API
-    // await store.dispatch('operators/createOperator', form)
-    swalToast.showSuccess('Operador creado exitosamente')
-    router.push({ name: 'Operadores de la Farmacia' })
+    const payload: any = {
+      ...form,
+      id_type_rol_user: 3,
+      id_pharmacy: route.params.id_pharmacy,
+    }
+    console.log('Guardando operador:', payload)
+    const success = await saveUser(payload, false)
+    if (success) {
+      router.push({ name: 'Operadores de la Farmacia' })
+    }
   } catch (error) {
     console.error('Error al guardar:', error)
     swalToast.showError('Ocurrió un error al intentar guardar el operador.')
-  } finally {
-    loading.value = false
   }
 }
 </script>

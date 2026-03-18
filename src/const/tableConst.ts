@@ -127,6 +127,15 @@ export const TABLE_HEADERS = {
     { key: 'phone', label: 'Teléfono' },
     { key: 'active', label: 'Estatus' },
   ],
+  operator: [
+    ...maybeId('id'),
+    { key: 'url_image', label: 'Foto' },
+    { key: 'full_name', label: 'Nombre y apellido' },
+    { key: 'email', label: 'Correo' },
+    { key: 'phone', label: 'Teléfono' },
+    { key: 'active', label: 'Estatus' },
+  ],
+
   coupons: [
     ...maybeId('id'),
     { key: 'code', label: 'Código' },
@@ -212,7 +221,7 @@ export const TABLE_HEADERS = {
   ],
   template_pharmacies: [
     ...maybeId('id'),
-    { key: 'title', label: 'Título' },
+    { key: 'name', label: 'Título' },
     { key: 'description', label: 'Descripción' },
     { key: 'active', label: 'Estatus' },
   ],
