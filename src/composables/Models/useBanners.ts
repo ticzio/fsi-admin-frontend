@@ -38,9 +38,9 @@ export function useBanners() {
       })
 
       if (response.code === 200) {
-        banners.value = response.data
-        pagination.totalPages = response.meta.last_page
-        pagination.currentPage = response.meta.current_page
+        banners.value = response.data.data
+        pagination.totalPages = response.data.meta.last_page
+        pagination.currentPage = response.data.meta.current_page
       } else {
         swalToast.showError(response.message || 'Error al obtener los banners')
       }

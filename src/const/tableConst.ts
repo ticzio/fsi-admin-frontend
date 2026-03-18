@@ -110,10 +110,10 @@ export const TABLE_HEADERS = {
   administrator: [
     ...maybeId('id'),
     { key: 'url_image', label: 'Foto' },
-    { key: 'role.name', label: 'Rol' },
     { key: 'full_name', label: 'Nombre y apellido' },
     { key: 'email', label: 'Correo' },
     { key: 'phone', label: 'Teléfono' },
+    { key: 'id_type_rol.name', label: 'Rol' },
     { key: 'active', label: 'Estatus' },
   ],
   pharmacy: [

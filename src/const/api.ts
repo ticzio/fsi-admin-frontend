@@ -11,16 +11,16 @@ function CreateApiEndpoints(prefix: string) {
 
 // 2. Un mapa más simple con tus recursos y sus prefijos
 const RESOURCES = {
-  administrator: 'admin',
   user: 'user',
   state: 'state',
   city: 'city',
-  role: 'role',
+  role: 'rol',
   notification: 'notification',
   news: 'news',
   level: 'level',
   coupon: 'coupon',
   banner: 'banner',
+  benefit: 'benefit',
   mission: 'missions',
   appUbication: 'app_ubication',
 }

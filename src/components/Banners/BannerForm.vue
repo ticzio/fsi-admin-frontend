@@ -47,9 +47,10 @@ const initForm = () => {
     const ubication = Array.isArray(rawUbication) ? rawUbication[0] : rawUbication
 
     // Mapear ID a objeto si es necesario
-    const mappedUbication = (typeof ubication === 'object' && ubication !== null)
-      ? ubication
-      : appUbication.value.find((opt: any) => opt.id === ubication) || ubication
+    const mappedUbication =
+      typeof ubication === 'object' && ubication !== null
+        ? ubication
+        : appUbication.value.find((opt: any) => opt.id === ubication) || ubication
 
     formData.value = {
       id: props.initialData.id,
@@ -130,8 +131,6 @@ defineExpose({
             />
           </div>
         </div>
-
-
       </div>
 
       <!-- Columna Derecha: Detalles -->
@@ -181,15 +180,11 @@ defineExpose({
   letter-spacing: 0.5px;
 }
 
-
-
 @media (min-width: 768px) {
   .border-md-end {
     border-right: 1px solid #e5e7eb !important;
   }
 }
-
-
 
 .image-wrapper {
   min-height: 200px;

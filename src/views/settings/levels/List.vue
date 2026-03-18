@@ -5,15 +5,17 @@ import titleSection from '@/components/common/titleSection.vue'
 import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
-import RedirectButton from '@/components/common/RedirectButton.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { useTableActions } from '@/composables/useTableActions'
 
-import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
-import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
+import {
+  TITLE_SECTION_COMPONENT,
+  TABLE_HEADERS,
+  TABLE_PAGINATION,
+  TABLE_ACTIONS,
+} from '@/const/tableConst'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { URLS } from '@/const/api'
 
@@ -21,7 +23,6 @@ const router = useRouter()
 const store = useStore()
 const swalToast = useSwalToast()
 const isMobile = computed(() => store.getters.isMobile)
-const { getDefaultActions } = useTableActions()
 
 const loading = ref(false)
 const levels = ref<any[]>([])
@@ -35,13 +36,13 @@ const pagination = reactive({
 })
 
 const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
-  if (actionName === 'edit') {
+  if (actionName === TABLE_ACTIONS.edit.name) {
     router.push(`/settings/levels/edit/${item.id}`)
   }
 }
 
-const getTableActions = async (item: any) => {
-  return getDefaultActions(item)
+const getTableActions = async () => {
+  return [TABLE_ACTIONS.edit]
 }
 
 const handleTablePagination = (page: number) => {
@@ -53,9 +54,6 @@ const handleTablePagination = (page: number) => {
   getDataLevels(page)
 }
 
-const goToNew = () => {
-  // router.push({ name: 'Nuevo Nivel' })
-}
 
 const getDataLevels = async (page = 1) => {
   loading.value = true
@@ -116,10 +114,6 @@ onMounted(() => {
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
           <FetchButton @fetch="getDataLevels" />
-          <RedirectButton
-            :tooltip-title="BUTTONS_TOOLTIPS.levels.tooltipTitle"
-            @redirect="goToNew"
-          />
         </div>
       </div>
 

@@ -1,118 +1,64 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
-import CustomTable from '@/components/common/CustomTable.vue'
-import SearchInput from '@/components/common/SearchInput.vue'
-import FetchButton from '@/components/common/FetchButton.vue'
-import RedirectButton from '@/components/common/RedirectButton.vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import LevelProgress from '@/components/Levels/LevelProgress.vue'
+import BenefitGrid from '@/components/Benefits/BenefitGrid.vue'
 
 //Composables
-import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { useTableActions } from '@/composables/useTableActions'
+import { useBenefits } from '@/composables/Models/useBenefits'
+import { useLevels } from '@/composables/Models/useLevels'
 
-import { TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
-import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
-
-interface Item {
-  id: string | number
-  [key: string]: any
-}
-
-const router = useRouter()
+const route = useRoute()
 const store = useStore()
-const isMobile = computed(() => store.getters.isMobile)
-const { getDefaultActions } = useTableActions()
 
-const loading = ref(false)
-const items = ref<Item[]>([])
-const search = ref('')
+const { benefits, loading: loadingBenefits, getDataBenefits } = useBenefits()
+const { level, loading: loadingLevel, getLevelById, updateLevelPoints } = useLevels()
 
-const paginationKey = 'benefits-banners-list'
-const pagination = reactive({
-  currentPage: TABLE_PAGINATION.currentPage,
-  totalPages: TABLE_PAGINATION.totalPages,
-  limit: TABLE_PAGINATION.limit,
-})
+const loading = computed(() => loadingBenefits.value || loadingLevel.value)
 
-const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
-  if (actionName === 'edit') {
-    // router.push(`/settings/banners/benefits/edit/${item.id}`)
+const idLevel = computed(() => route.params.id_level as string)
+
+const fetchData = async () => {
+  if (idLevel.value) {
+    await Promise.all([getDataBenefits(idLevel.value), getLevelById(idLevel.value)])
   }
 }
 
-const getTableActions = async (item: any) => {
-  return getDefaultActions(item)
-}
-
-const handleTablePagination = (page: number) => {
-  pagination.currentPage = page
-  store.dispatch('pagination/updatePagination', {
-    key: paginationKey,
-    currentPage: page,
-  })
-}
-
-const goToNew = () => {
-  // router.push({ name: 'settings.banners.benefits.new' })
-}
-
-const fetchData = () => {
-  search.value = ''
+const handleUpdateLevelPoints = async (pointsData: {
+  min_points: number | string
+  max_points: number | string
+}) => {
+  if (idLevel.value) {
+    const success = await updateLevelPoints(idLevel.value, pointsData)
+    if (success) {
+      await getLevelById(idLevel.value)
+    }
+  }
 }
 
 onMounted(() => {
-  const savedPageGetter = store.getters['pagination/getPage']
-  pagination.currentPage = savedPageGetter(paginationKey)
   fetchData()
 })
 </script>
 
 <template>
-  <div class="d-flex flex-column h-100">
-    <!-- Fila de filtros -->
-    <div class="row mb-4 align-items-end g-3">
-      <div class="col-12 col-md-4">
-        <SearchInput
-          id="benefits-banners-search"
-          v-model="search"
-          label="Buscar por:"
-          placeholder="Nombre o descripción"
-          :loading="loading"
-          :infoTexts="['Puedes buscar por título', 'O por descripción']"
-        />
-      </div>
+  <div class="d-flex flex-column h-100 gap-4 bg-light-subtle p-3">
+    <!-- Benefits Section -->
+    <BenefitGrid :benefits="benefits" :loading="loading" />
 
-      <div
-        class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
-      >
-        <FetchButton @fetch="fetchData" />
-        <RedirectButton
-          :tooltip-title="
-            BUTTONS_TOOLTIPS.benefitsBanners?.tooltipTitle || 'Nuevo banner de beneficio'
-          "
-          @redirect="goToNew"
-        />
-      </div>
-    </div>
-
-    <div
-      :class="{
-        'container-fluid mt-2 border rounded-4 flex-grow-1 d-flex flex-column p-0 bg-white overflow-hidden':
-          !isMobile,
-      }"
-    >
-      <CustomTable
-        :data="items"
-        :headers="TABLE_HEADERS.benefitsBanners || []"
-        :actions="getTableActions"
-        :is-loading="loading"
-        :current-page="pagination.currentPage"
-        :total-pages="pagination.totalPages"
-        :limit="pagination.limit"
-        :change-page="handleTablePagination"
-        @change-page="handleTablePagination"
-        @action-click="handleTableAction"
-      />
-    </div>
+    <!-- Progress Section -->
+    <LevelProgress :level="level" @update="handleUpdateLevelPoints" />
   </div>
 </template>
+
+<style scoped>
+.content-card {
+  border-width: 1px;
+}
+
+/* Custom transitions and refinements */
+.overflow-auto {
+  scrollbar-width: thin;
+}
+</style>

@@ -3,9 +3,9 @@
     <div class="card border-0 shadow-sm">
       <div class="card-body p-4">
         <AdministratorForm
-          v-if="!isLoading"
+          v-if="!loading"
           :form="form"
-          :role-options="roleOptions"
+          :role-options="filteredRoles"
           :is-edit="true"
         />
         <div v-else class="text-center py-5">
@@ -21,10 +21,10 @@
           <button
             type="button"
             class="btn btn-primary px-4"
-            :disabled="isSaving"
+            :disabled="loading"
             @click="saveChanges"
           >
-            <span v-if="isSaving" class="spinner-border spinner-border-sm me-1"></span>
+            <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
             Guardar Cambios
           </button>
         </div>
@@ -34,99 +34,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useStore } from 'vuex'
-import { useSwal } from '@/composables/useSwal'
-import { URLS } from '@/const/api'
+import { useUsers } from '@/composables/Models/useUsers'
 import AdministratorForm from '@/components/Administrators/AdministratorForm.vue'
 
 const route = useRoute()
 const router = useRouter()
-const store = useStore()
-const { showSuccess, showError } = useSwal()
 
-const isLoading = ref(true)
-const isSaving = ref(false)
-const roleOptions = ref([])
+const { loading, roles, getRoles, getUser, saveUser } = useUsers()
 
 const form = ref({
+  id: '',
   first_name: '',
   last_name: '',
   email: '',
   phone: '',
-  role_id: null,
-  url_image: '',
+  id_type_rol_user: null as any,
+  url_image: '' as string | File,
   password: '',
   password_confirmation: '',
 })
 
-const fetchRoles = async () => {
-  try {
-    const response = await store.dispatch('getData', {
-      url: URLS.role.getAll,
-    })
-    if (response.code === 200) {
-      roleOptions.value = response.data
-    }
-  } catch (error) {
-    console.error('Error fetching roles:', error)
-  }
-}
+const filteredRoles = computed(() => {
+  return roles.value.filter((role: any) => role.id !== 3)
+})
 
 const fetchAdminData = async () => {
-  isLoading.value = true
-  try {
-    const response = await store.dispatch('getData', {
-      url: `${URLS.administrator.prefix}/${route.params.id}`,
-    })
-    if (response.code === 200) {
-      const data = response.data
-      form.value = {
-        ...form.value,
-        ...data,
-        password: '', // Don't populate password
-        password_confirmation: '',
-      }
+  const adminId = route.params.id as string
+  const data = await getUser(adminId)
+  if (data) {
+    form.value = {
+      ...form.value,
+      ...data,
+      password: '', // Don't populate password
+      password_confirmation: '',
     }
-  } catch (error) {
-    console.error('Error fetching admin data:', error)
-    showError('No se pudieron cargar los datos del administrador')
-  } finally {
-    isLoading.value = false
   }
 }
 
 const saveChanges = async () => {
-  isSaving.value = true
-  try {
-    const payload: any = { ...form.value }
-    // Remove password fields if they are empty
-    if (!payload.password) {
-      delete payload.password
-      delete payload.password_confirmation
-    }
+  if (form.value.password && form.value.password !== form.value.password_confirmation) {
+    // Note: The store dispatch handled errors, but we should probably use swalToast here if needed.
+    // However, saveUser in the composable already handles success/error toasts.
+    return
+  }
 
-    const response = await store.dispatch('postData', {
-      url: `${URLS.administrator.update}/${route.params.id}`,
-      data: payload,
-    })
-
-    if (response.code === 200) {
-      showSuccess('Administrador actualizado correctamente')
-      router.push('/administrators')
-    } else {
-      showError(response.message || 'Error al actualizar administrador')
-    }
-  } catch (error) {
-    console.error('Error saving changes:', error)
-    showError('Ocurrió un error al guardar los cambios')
-  } finally {
-    isSaving.value = false
+  const success = await saveUser(form.value as any, true, route.params.id as string)
+  if (success) {
+    router.push('/administrators')
   }
 }
 
 onMounted(async () => {
-  await Promise.all([fetchRoles(), fetchAdminData()])
+  await Promise.all([getRoles(), fetchAdminData()])
 })
 </script>
