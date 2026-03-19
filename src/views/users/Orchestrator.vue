@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, computed, onMounted, onBeforeUnmount, provide } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import ScrollableTabs from '@/components/common/ScrollableTabs.vue'
@@ -18,7 +18,8 @@ const route = useRoute()
 const router = useRouter()
 const store = useStore()
 const logger = useLogger()
-const { getClient } = useClients()
+const { getClient, client } = useClients()
+provide('targetClient', client)
 
 const isLoading = ref(false)
 const localTitle = ref('Titulo por defecto')
@@ -152,23 +153,11 @@ watch(
   },
 )
 
-watch(isGetting, (newValue: boolean) => {
-  if (newValue) {
-    isLoading.value = false
-    store.dispatch('utils/setIsGetting', false)
-  }
-})
+// watcher removido por causar montado prematuro de subvistas
 
 onMounted(async () => {
   await determineVisibleTabs()
-
-  if (isGetting.value) {
-    // Si ya está cargando (por el store), iniciamos el timeout de seguridad
-    startLoadingTimeout()
-  } else {
-    // Si no está cargando, cargamos los datos inmediatamente
-    loadUserData()
-  }
+  loadUserData()
 })
 
 onBeforeUnmount(() => {

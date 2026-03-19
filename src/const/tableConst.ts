@@ -167,11 +167,12 @@ export const TABLE_HEADERS = {
   ],
   user: [
     ...maybeId('id_user'),
-    { key: 'user.url_image', label: 'Foto' },
-    { key: 'user.full_name', label: 'Nombre y apellido' },
-    { key: 'user.email', label: 'Correo' },
-    { key: 'user.phone', label: 'Teléfono' },
-    { key: 'role.name', label: 'Rol' },
+    { key: 'code', label: 'Código' },
+    { key: 'full_name', label: 'Nombre y apellido' },
+    { key: 'email', label: 'Correo' },
+    { key: 'phone', label: 'Teléfono' },
+    { key: 'type_city.name', label: 'Ciudad' },
+    { key: 'type_level.name', label: 'Nivel' },
     { key: 'active', label: 'Estatus' },
   ],
 

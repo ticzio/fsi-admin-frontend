@@ -13,9 +13,9 @@ export interface ClientInterface {
   id_type_rol_user: number | string
   blocked_at?: string | null
   id_pharmacy?: number | string | null
-  count_login?: number
+  count_login?: number | null
   email: string
-  failed_attempts?: number
+  failed_attempts?: number | null
   first_name: string
   last_name: string
   last_login?: string | null
@@ -24,7 +24,25 @@ export interface ClientInterface {
   url_image?: string | File | null
   active?: number | boolean
   timestamp?: string
+  ci?: string | number
+  born_date?: string | null
+  gender?: string | null
+  id_type_city?: number | string | null
+  type_level?: any
+  point_level?: number
 }
+
+const sharedClient = ref<ClientInterface | null>(null)
+const sharedLoading = ref(false)
+const sharedClients = ref<ClientInterface[]>([])
+const sharedPagination = reactive({
+  currentPage: TABLE_PAGINATION.currentPage,
+  totalPages: TABLE_PAGINATION.totalPages,
+  limit: TABLE_PAGINATION.limit,
+})
+
+// Mapa para deduplicar peticiones simultáneas por ID
+const pendingGetClient = new Map<string | number, Promise<any>>()
 
 export function useClients() {
   const store = useStore()
@@ -33,16 +51,12 @@ export function useClients() {
   const logger = useLogger()
   const { roles, getRoles } = useRoles()
 
-  const loading = ref(false)
-  const clients = ref<ClientInterface[]>([])
-  const client = ref<ClientInterface | null>(null)
+  const loading = sharedLoading
+  const clients = sharedClients
+  const client = sharedClient
 
   const paginationKey = 'clients-list'
-  const pagination = reactive({
-    currentPage: TABLE_PAGINATION.currentPage,
-    totalPages: TABLE_PAGINATION.totalPages,
-    limit: TABLE_PAGINATION.limit,
-  })
+  const pagination = sharedPagination
 
   const currentSearch = ref('')
   const currentExtraParams = ref<any>({})
@@ -86,25 +100,40 @@ export function useClients() {
    * Útil para buscar por ID o algún parámetro específico.
    */
   const getClient = async (id: string | number) => {
-    loading.value = true
-    try {
-      const response: any = await store.dispatch('getData', {
-        url: URLS.client.prefix + '/' + id, // Modified targeted resource
-        params: {},
-      })
-
-      if (response.code === 200) {
-        client.value = response.data
-        return response.data
-      } else {
-        swalToast.showError(response.message || 'Error al obtener el cliente')
-      }
-    } catch (error: any) {
-      console.error('Error fetching client:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener el cliente')
-    } finally {
-      loading.value = false
+    // 1. Si ya tenemos el cliente (y coincide el ID), devolverlo directamente
+    if (client.value && String(client.value.id) === String(id)) {
+      return client.value
     }
+
+    // 2. Si hay una petición en curso para este ID, compartir la misma promesa
+    if (pendingGetClient.has(id)) {
+      return pendingGetClient.get(id)
+    }
+
+    const promise = (async () => {
+      loading.value = true
+      try {
+        const response: any = await store.dispatch('getData', {
+          url: URLS.client.prefix + '/' + id,
+          params: { active: 1 },
+        })
+
+        if (response.code === 200) {
+          client.value = response.data
+          return response.data
+        }
+        return null
+      } catch (error) {
+        console.error('Error in getClient:', error)
+        return null
+      } finally {
+        loading.value = false
+        pendingGetClient.delete(id)
+      }
+    })()
+
+    pendingGetClient.set(id, promise)
+    return promise
   }
 
   /**
@@ -126,7 +155,13 @@ export function useClients() {
       formData.append('email', data.email)
       formData.append('first_name', data.first_name)
       formData.append('last_name', data.last_name)
-      formData.append('phone', data.phone)
+      formData.append('phone', data.phone || '')
+      formData.append('ci', String(data.ci || ''))
+      formData.append('born_date', data.born_date || '')
+      formData.append('gender', data.gender || '')
+      if (data.id_type_city) {
+        formData.append('id_type_city', String(data.id_type_city))
+      }
       formData.append('id_pharmacy', data.id_pharmacy ? String(data.id_pharmacy) : String(0))
 
       if (data.password) formData.append('password', data.password)

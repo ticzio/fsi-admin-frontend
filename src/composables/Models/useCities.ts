@@ -8,21 +8,25 @@ import { ERROR } from '@/const/errorConst'
 import { TABLE_PAGINATION } from '@/const/tableConst'
 import { ICONS_MULTISELECT } from '@/const/multiselectConst'
 
+const sharedCities = ref<any[]>([])
+const sharedLoading = ref(false)
+const sharedPagination = reactive({
+  currentPage: TABLE_PAGINATION.currentPage,
+  totalPages: TABLE_PAGINATION.totalPages,
+  limit: TABLE_PAGINATION.limit,
+})
+
+let pendingGetCities: Promise<any> | null = null
+
 export function useCities() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
   const logger = useLogger()
 
-  const loading = ref(false)
-  const cities = ref<any[]>([])
-
-  const paginationKey = 'cities-list'
-  const pagination = reactive({
-    currentPage: TABLE_PAGINATION.currentPage,
-    totalPages: TABLE_PAGINATION.totalPages,
-    limit: TABLE_PAGINATION.limit,
-  })
+  const loading = sharedLoading
+  const cities = sharedCities
+  const pagination = sharedPagination
 
   const getDataCities = async (page = 1, search = '') => {
     loading.value = true
@@ -53,29 +57,45 @@ export function useCities() {
   }
 
   const getCities = async (id_state?: string | number) => {
-    loading.value = true
-    try {
-      const params: any = { limit: 100 }
-      if (id_state) {
-        params.id_state = id_state
-      }
-
-      const response: any = await store.dispatch('getData', {
-        url: URLS.city.getAll,
-        params,
-      })
-
-      if (response.code === 200) {
-        cities.value = response.data
-      } else {
-        swalToast.showError(response.message || 'Error al obtener las ciudades')
-      }
-    } catch (error: any) {
-      console.error('Error fetching cities:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener las ciudades')
-    } finally {
-      loading.value = false
+    // 1. Si ya tenemos las ciudades y no se pide un estado específico, devolverlas
+    if (cities.value.length > 0 && !id_state) {
+      return cities.value
     }
+
+    // 2. Si hay una petición en curso (y no se filtra por estado), compartirla
+    if (pendingGetCities && !id_state) {
+      return pendingGetCities
+    }
+
+    const promise = (async () => {
+      loading.value = true
+      try {
+        const params: any = { limit: 100, active: 1 }
+        if (id_state) {
+          params.id_state = id_state
+        }
+
+        const response: any = await store.dispatch('getData', {
+          url: URLS.city.getAll,
+          params,
+        })
+
+        if (response.code === 200) {
+          cities.value = response.data
+          return response.data
+        }
+        return []
+      } catch (error) {
+        console.error('Error in getCities:', error)
+        return []
+      } finally {
+        loading.value = false
+        if (!id_state) pendingGetCities = null
+      }
+    })()
+
+    if (!id_state) pendingGetCities = promise
+    return promise
   }
 
 

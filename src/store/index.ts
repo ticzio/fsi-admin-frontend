@@ -130,8 +130,10 @@ const store = createStore({
               setCookie('fsi_admin_token', userData.auth.token)
               setCookie('fsi_admin_full_name', userData.full_name)
               setCookie('fsi_admin_id_user', userData.id)
+              setCookie('fsi_admin_code_user', userData.code)
               const id_role_hashing = btoa(userData.id_type_rol_user.toString())
               setCookie('fsi_admin_id_role', id_role_hashing)
+
               //setCookie('fsi_admin_id_admin', userData.id_admin)
               if (userData.url_image) {
                 setCookie('fsi_admin_url_image', userData.url_image)
@@ -158,6 +160,8 @@ const store = createStore({
       removeCookie('fsi_admin_id_role')
       removeCookie('fsi_admin_id_admin')
       removeCookie('fsi_admin_url_image')
+      removeCookie('fsi_admin_code_user')
+      removeCookie('fsi_admin_id_user')
 
       resetAuthRole()
 

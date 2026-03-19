@@ -1,13 +1,40 @@
 <script setup lang="ts">
+import { onMounted, computed } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
-import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
+import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
+import { useCities } from '@/composables/Models/useCities'
 
 const props = defineProps<{
   form: any
-  roleOptions: any[]
   isEdit?: boolean
 }>()
+
+const { cities, getCities } = useCities()
+
+const genderOptions = [
+  { name: 'Masculino' },
+  { name: 'Femenino' },
+  { name: 'Otro' },
+]
+
+const selectedGender = computed({
+  get: () => genderOptions.find((opt) => opt.name === props.form.gender) || null,
+  set: (val: any) => {
+    props.form.gender = val ? val.name : ''
+  },
+})
+
+const selectedCity = computed({
+  get: () => cities.value.find((city: any) => city.id === props.form.id_type_city) || null,
+  set: (val: any) => {
+    props.form.id_type_city = val ? val.id : ''
+  },
+})
+
+onMounted(async () => {
+  await getCities()
+})
 </script>
 
 <template>
@@ -21,11 +48,28 @@ const props = defineProps<{
         placeholder="Haz click o arrastra una imagen"
         accepted-formats="image/png, image/jpeg, image/jpg"
       />
+
+      <!-- Información del Nivel (Solo lectura) -->
+      <div v-if="isEdit" class="mt-4 p-3 bg-light rounded-4 border border-light shadow-sm">
+        <h6 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
+          <i class="bi bi-star-fill"></i>
+          Información de Nivel
+        </h6>
+        <div class="mb-2">
+          <label class="small text-muted d-block p-0">Nivel Actual</label>
+          <span class="fw-bold text-dark">{{ form.type_level?.name || 'Cargando...' }}</span>
+        </div>
+        <div>
+          <label class="small text-muted d-block p-0">Puntos Acumulados</label>
+          <span class="fw-bold text-dark">{{ form.point_level || 0 }} pts</span>
+        </div>
+      </div>
     </div>
 
     <!-- General Data -->
     <div class="col-12 col-md-8 col-lg-9">
       <div class="row g-3">
+        <!-- Nombres y Apellidos -->
         <div class="col-12 col-md-6">
           <BaseInput
             id="first_name"
@@ -44,6 +88,26 @@ const props = defineProps<{
             :rules="[(v) => !!v || 'Campo obligatorio']"
           />
         </div>
+
+        <!-- CI y Fecha de Nacimiento -->
+        <div class="col-12 col-md-6">
+          <BaseInput
+            id="ci"
+            v-model="form.ci"
+            label="Cédula de Identidad"
+            placeholder="Ej. 12345678"
+          />
+        </div>
+        <div class="col-12 col-md-6">
+          <BaseInput
+            id="born_date"
+            v-model="form.born_date"
+            type="date"
+            label="Fecha de Nacimiento"
+          />
+        </div>
+
+        <!-- Email y Teléfono -->
         <div class="col-12 col-md-6">
           <BaseInput
             id="email"
@@ -62,18 +126,28 @@ const props = defineProps<{
             placeholder="Ej. 04141234567"
           />
         </div>
-        <div class="col-12 col-md-12">
+
+        <!-- Género y Ciudad -->
+        <div class="col-12 col-md-6">
           <MultiselectCustom
-            v-model="form.role_id"
-            :options="roleOptions"
-            label="Rol *"
-            placeholder="Selecciona el rol"
-            labelKey="name"
-            trackBy="id"
-            :showIcons="true"
-            helperType="custom"
-            customDefaultIcon="bi bi-person-badge"
-            :clearable="true"
+            v-model="selectedGender"
+            :options="genderOptions"
+            label="Género"
+            placeholder="Selecciona género"
+            :show-icons="false"
+            :show-descriptions="false"
+          />
+        </div>
+        <div class="col-12 col-md-6">
+          <MultiselectCustom
+            v-model="selectedCity"
+            :options="cities"
+            label="Ciudad"
+            placeholder="Selecciona ciudad"
+            label-key="name"
+            track-by="id"
+            :show-icons="false"
+            :show-descriptions="false"
           />
         </div>
 
@@ -103,4 +177,20 @@ const props = defineProps<{
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.custom-select {
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 0.95rem;
+}
+
+.custom-select:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.1);
+}
+
+.bg-light {
+  background-color: #f9fafb !important;
+}
+</style>

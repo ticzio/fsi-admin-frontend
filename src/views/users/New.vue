@@ -15,11 +15,6 @@ const { saveClient } = useClients()
 
 const loading = ref(false)
 
-const roleOptions = ref([
-  { id: 1, name: 'Administrador' },
-  { id: 2, name: 'Cliente' },
-  { id: 3, name: 'Soporte' },
-])
 
 const form = reactive({
   url_image: null as File | null,
@@ -27,13 +22,16 @@ const form = reactive({
   last_name: '',
   email: '',
   phone: '',
-  role_id: null as any,
+  ci: '',
+  born_date: '',
+  gender: '',
+  id_type_city: '',
   password: '',
   password_confirmation: '',
 })
 
 const saveUser = async () => {
-  if (!form.first_name || !form.last_name || !form.email || !form.role_id) {
+  if (!form.first_name || !form.last_name || !form.email) {
     swalToast.showError('Por favor, completa los campos obligatorios.')
     return
   }
@@ -53,10 +51,9 @@ const saveUser = async () => {
   const clientData = {
     ...form,
     id: 0,
-    id_type_rol_user: form.role_id,
   }
   
-  const success = await saveClient(clientData, false)
+  const success = await saveClient(clientData as any, false)
   loading.value = false
   
   if (success) {
@@ -86,7 +83,7 @@ const saveUser = async () => {
 
       <div class="flex-grow-1">
         <form id="userForm" @submit.prevent="saveUser">
-          <UserForm :form="form" :roleOptions="roleOptions" :is-edit="false" />
+          <UserForm :form="form" :is-edit="false" />
         </form>
       </div>
 

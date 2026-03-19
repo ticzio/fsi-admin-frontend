@@ -26,6 +26,17 @@ export interface UserInterface {
   timestamp?: string
 }
 
+const sharedUser = ref<UserInterface | null>(null)
+const sharedLoading = ref(false)
+const sharedUsers = ref<UserInterface[]>([])
+const sharedPagination = reactive({
+  currentPage: TABLE_PAGINATION.currentPage,
+  totalPages: TABLE_PAGINATION.totalPages,
+  limit: TABLE_PAGINATION.limit,
+})
+
+const pendingGetUser = new Map<string | number, Promise<any>>()
+
 export function useUsers() {
   const store = useStore()
   const swalToast = useSwalToast()
@@ -33,16 +44,12 @@ export function useUsers() {
   const logger = useLogger()
   const { roles, getRoles } = useRoles()
 
-  const loading = ref(false)
-  const users = ref<UserInterface[]>([])
-  const user = ref<UserInterface | null>(null)
+  const loading = sharedLoading
+  const users = sharedUsers
+  const user = sharedUser
 
   const paginationKey = 'users-list'
-  const pagination = reactive({
-    currentPage: TABLE_PAGINATION.currentPage,
-    totalPages: TABLE_PAGINATION.totalPages,
-    limit: TABLE_PAGINATION.limit,
-  })
+  const pagination = sharedPagination
 
   const currentSearch = ref('')
   const currentExtraParams = ref<any>({})
@@ -86,25 +93,40 @@ export function useUsers() {
    * Útil para buscar por ID o algún parámetro específico.
    */
   const getUser = async (id: string | number) => {
-    loading.value = true
-    try {
-      const response: any = await store.dispatch('getData', {
-        url: URLS.user.prefix + '/' + id,
-        params: {},
-      })
-
-      if (response.code === 200) {
-        user.value = response.data
-        return response.data
-      } else {
-        swalToast.showError(response.message || 'Error al obtener el usuario')
-      }
-    } catch (error: any) {
-      console.error('Error fetching user:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener el usuario')
-    } finally {
-      loading.value = false
+    // 1. Si ya tenemos el usuario (y coincide el ID), devolverlo directamente
+    if (user.value && String(user.value.id) === String(id)) {
+      return user.value
     }
+
+    // 2. Si hay una petición en curso para este ID, compartir la misma promesa
+    if (pendingGetUser.has(id)) {
+      return pendingGetUser.get(id)
+    }
+
+    const promise = (async () => {
+      loading.value = true
+      try {
+        const response: any = await store.dispatch('getData', {
+          url: URLS.user.prefix + '/' + id,
+          params: { active: 1 },
+        })
+
+        if (response.code === 200) {
+          user.value = response.data
+          return response.data
+        }
+        return null
+      } catch (error) {
+        console.error('Error in getUser:', error)
+        return null
+      } finally {
+        loading.value = false
+        pendingGetUser.delete(id)
+      }
+    })()
+
+    pendingGetUser.set(id, promise)
+    return promise
   }
 
   /**
@@ -127,7 +149,9 @@ export function useUsers() {
       formData.append('first_name', data.first_name)
       formData.append('last_name', data.last_name)
       formData.append('phone', data.phone)
-      formData.append('id_pharmacy', data.id_pharmacy ? String(data.id_pharmacy) : String(0))
+      if (data.id_pharmacy) {
+        formData.append('id_pharmacy', String(data.id_pharmacy))
+      }
 
       if (data.password) formData.append('password', data.password)
 
