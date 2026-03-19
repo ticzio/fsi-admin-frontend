@@ -7,9 +7,11 @@ import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import UserForm from '@/components/Users/UserForm.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
+import { useClients } from '@/composables/Models/useClients'
 
 const router = useRouter()
 const swalToast = useSwalToast()
+const { saveClient } = useClients()
 
 const loading = ref(false)
 
@@ -47,16 +49,18 @@ const saveUser = async () => {
   }
 
   loading.value = true
-  try {
-    console.log('Guardando usuario:', form)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    swalToast.showSuccess('Usuario creado exitosamente')
+  
+  const clientData = {
+    ...form,
+    id: 0,
+    id_type_rol_user: form.role_id,
+  }
+  
+  const success = await saveClient(clientData, false)
+  loading.value = false
+  
+  if (success) {
     router.push('/users')
-  } catch (error) {
-    console.error('Error al guardar:', error)
-    swalToast.showError('Ocurrió un error al intentar guardar el usuario.')
-  } finally {
-    loading.value = false
   }
 }
 </script>

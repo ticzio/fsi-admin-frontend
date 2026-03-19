@@ -12,12 +12,13 @@ import { useCookies } from '@/composables/useCookies'
 import { decodeRole } from '@/composables/useAccessControl'
 
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
-import { URLS } from '@/const/api'
+import { useClients } from '@/composables/Models/useClients'
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
 const logger = useLogger()
+const { getClient } = useClients()
 
 const isLoading = ref(false)
 const localTitle = ref('Titulo por defecto')
@@ -117,7 +118,7 @@ const startLoadingTimeout = () => {
   loadingTimeout = setTimeout(() => {
     if (isLoading.value) {
       console.warn('Loading timeout alcanzado, cargando datos directamente...')
-      //loadPharmacyData()
+      loadUserData()
     }
   }, 3000) // 3 segundos de espera máxima
 }
@@ -131,21 +132,13 @@ const clearLoadingTimeout = () => {
 
 // Cargar datos del usuario directamente si es necesario (ej: recarga de página)
 const loadUserData = async () => {
-  try {
-    const response = await store.dispatch('getData', {
-      url: `${URLS.users?.prefix || 'users'}/${route.params.id}`,
-    })
-    if (response.code === 200) {
-      const data = response.data
-      logger.logRequest((URLS.users?.prefix || 'users') + '/' + route.params.id, {}, data)
-      localTitle.value = data.first_name + ' ' + data.last_name || data.full_name || ''
-      store.dispatch('utils/setIsItem', localTitle.value)
-    }
-  } catch (error) {
-    logger.logRequest((URLS.users?.prefix || 'users') + '/' + route.params.id, {}, error)
-  } finally {
-    isLoading.value = false
+  isLoading.value = true
+  const data = await getClient(route.params.id as string)
+  if (data) {
+    localTitle.value = data.first_name + ' ' + data.last_name || data.full_name || ''
+    store.dispatch('utils/setIsItem', localTitle.value)
   }
+  isLoading.value = false
 }
 
 watch(
@@ -174,7 +167,7 @@ onMounted(async () => {
     startLoadingTimeout()
   } else {
     // Si no está cargando, cargamos los datos inmediatamente
-    //loadUserData()
+    loadUserData()
   }
 })
 

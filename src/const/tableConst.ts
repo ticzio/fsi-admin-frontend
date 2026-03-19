@@ -109,6 +109,7 @@ export type TitleSectionKey = keyof typeof TITLE_SECTION_COMPONENT
 export const TABLE_HEADERS = {
   administrator: [
     ...maybeId('id'),
+    { key: 'code', label: 'Código' },
     { key: 'url_image', label: 'Foto' },
     { key: 'full_name', label: 'Nombre y apellido' },
     { key: 'email', label: 'Correo' },

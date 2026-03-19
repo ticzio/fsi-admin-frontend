@@ -67,6 +67,7 @@ const fetchAdminData = async () => {
     form.value = {
       ...form.value,
       ...data,
+      id_type_rol_user: data.id_type_rol || null,
       password: '', // Don't populate password
       password_confirmation: '',
     }

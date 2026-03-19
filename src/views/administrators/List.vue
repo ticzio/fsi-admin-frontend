@@ -82,12 +82,11 @@ onMounted(async () => {
             id="administrators-search"
             v-model="search"
             label="Buscar por:"
-            placeholder="Nombre, correo o teléfono"
+            placeholder="Nombre o correo"
             :loading="loading"
             :infoTexts="[
               'Puedes buscar por nombre completo',
               'Puedes buscar por correo electrónico',
-              'O por número de teléfono',
             ]"
             @search="fetchData"
             only-on-enter

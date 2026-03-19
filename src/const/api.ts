@@ -16,15 +16,16 @@ const RESOURCES = {
   state: 'state',
   city: 'city',
   role: 'rol',
-  notification: 'notification',
+  notification: 'notifications',
   news: 'news',
+  client: 'client',
   level: 'level',
   coupon: 'coupon',
   banner: 'banner',
   benefit: 'benefit',
   mission: 'mission',
   appUbication: 'app_ubication',
-  template_message: 'templates',
+  template_message: 'message_template',
 }
 
 // 3. Genera el objeto URLS final de forma dinámica

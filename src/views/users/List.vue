@@ -15,6 +15,7 @@ import { useTableActions } from '@/composables/useTableActions'
 
 import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
+import { useClients } from '@/composables/Models/useClients'
 
 interface Item {
   id: string | number
@@ -26,42 +27,17 @@ const swalToast = useSwalToast()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
+const { clients, loading, pagination, paginationKey, getDataClients, deactivateClient, deleteClient } = useClients()
 
-const loading = ref(false)
-const items = ref<Item[]>([
-  {
-    id: 1,
-    id_user: 1,
-    'user.url_image': '',
-    'user.full_name': 'Juan Pérez',
-    'user.email': 'juan.perez@ejemplo.com',
-    'user.phone': '+58 212 111 0001',
-    'role.name': 'Cliente',
-    active: true,
-  },
-  {
-    id: 2,
-    id_user: 2,
-    'user.url_image': '',
-    'user.full_name': 'María García',
-    'user.email': 'maria.garcia@ejemplo.com',
-    'user.phone': '+58 212 222 0002',
-    'role.name': 'Cliente',
-    active: false,
-  },
-])
 const search = ref('')
 
-const paginationKey = 'users-list'
-const pagination = reactive({
-  currentPage: TABLE_PAGINATION.currentPage,
-  totalPages: TABLE_PAGINATION.totalPages,
-  limit: TABLE_PAGINATION.limit,
-})
-
-const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
+const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
-    router.push(`/users/edit/${item.id_user}`)
+    router.push(`/users/edit/${item.id}`)
+  } else if (actionName === 'deactivate') {
+    await deactivateClient(item)
+  } else if (actionName === 'delete') {
+    await deleteClient(item)
   }
 }
 
@@ -70,7 +46,7 @@ const getTableActions = async (item: any) => {
 }
 
 const handleTablePagination = (page: number) => {
-  pagination.currentPage = page
+  getDataClients(page, search.value)
   store.dispatch('pagination/updatePagination', {
     key: paginationKey,
     currentPage: page,
@@ -82,13 +58,17 @@ const goToNew = () => {
 }
 
 const fetchData = () => {
-  // TODO: Lógica para hacer la petición GET
-  search.value = ''
+  getDataClients(1, search.value)
 }
 
 onMounted(() => {
   const savedPageGetter = store.getters['pagination/getPage']
-  pagination.currentPage = savedPageGetter(paginationKey)
+  const savedPage = savedPageGetter(paginationKey)
+  if (savedPage) {
+    getDataClients(savedPage)
+  } else {
+    getDataClients()
+  }
 })
 </script>
 
@@ -132,7 +112,7 @@ onMounted(() => {
         }"
       >
         <CustomTable
-          :data="items"
+          :data="clients"
           :headers="TABLE_HEADERS.user"
           :actions="getTableActions"
           :is-loading="loading"
