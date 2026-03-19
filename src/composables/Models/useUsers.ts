@@ -11,6 +11,7 @@ import { useRoles } from '@/composables/Models/useRoles'
 export interface UserInterface {
   id: number | string
   id_type_rol_user: number | string
+  code?: string
   blocked_at?: string | null
   id_pharmacy?: number | string | null
   count_login?: number
