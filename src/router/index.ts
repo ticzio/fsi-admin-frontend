@@ -5,7 +5,7 @@ import { roleHasAllPermissions } from '@/const/rolePermissions'
 
 import dashboardRoutes from './routes/dashboard'
 import pharmacyRoutes from './routes/pharmacy'
-import couponsRoutes from './routes/coupons'
+import couponsRoutes from './routes/exchanges'
 import newsRoutes from './routes/news'
 import notificationsRoutes from './routes/notifications'
 import usersRoutes from './routes/users'

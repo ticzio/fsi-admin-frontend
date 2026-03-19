@@ -21,6 +21,7 @@ const RESOURCES = {
   client: 'client',
   level: 'level',
   coupon: 'coupon',
+  exchange: 'exchange',
   banner: 'banner',
   benefit: 'benefit',
   mission: 'mission',

@@ -47,9 +47,11 @@ const store = createStore({
      *   // Retorna una promesa con los datos
      */
     getData({ commit }: { commit: Function }, form: { url: string; params?: Record<string, any> }) {
+      const isAbsolute = form.url.startsWith('http')
+      const finalUrl = isAbsolute ? form.url : '/' + form.url
       return new Promise((resolve, reject) => {
         apiClient
-          .get('/' + form.url, {
+          .get(finalUrl, {
             params: { active: 1, ...(form.params || {}) },
           })
           .then((response) => resolve(response.data))

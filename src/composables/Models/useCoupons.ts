@@ -40,8 +40,10 @@ export function useCoupons() {
         coupons.value = response.data
         pagination.totalPages = response.meta.last_page
         pagination.currentPage = response.meta.current_page
+      } else if (response.code === 404) {
+        swalToast.showError('No se encontraron registros de cupones')
       } else {
-        swalToast.showError(response.message || 'Error al obtener los cupones')
+        swalToast.showError('Error al obtener los registros de cupones')
       }
     } catch (error: any) {
       console.error('Error fetching coupons:', error)

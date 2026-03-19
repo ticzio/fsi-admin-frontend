@@ -14,7 +14,7 @@ export interface MenuItem {
 export const MENU_ITEMS: MenuItem[] = [
   { label: 'Inicio', to: '/dashboard', matchPath: '/dashboard' },
   { label: 'Farmacia', to: '/pharmacy', matchPath: '/pharmacy' },
-  { label: 'Cupones', to: '/coupons', matchPath: '/coupons' },
+  { label: 'Canjes', to: '/exchanges', matchPath: '/exchanges' },
   { label: 'Noticias', to: '/news', matchPath: '/news' },
   { label: 'Notificaciones', to: '/notifications', matchPath: '/notifications' },
   { label: 'Usuarios', to: '/users', matchPath: '/users' },

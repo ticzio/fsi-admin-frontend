@@ -18,6 +18,13 @@ export const TITLE_SECTION_COMPONENT = {
     new: 'Nueva farmacia',
     newDescription: 'Aquí puedes crear una nueva farmacia con toda la información necesaria.',
   },
+  exchanges: {
+    title: 'Cupones Canjeados',
+    description: 'Lista de cupones canjeados',
+    details: 'Detalles del cupón canjeado',
+    new: 'Nuevo cupón canjeado',
+    newDescription: 'Aquí puedes crear un nuevo cupón canjeado con toda la información necesaria.',
+  },
   coupons: {
     title: 'Cupones',
     description: 'Lista de cupones',
@@ -130,11 +137,20 @@ export const TABLE_HEADERS = {
   ],
   operator: [
     ...maybeId('id'),
+    { key: 'code', label: 'Código' },
+    { key: 'id_pharma.name', label: 'Farmacia' },
     { key: 'url_image', label: 'Foto' },
     { key: 'full_name', label: 'Nombre y apellido' },
     { key: 'email', label: 'Correo' },
     { key: 'phone', label: 'Teléfono' },
     { key: 'active', label: 'Estatus' },
+  ],
+  exchanges: [
+    ...maybeId('id'),
+    { key: 'id_coupon_client.code', label: 'Código Cupón' },
+    { key: 'id_pharmacy.name', label: 'Farmacia' },
+    { key: 'id_user.full_name', label: 'Operador' },
+    { key: 'exchanged_at', label: 'Fecha de Canje' },
   ],
 
   coupons: [
