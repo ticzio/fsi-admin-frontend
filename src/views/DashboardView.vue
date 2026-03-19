@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import TitleSection from '@/components/common/titleSection.vue'
 import StatisticCards from '@/components/Home/StatisticCards.vue'
@@ -7,7 +8,9 @@ import LineChart from '@/components/common/Charts/LineChart.vue'
 import AreaChart from '@/components/common/Charts/AreaChart.vue'
 import StackedBarChart from '@/components/common/Charts/StackedBarChart.vue'
 import LatestUsers from '@/components/Home/LatestUsers.vue'
+import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
 import { useDashboardCharts } from '@/composables/useDashboardCharts'
+import type { StatisticItem } from '@/components/Home/StatisticCards.vue'
 
 const users = ref([
   { id: 1, name: 'Gabriel Correa', email: 'gabriel@example.com' },
@@ -21,21 +24,35 @@ const users = ref([
 ])
 
 const statisticItems = ref([
-  { value: 12, label: 'Sedes activas' },
-  { value: 34, label: 'Operadores activos' },
-  { value: 234, label: 'Usuarios registrados', highlighted: true },
-  { value: 96, label: 'Cupones canjeados' },
+  { value: 12, label: 'Farmacias activas', to: 'Farmacia' },
+  { value: 34, label: 'Operadores activos', to: 'Operadores' },
+  { value: 234, label: 'Usuarios registrados', highlighted: true, to: 'Usuarios' },
+  { value: 96, label: 'Cupones canjeados', to: 'Canjes' },
 ])
 
 const { chart1Series, chart1Options, chart2Series, chart2Options } = useDashboardCharts()
+
+const router = useRouter()
+const isRedirecting = ref(false)
+
+const handleCardClick = async (item: StatisticItem) => {
+  isRedirecting.value = true
+  // Doherty Threshold: Small delay to let the user see the "Redirection" state
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  if (item.to) {
+    router.push({ name: item.to })
+  }
+}
 </script>
 
 <template>
   <DashboardLayout>
     <div
-      class="dashboard-wrapper bg-white shadow-sm p-3 p-md-4 m-0 d-flex flex-column gap-3 gap-md-4"
+      class="dashboard-wrapper bg-white shadow-sm p-3 p-md-4 m-0 d-flex flex-column gap-3 gap-md-4 position-relative"
       style="border-radius: 20px"
     >
+      <!-- REDIRECT OVERLAY -->
+      <LoadingOverlay v-if="isRedirecting" message="Redireccionando..." />
       <!-- HEADER -->
       <TitleSection
         title="Bienvenido"
@@ -44,7 +61,7 @@ const { chart1Series, chart1Options, chart2Series, chart2Options } = useDashboar
       />
 
       <!-- CARDS -->
-      <StatisticCards :items="statisticItems" />
+      <StatisticCards :items="statisticItems" @click-card="handleCardClick" />
 
       <!-- MAIN CONTENT -->
       <div class="row g-4 flex-grow-1">
