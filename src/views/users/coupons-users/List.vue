@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
@@ -7,39 +8,26 @@ import FetchButton from '@/components/common/FetchButton.vue'
 //Composables
 import { useStore } from 'vuex'
 import { useTableActions } from '@/composables/useTableActions'
+import { useExchanges } from '@/composables/Models/useExchanges'
 
-import { TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
-
-interface Item {
-  id: string | number
-  [key: string]: any
-}
+import { TABLE_HEADERS } from '@/const/tableConst'
 
 const store = useStore()
+const route = useRoute()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
+const {
+  loading,
+  exchanges,
+  pagination,
+  paginationKey,
+  getExchangesByClientId,
+} = useExchanges()
 
-const loading = ref(false)
-const items = ref<Item[]>([
-  {
-    id: 1,
-    code: 'USER10',
-    description: '10% de descuento para clientes fieles',
-    discount_type: 'Porcentaje',
-    value: '10%',
-    active: true,
-  },
-])
+const idClient = computed(() => route.params.id as string)
 const search = ref('')
 
-const paginationKey = 'users-coupons-list'
-const pagination = reactive({
-  currentPage: TABLE_PAGINATION.currentPage,
-  totalPages: TABLE_PAGINATION.totalPages,
-  limit: TABLE_PAGINATION.limit,
-})
-
-const handleTableAction = ({ actionName, item }: { actionName: string; item: Item }) => {
+const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
   console.log('Action:', actionName, 'Item:', item)
 }
 
@@ -53,15 +41,32 @@ const handleTablePagination = (page: number) => {
     key: paginationKey,
     currentPage: page,
   })
+  fetchData(page)
 }
 
-const fetchData = () => {
-  search.value = ''
+const fetchData = async (page = 1) => {
+  if (idClient.value) {
+    await getExchangesByClientId(idClient.value, page, search.value)
+  }
 }
 
-onMounted(() => {
+const onSearch = () => {
+  fetchData(1)
+}
+
+onMounted(async () => {
   const savedPageGetter = store.getters['pagination/getPage']
-  pagination.currentPage = savedPageGetter(paginationKey)
+  const savedPage = savedPageGetter(paginationKey)
+  if (savedPage) {
+    pagination.currentPage = savedPage
+  }
+  await fetchData(pagination.currentPage)
+})
+
+watch(search, (newSearch) => {
+  if (!newSearch) {
+    fetchData(1)
+  }
 })
 </script>
 
@@ -76,13 +81,14 @@ onMounted(() => {
           label="Buscar por:"
           placeholder="Código o descripción"
           :loading="loading"
+          @search="onSearch"
         />
       </div>
 
       <div
         class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
       >
-        <FetchButton @fetch="fetchData" />
+        <FetchButton :loading="loading" @fetch="fetchData(1)" />
       </div>
     </div>
 
@@ -93,8 +99,8 @@ onMounted(() => {
       }"
     >
       <CustomTable
-        :data="items"
-        :headers="TABLE_HEADERS.coupons || []"
+        :data="exchanges"
+        :headers="TABLE_HEADERS.exchangesClient || []"
         :actions="getTableActions"
         :is-loading="loading"
         :current-page="pagination.currentPage"

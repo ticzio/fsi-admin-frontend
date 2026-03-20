@@ -179,8 +179,8 @@ const props = withDefaults(
   }>(),
   {
     pasteBehavior: 'global-active',
-    acceptedFormats: 'image/png, image/jpeg, image/jpg',
-    maxSizeMB: 3,
+    acceptedFormats: 'image/png, image/jpeg, image/jpg, image/gif',
+    maxSizeMB: 1.5,
     placeholder: 'Haz click para subir una imagen',
   },
 )
@@ -333,7 +333,8 @@ function isImage(nameOrUrl: string) {
     lower.startsWith('http') ||
     lower.endsWith('.png') ||
     lower.endsWith('.jpg') ||
-    lower.endsWith('.jpeg')
+    lower.endsWith('.jpeg') ||
+    lower.endsWith('.gif')
   )
 }
 
@@ -511,8 +512,8 @@ Props disponibles:
 - round: boolean (si es true, imagen circular; si es false, rectangular)
 - initialImageUrl: string | null (URL de imagen inicial, opcional)
 - inputDisabled: boolean (si es true, solo vista previa, no permite subir)
-- acceptedFormats: string (formatos aceptados, por defecto: 'image/png, image/jpeg, image/jpg')
-- maxSizeMB: number (tamaño máximo en MB, por defecto: 3)
+- acceptedFormats: string (formatos aceptados, por defecto: 'image/png, image/jpeg, image/jpg, image/gif')
+- maxSizeMB: number (tamaño máximo en MB, por defecto: 1.5)
 
 Eventos:
 - @update:modelValue="(file: File | null) => void" // Se emite cuando el usuario selecciona o borra una imagen
@@ -536,7 +537,7 @@ Ejemplo con formatos personalizados (PDF, documentos):
 Ejemplo aceptando imágenes y PDFs:
 <ImageUploader
   v-model="selectedFile"
-  accepted-formats="image/png, image/jpeg, image/jpg, application/pdf"
+  accepted-formats="image/png, image/jpeg, image/jpg, image/gif, application/pdf"
   :max-size-m-b="5"
 />
 

@@ -7,12 +7,12 @@ import { RouterLink, RouterView } from 'vue-router'
 </template>
 
 <style lang="scss" is:global>
-$primary: #103560;
+$primary: #044692;
 $secondary: #527387;
-$info: #84b0c0;
+$info: #006be8;
 $dark: #2c363e;
-$success: #16855f;
-$danger: #b25672;
+$success: #00b100;
+$danger: #ce000c;
 $warning: #ffba43;
 $light: #d6dde6;
 
@@ -67,7 +67,7 @@ body {
 [data-title]:after {
   content: attr(data-title);
   /* Glass efecto tomado del nav-link.active del sidebar */
-  background: rgba(15, 32, 92, 0.55);
+  background: rgba(4, 70, 146, 0.55);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(3px);
   white-space: nowrap;

@@ -6,6 +6,7 @@ import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import AppImage from '@/components/common/AppImage.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -14,9 +15,8 @@ import { useSwalToast } from '@/composables/useSwalToast'
 import { useTableActions } from '@/composables/useTableActions'
 import { useUsers } from '@/composables/Models/useUsers'
 
-import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
+import { TITLE_SECTION_COMPONENT, TABLE_HEADERS } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
-import defaultProfileImage from '@/assets/images/default-profile.png'
 
 interface Item {
   id: string | number
@@ -124,13 +124,7 @@ onMounted(async () => {
         >
           <template #cell(url_image)="{ value }">
             <div class="d-flex justify-content-center">
-              <img
-                :src="value || defaultProfileImage"
-                :alt="value || 'foto'"
-                class="img-fluid object-fit-cover rounded-pill"
-                style="width: 45px; height: 45px"
-                @error="(e: Event) => ((e.target as HTMLImageElement).src = defaultProfileImage)"
-              />
+              <AppImage :src="value" type="user" />
             </div>
           </template>
         </CustomTable>

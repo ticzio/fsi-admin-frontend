@@ -69,6 +69,38 @@ export function useExchanges() {
   }
 
   /**
+   * Obtiene la lista de canjes (exchanges) por ID de cliente.
+   */
+  const getExchangesByClientId = async (idClient: string | number, page = 1, search = '') => {
+    currentSearch.value = search
+    loading.value = true
+    try {
+      const response: any = await store.dispatch('getData', {
+        url: `${URLS.exchange.prefix}/client/${idClient}`,
+        params: {
+          page: page,
+          limit: pagination.limit,
+          query: search || null,
+          active: null,
+        },
+      })
+
+      if (response.code === 200) {
+        exchanges.value = response.data
+        pagination.totalPages = response.meta?.last_page || response.last_page
+        pagination.currentPage = response.meta?.current_page || response.current_page
+      } else {
+        swalToast.showError(response.message || 'Error al obtener los registros')
+      }
+    } catch (error: any) {
+      console.error('Error fetching exchanges by client id:', error)
+      swalToast.showError(error.message || 'Error de conexión al obtener los registros')
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
    * Obtiene un registro específico por ID.
    */
   const getExchangeById = async (id: string | number) => {
@@ -218,6 +250,7 @@ export function useExchanges() {
     pagination,
     paginationKey,
     getExchanges,
+    getExchangesByClientId,
     getExchangeById,
     saveExchange,
     deactivateExchange,

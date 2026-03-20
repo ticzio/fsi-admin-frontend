@@ -138,6 +138,7 @@ export const TABLE_HEADERS = {
   operator: [
     ...maybeId('id'),
     { key: 'code', label: 'Código' },
+
     { key: 'id_pharma.name', label: 'Farmacia' },
     { key: 'url_image', label: 'Foto' },
     { key: 'full_name', label: 'Nombre y apellido' },
@@ -146,6 +147,15 @@ export const TABLE_HEADERS = {
     { key: 'active', label: 'Estatus' },
   ],
   exchanges: [
+    ...maybeId('id'),
+    { key: 'id_coupon_client.code', label: 'Código Cupón' },
+    { key: 'id_pharmacy.name', label: 'Farmacia' },
+
+    { key: 'id_user.full_name', label: 'Operador' },
+    { key: 'exchanged_at', label: 'Fecha de Canje' },
+  ],
+
+  exchangesClient: [
     ...maybeId('id'),
     { key: 'id_coupon_client.code', label: 'Código Cupón' },
     { key: 'id_pharmacy.name', label: 'Farmacia' },
@@ -168,6 +178,7 @@ export const TABLE_HEADERS = {
   user: [
     ...maybeId('id_user'),
     { key: 'code', label: 'Código' },
+    { key: 'ci', label: 'Cédula' },
     { key: 'full_name', label: 'Nombre y apellido' },
     { key: 'email', label: 'Correo' },
     { key: 'phone', label: 'Teléfono' },
@@ -223,6 +234,9 @@ export const TABLE_HEADERS = {
     { key: 'url_image', label: 'Imagen' },
     { key: 'name', label: 'Título' },
     { key: 'id_app_ubication.name', label: 'Ubicación en la App' },
+    { key: 'views', label: 'Visualizaciones' },
+    { key: 'clicks', label: 'Clicks al banner' },
+
     { key: 'active', label: 'Estatus' },
   ],
   benefitsBanners: [

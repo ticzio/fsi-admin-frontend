@@ -6,6 +6,7 @@ import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import AppImage from '@/components/common/AppImage.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -135,18 +136,14 @@ onMounted(async () => {
           @action-click="handleTableAction"
         >
           <template #cell(url_image)="{ value }">
-            <div
-              class="d-flex justify-content-center align-items-center"
-              style="height: 40px; width: 40px; margin: 0 auto"
-            >
-              <img
-                v-if="value && value !== '-'"
+            <div class="d-flex justify-content-center align-items-center">
+              <AppImage
                 :src="value"
-                class="rounded shadow-sm"
-                alt="User photo"
-                style="width: 100%; height: 100%; object-fit: cover"
+                type="user"
+                width="40px"
+                height="40px"
+                rounded="rounded shadow-sm"
               />
-              <i v-else class="bi bi-person-circle fs-2 text-secondary opacity-50"></i>
             </div>
           </template>
         </CustomTable>

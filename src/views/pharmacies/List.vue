@@ -16,9 +16,9 @@ import { useTableActions } from '@/composables/useTableActions'
 import { usePharmacy } from '@/composables/Models/usePharmacy'
 import { useStates } from '@/composables/Models/useStates'
 import { useCities } from '@/composables/Models/useCities'
-import defaultProfileImage from '@/assets/images/default-profile.png'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import AppImage from '@/components/common/AppImage.vue'
 
 import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
@@ -223,13 +223,7 @@ watch(selectedCity, () => {
           @action-click="handleTableAction"
         >
           <template #cell(url_image)="{ value }">
-            <img
-              :src="value || defaultProfileImage"
-              :alt="value || 'imagen'"
-              class="img-fluid object-fit-cover rounded-pill"
-              style="width: 50px; height: 50px"
-              @error="(e: Event) => ((e.target as HTMLImageElement).src = defaultProfileImage)"
-            />
+            <AppImage :src="value" type="entity" width="50px" height="50px" />
           </template>
           <template #cell(active)="{ value }">
             <StatusBadge :value="value" />

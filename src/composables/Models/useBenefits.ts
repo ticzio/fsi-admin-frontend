@@ -41,7 +41,7 @@ export function useBenefits() {
       const response: any = await store.dispatch('getData', {
         url: URLS.benefit.getAll,
         params: {
-          id_level: idLevel,
+          id_levels: idLevel,
           page: page,
           limit: pagination.limit,
           query: search || null,

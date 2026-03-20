@@ -8,6 +8,7 @@ import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
 import Modal from '@/components/common/Modal.vue'
 import BannerForm from '@/components/Banners/BannerForm.vue'
+import AppImage from '@/components/common/AppImage.vue'
 
 //Composables
 import { useStore } from 'vuex'
@@ -124,12 +125,13 @@ onMounted(() => {
         >
           <template #cell(url_image)="{ value, item }">
             <div class="d-flex justify-content-center py-1">
-              <img
-                v-if="value"
+              <AppImage
                 :src="value"
                 :alt="item.name"
-                class="rounded-3 shadow-sm object-fit-cover border"
-                style="width: 120px; height: 60px"
+                type="entity"
+                width="120px"
+                height="60px"
+                rounded="rounded-3 shadow-sm border"
               />
             </div>
           </template>
