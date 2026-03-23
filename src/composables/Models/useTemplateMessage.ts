@@ -33,7 +33,7 @@ export function useTemplateMessage() {
           limit: pagination.limit,
           query: search || null,
           active: null,
-          id_pharmacy: idPharmacy || null, // Se envía el id_pharmacy para filtrar por farmacia si es necesario
+          id_pharmacies: idPharmacy || null, // Se envía el id_pharmacy para filtrar por farmacia si es necesario
         },
       })
 
@@ -115,7 +115,40 @@ export function useTemplateMessage() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.template_message.changeStatus, {}, error)
-      swalToast.showError(`${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name || item.title}`)
+      swalToast.showError(
+        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name || item.title}`,
+      )
+      return false
+    }
+  }
+
+  const deleteTemplate = async (item: any) => {
+    const result = await swal.showConfirm(
+      `¿Estás seguro de eliminar la plantilla?`,
+      `Esta acción eliminará ${item.name || item.title}.`,
+      {
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+      },
+    )
+
+    if (!result) return false
+
+    try {
+      const response = await store.dispatch('changeStatus', {
+        url: URLS.template_message.changeStatus,
+        id: item.id,
+        status: 2,
+      })
+      if (response.code === 200 || response.code === 201) {
+        logger.logRequest(URLS.template_message.changeStatus, {}, response)
+        swal.showSuccess('Plantilla eliminada exitosamente')
+        return true
+      }
+      return false
+    } catch (error: any) {
+      logger.logRequest(URLS.template_message.changeStatus, {}, error)
+      swalToast.showError(`${ERROR.errorDelete} ${item.name || item.title}`)
       return false
     }
   }
@@ -128,5 +161,6 @@ export function useTemplateMessage() {
     getDataTemplates,
     saveTemplate,
     deactivateTemplate,
+    deleteTemplate,
   }
 }

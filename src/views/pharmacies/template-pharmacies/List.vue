@@ -49,6 +49,7 @@ const {
   getDataTemplates,
   saveTemplate,
   deactivateTemplate,
+  deleteTemplate,
 } = useTemplateMessage()
 
 const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {
@@ -58,6 +59,11 @@ const handleTableAction = async ({ actionName, item }: { actionName: string; ite
     templateModalRef.value?.openModal()
   } else if (actionName === 'deactivate') {
     const success = await deactivateTemplate(item)
+    if (success) {
+      await fetchData()
+    }
+  } else if (actionName === 'delete') {
+    const success = await deleteTemplate(item)
     if (success) {
       await fetchData()
     }
@@ -89,7 +95,7 @@ const fetchData = async () => {
 
 const handleTemplateSubmit = async (formData: any) => {
   const isEditing = modalMode.value === 'edit'
-  const payload = { ...formData, id_pharmacy: idPharmacy }
+  const payload = { ...formData, id_pharmacies: idPharmacy }
   const idToEdit = selectedTemplate.value?.id
 
   const success = await saveTemplate(payload, isEditing, idToEdit)
