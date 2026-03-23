@@ -124,8 +124,8 @@ export function useTemplateMessage() {
 
   const deleteTemplate = async (item: any) => {
     const result = await swal.showConfirm(
-      `¿Estás seguro de eliminar la plantilla?`,
-      `Esta acción eliminará ${item.name || item.title}.`,
+      `¿Estás seguro de eliminar la plantilla ${item.name || item.title}?`,
+      `Esta acción eliminará permanentemente el registro.`,
       {
         confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar',

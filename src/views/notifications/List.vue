@@ -6,6 +6,7 @@ import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
 import Modal from '@/components/common/Modal.vue'
 import NotificationForm from '@/components/Notifications/NotificationForm.vue'
 import NotificationDetails from '@/components/Notifications/NotificationDetails.vue'
@@ -152,7 +153,11 @@ onMounted(async () => {
           :change-page="handleTablePagination"
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
-        />
+        >
+          <template #cell(active)="{ value }">
+            <StatusBadge :value="value" />
+          </template>
+        </CustomTable>
       </div>
       <Modal
         ref="newNotificationModalRef"

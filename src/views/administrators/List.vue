@@ -7,6 +7,7 @@ import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
 import AppImage from '@/components/common/AppImage.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -126,6 +127,10 @@ onMounted(async () => {
             <div class="d-flex justify-content-center">
               <AppImage :src="value" type="user" />
             </div>
+          </template>
+
+          <template #cell(active)="{ value }">
+            <StatusBadge :value="value" />
           </template>
         </CustomTable>
       </div>

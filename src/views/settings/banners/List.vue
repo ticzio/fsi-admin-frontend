@@ -6,6 +6,7 @@ import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
 import Modal from '@/components/common/Modal.vue'
 import BannerForm from '@/components/Banners/BannerForm.vue'
 import AppImage from '@/components/common/AppImage.vue'
@@ -134,6 +135,10 @@ onMounted(() => {
                 rounded="rounded-3 shadow-sm border"
               />
             </div>
+          </template>
+
+          <template #cell(active)="{ value }">
+            <StatusBadge :value="value" />
           </template>
         </CustomTable>
       </div>

@@ -275,19 +275,19 @@ export const TABLE_ACTIONS = {
   edit: {
     name: 'edit',
     icon: 'bi-list fs-5',
-    class: 'border-radius-left border-radius-right btn btn-light fw-medium',
+    class: 'rounded-3 btn bg-light-subtle border border-light fw-medium',
     tooltip: 'Ver detalles',
   },
   delete: {
     name: 'delete',
     icon: 'bi bi-trash3-fill fs-5 text-white',
-    class: 'border-radius-left border-radius-right btn btn-danger fw-medium text-light',
+    class: 'rounded-3 btn bg-danger-subtle border border-danger fw-medium',
     tooltip: 'Eliminar',
   },
   deactivate: {
     name: 'deactivate',
     icon: 'bi bi-check-circle-fill fs-5',
-    class: 'border-radius-left border-radius-right fw-medium text-white',
+    class: 'rounded-3 fw-medium text-white',
     tooltip: 'Desactivar',
   },
 }

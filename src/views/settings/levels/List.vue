@@ -5,6 +5,7 @@ import titleSection from '@/components/common/titleSection.vue'
 import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -134,7 +135,11 @@ onMounted(() => {
           :change-page="handleTablePagination"
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
-        />
+        >
+          <template #cell(active)="{ value }">
+            <StatusBadge :value="value" />
+          </template>
+        </CustomTable>
       </div>
     </div>
   </DashboardLayout>

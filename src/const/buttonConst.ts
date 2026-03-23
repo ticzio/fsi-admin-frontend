@@ -38,20 +38,15 @@ export const BUTTONS_TOOLTIPS: Record<ButtonKey, ButtonConfig> = Object.fromEntr
 
 export const BUTTONS = {
   new: {
-    icon: 'bi-plus text-white',
+    icon: 'bi bi-save text-white me-2',
     class: 'btn btn-dark border-radius-right border-radius-left py-2 fw-medium text-light',
     tooltipPos: 'left',
   },
   filter: {
-    icon: 'bi bi-eraser-fill text-white',
+    icon: 'bi bi-eraser-fill',
     class:
-      'btn btn-danger border-radius-right border-radius-left me-auto  py-2 fw-medium text-light',
+      'btn bg-body-tertiary border-radius-right border-radius-left me-auto  py-2 fw-medium text-dark border ',
     tooltipPos: 'right',
-  },
-  search: {
-    icon: 'bi bi-search ',
-    class: 'input-group-text border text-primary bg-transparent border-radius-left',
-    tooltipPos: 'top',
   },
   update: {
     icon: 'bi bi-upload text-white ms-1',

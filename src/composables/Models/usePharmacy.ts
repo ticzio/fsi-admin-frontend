@@ -290,6 +290,51 @@ export function usePharmacy() {
     }
   }
 
+  /**
+   * Actualiza únicamente los horarios de una farmacia.
+   */
+  const savePharmacySchedule = async (data: any, id: string | number) => {
+    loading.value = true
+    try {
+      const formData = new FormData()
+      const scheduleFields = [
+        'opening_week',
+        'close_week',
+        'opening_saturday',
+        'close_saturday',
+        'opening_sunday',
+        'close_sunday',
+      ]
+
+      scheduleFields.forEach((key) => {
+        const value = data[key]
+        if (value !== undefined && value !== null && value !== '') {
+          formData.append(key, String(value))
+        }
+      })
+
+      const response: any = await store.dispatch('updateData', {
+        url: URLS.pharmacy.update,
+        id: id,
+        data: formData,
+      })
+
+      if (response.code === 200 || response.code === 201) {
+        swalToast.showSuccess('Horarios actualizados correctamente')
+        return true
+      } else {
+        swalToast.showError(response.message || 'Error al actualizar los horarios')
+        return false
+      }
+    } catch (error: any) {
+      console.error('Error saving pharmacy schedule:', error)
+      swalToast.showError(error.message || 'Error de conexión al actualizar los horarios')
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     pharmacies,
@@ -299,6 +344,7 @@ export function usePharmacy() {
     getDataPharmacies,
     getPharmacy,
     savePharmacy,
+    savePharmacySchedule,
     deactivatePharmacy,
     deletePharmacy,
   }

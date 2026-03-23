@@ -1,13 +1,35 @@
 <template>
   <div class="h-100 p-3 bg-white rounded-3 shadow-sm border d-flex flex-column">
+    <div
+      class="d-flex flex-column flex-md-row justify-content-between align-items-center p-3 rounded-3 mb-4 gap-3"
+    >
+      <DateTimeBadges :createdAt="pharmacy?.created_at" :updatedAt="pharmacy?.updated_at" />
+      <div class="d-flex gap-2">
+        <button
+          type="button"
+          class="btn btn-outline-primary rounded-3"
+          :disabled="loading"
+          @click="handleOpenModal"
+        >
+          <i class="bi bi-calendar-event me-2"></i>
+          Agregar Horarios
+        </button>
+        <button
+          type="button"
+          :class="BUTTONS.delete.class"
+          :disabled="loading"
+          @click="handleDelete"
+        >
+          <i :class="BUTTONS.delete.icon"></i>
+          {{ BUTTONS.delete.title }}
+        </button>
+      </div>
+    </div>
+
     <form @submit.prevent="handleSave" class="flex-grow-1">
       <GeneralInfoStep :form="form" :cityOptions="cityOptions" />
       <div class="d-flex justify-content-end mt-4">
-        <button
-          type="submit"
-          class="btn btn-primary px-4 fw-medium d-flex align-items-center gap-2"
-          :disabled="loading"
-        >
+        <button type="submit" :class="BUTTONS.new.class" :disabled="loading">
           <span
             v-if="loading"
             class="spinner-border spinner-border-sm"
@@ -19,6 +41,31 @@
         </button>
       </div>
     </form>
+
+    <!-- Modal para gestionar horarios -->
+    <Modal id="scheduleModal" ref="modalRef" title="Gestionar Horarios" size="lg">
+      <ScheduleStep :form="form" />
+      <template #footer>
+        <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-dark rounded-3"
+          :disabled="loading"
+          @click="handleSaveSchedule"
+        >
+          <span
+            v-if="loading"
+            class="spinner-border spinner-border-sm me-2"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          <i v-else class="bi bi-save me-2"></i>
+          Guardar Horarios
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -27,12 +74,19 @@ import { reactive, ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePharmacy } from '@/composables/Models/usePharmacy'
 import { useCities } from '@/composables/Models/useCities'
+import { BUTTONS } from '@/const/buttonConst'
 import GeneralInfoStep from '@/components/Pharmacies/GeneralInfoStep.vue'
+import ScheduleStep from '@/components/Pharmacies/ScheduleStep.vue'
+import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
+import Modal from '@/components/common/Modal.vue'
 
 const route = useRoute()
 const router = useRouter()
-const { getPharmacy, savePharmacy, loading } = usePharmacy()
+const { getPharmacy, savePharmacy, savePharmacySchedule, deletePharmacy, pharmacy, loading } =
+  usePharmacy()
 const { cities, getCities } = useCities()
+
+const modalRef = ref<any>(null)
 
 // Minimal state to satisfy the component props
 const form = reactive({
@@ -78,6 +132,26 @@ const handleSave = async () => {
   const success = await savePharmacy(form as any, true, route.params.id_pharmacy as string)
   if (success) {
     // router.push('/pharmacy') // Se puede mantener aquí o ir atras
+  }
+}
+
+const handleDelete = async () => {
+  if (pharmacy.value) {
+    const success = await deletePharmacy(pharmacy.value)
+    if (success) {
+      router.push('/pharmacy')
+    }
+  }
+}
+
+const handleOpenModal = () => {
+  modalRef.value?.openModal()
+}
+
+const handleSaveSchedule = async () => {
+  const success = await savePharmacySchedule(form, route.params.id_pharmacy as string)
+  if (success) {
+    modalRef.value?.closeModal()
   }
 }
 </script>
