@@ -19,8 +19,6 @@
     <div v-else class="flex-grow-1 d-flex align-items-center justify-content-center text-muted">
       <p v-if="!loading">No se pudo cargar la información necesaria para el chat.</p>
     </div>
-
-    {{ operatorCode }}
   </div>
 </template>
 
