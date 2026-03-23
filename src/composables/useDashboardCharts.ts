@@ -32,7 +32,7 @@ export function useDashboardCharts() {
 
   const chart2Series = reactive([
     {
-      name: 'Usuarios registrados',
+      name: 'Clientes registrados',
       data: [300, 400, 350, 500, 490, 600, 700],
     },
   ])

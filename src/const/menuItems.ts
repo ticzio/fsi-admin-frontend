@@ -17,7 +17,7 @@ export const MENU_ITEMS: MenuItem[] = [
   { label: 'Canjes', to: '/exchanges', matchPath: '/exchanges' },
   { label: 'Noticias', to: '/news', matchPath: '/news' },
   { label: 'Notificaciones', to: '/notifications', matchPath: '/notifications' },
-  { label: 'Usuarios', to: '/users', matchPath: '/users' },
+  { label: 'Clientes', to: '/clients', matchPath: '/clients' },
   { label: 'Operadores', to: '/operators', matchPath: '/operators' },
   { label: 'Administradores', to: '/administrators', matchPath: '/administrators' },
   { label: 'Configuración', to: '/settings', matchPath: '/settings' },

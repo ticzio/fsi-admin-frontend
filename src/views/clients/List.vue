@@ -27,13 +27,21 @@ const swalToast = useSwalToast()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
-const { clients, loading, pagination, paginationKey, getDataClients, deactivateClient, deleteClient } = useClients()
+const {
+  clients,
+  loading,
+  pagination,
+  paginationKey,
+  getDataClients,
+  deactivateClient,
+  deleteClient,
+} = useClients()
 
 const search = ref('')
 
 const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
-    router.push(`/users/edit/${item.id}`)
+    router.push(`/clients/edit/${item.id}`)
   } else if (actionName === 'deactivate') {
     await deactivateClient(item)
   } else if (actionName === 'delete') {
@@ -54,7 +62,7 @@ const handleTablePagination = (page: number) => {
 }
 
 const goToNew = () => {
-  router.push({ name: 'Nuevo Usuario' })
+  router.push({ name: 'Nuevo Cliente' })
 }
 
 const fetchData = () => {
@@ -76,8 +84,8 @@ onMounted(() => {
   <DashboardLayout>
     <div class="d-flex flex-column h-100">
       <titleSection
-        :title="TITLE_SECTION_COMPONENT.users.title"
-        :description="TITLE_SECTION_COMPONENT.users.description"
+        :title="TITLE_SECTION_COMPONENT?.clients?.title || 'Clientes'"
+        :description="TITLE_SECTION_COMPONENT?.clients?.description || 'Lista de clientes'"
         :show-logo="true"
       />
       <!-- Fila de filtros -->
@@ -101,7 +109,7 @@ onMounted(() => {
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
           <FetchButton @fetch="fetchData" />
-          <RedirectButton :tooltip-title="BUTTONS_TOOLTIPS.user.tooltipTitle" @redirect="goToNew" />
+          <RedirectButton :tooltip-title="BUTTONS_TOOLTIPS?.clients?.tooltipTitle || 'Nuevo cliente'" @redirect="goToNew" />
         </div>
       </div>
 
@@ -113,7 +121,7 @@ onMounted(() => {
       >
         <CustomTable
           :data="clients"
-          :headers="TABLE_HEADERS.user"
+          :headers="TABLE_HEADERS.clients"
           :actions="getTableActions"
           :is-loading="loading"
           :current-page="pagination.currentPage"

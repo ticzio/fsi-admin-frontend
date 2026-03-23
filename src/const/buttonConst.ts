@@ -9,7 +9,9 @@ const BUTTON_TOOLTIPS = {
   administrator: 'Nuevo administrador',
   news: 'Nueva noticia',
   notification: 'Nueva notificación',
-  user: 'Nuevo usuario',
+  user: 'Nuevo cliente',
+  client: 'Nuevo cliente',
+  clients: 'Nuevo cliente',
   operator: 'Nuevo operador',
   // Nuevos contextos de settings
   cities: 'Nueva ciudad',

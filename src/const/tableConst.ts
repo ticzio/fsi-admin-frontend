@@ -46,12 +46,12 @@ export const TITLE_SECTION_COMPONENT = {
     new: 'Nueva notificación',
     newDescription: 'Aquí puedes crear una nueva notificación con toda la información necesaria.',
   },
-  users: {
-    title: 'Usuarios',
-    description: 'Lista de usuarios',
-    details: 'Detalles del usuario',
-    new: 'Nuevo usuario',
-    newDescription: 'Aquí puedes crear un nuevo usuario con toda la información necesaria.',
+  clients: {
+    title: 'Clientes',
+    description: 'Lista de clientes',
+    details: 'Detalles del cliente',
+    new: 'Nuevo cliente',
+    newDescription: 'Aquí puedes crear un nuevo cliente con toda la información necesaria.',
   },
   operators: {
     title: 'Operadores',
@@ -175,7 +175,7 @@ export const TABLE_HEADERS = {
     { key: 'timestamp', label: 'Fecha de creación' },
     { key: 'active', label: 'Estatus' },
   ],
-  user: [
+  clients: [
     ...maybeId('id_user'),
     { key: 'code', label: 'Código' },
     { key: 'ci', label: 'Cédula' },

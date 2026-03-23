@@ -30,17 +30,17 @@ const isGetting = computed(() => store.getters['utils/isGetting'])
 const showNewActivity = ref<boolean>(false)
 const showNewAdministrator = ref<boolean>(false)
 const prevTab = ref(0)
-const routeName = ref('/users/edit')
+const routeName = ref('/clients/edit')
 const transitionName = ref('slide-left')
 
 const allTabRoutes = [
   {
-    label: 'Datos del Usuario',
-    path: 'detail-users',
+    label: 'Datos del Cliente',
+    path: 'detail-clients',
     allowedRoles: [1, 2, 3, 4, 5],
   },
-  { label: 'Cupones', path: 'coupons-users', allowedRoles: [1, 2, 3, 4, 5] },
-  { label: 'Chats', path: 'chats-users', allowedRoles: [1, 2, 3, 4, 5] },
+  { label: 'Cupones', path: 'coupons-clients', allowedRoles: [1, 2, 3, 4, 5] },
+  { label: 'Chats', path: 'chats-clients', allowedRoles: [1, 2, 3, 4, 5] },
 ]
 
 // ----- INICIO DE LA CORRECCIÓN -----
@@ -170,7 +170,7 @@ onBeforeUnmount(() => {
     <div>
       <titleSection
         :title="title"
-        :description="TITLE_SECTION_COMPONENT.users?.details || 'Detalles del usuario'"
+        :description="TITLE_SECTION_COMPONENT.clients?.details || 'Detalles del usuario'"
         :is-loading="isLoading"
       />
       <div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive, inject, watch, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
-import UserForm from '@/components/Users/UserForm.vue'
+import ClientForm from '@/components/Clients/ClientForm.vue'
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
 import { useClients, type ClientInterface } from '@/composables/Models/useClients'
 import { useSwalToast } from '@/composables/useSwalToast'
@@ -12,7 +12,6 @@ const swalToast = useSwalToast()
 const isLoading = ref(false)
 
 const targetClient = inject<Ref<ClientInterface | null>>('targetClient')
-
 
 const form = reactive({
   url_image: '',
@@ -73,13 +72,13 @@ const updateClient = async () => {
     swalToast.showError('Por favor, completa los campos obligatorios.')
     return
   }
-  
+
   isLoading.value = true
   const clientData = {
     ...form,
     id: route.params.id as string,
   }
-  
+
   await saveClient(clientData as any, true, route.params.id as string)
   isLoading.value = false
 }
@@ -93,10 +92,19 @@ onMounted(() => {
   <div class="position-relative">
     <LoadingOverlay v-if="isLoading" />
     <form @submit.prevent="updateClient">
-      <UserForm :form="form" :is-edit="true" />
+      <ClientForm :form="form" :is-edit="true" />
       <div class="mt-4 d-flex justify-content-end">
-        <button type="submit" class="btn btn-primary d-flex align-items-center gap-2 rounded-pill px-4 shadow-sm" :disabled="isLoading">
-          <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        <button
+          type="submit"
+          class="btn btn-primary d-flex align-items-center gap-2 rounded-pill px-4 shadow-sm"
+          :disabled="isLoading"
+        >
+          <span
+            v-if="isLoading"
+            class="spinner-border spinner-border-sm"
+            role="status"
+            aria-hidden="true"
+          ></span>
           <i v-else class="bi bi-save-fill"></i>
           Guardar Cambios
         </button>

@@ -5,7 +5,7 @@ import { useSwalToast } from '@/composables/useSwalToast'
 
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
-import UserForm from '@/components/Users/UserForm.vue'
+import ClientForm from '@/components/Clients/ClientForm.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 import { useClients } from '@/composables/Models/useClients'
 
@@ -14,7 +14,6 @@ const swalToast = useSwalToast()
 const { saveClient } = useClients()
 
 const loading = ref(false)
-
 
 const form = reactive({
   url_image: null as File | null,
@@ -47,17 +46,17 @@ const saveUser = async () => {
   }
 
   loading.value = true
-  
+
   const clientData = {
     ...form,
     id: 0,
   }
-  
+
   const success = await saveClient(clientData as any, false)
   loading.value = false
-  
+
   if (success) {
-    router.push('/users')
+    router.push('/clients')
   }
 }
 </script>
@@ -67,8 +66,8 @@ const saveUser = async () => {
     <div class="d-flex flex-column h-100 gap-3">
       <div class="d-flex justify-content-between align-items-center">
         <titleSection
-          :title="TITLE_SECTION_COMPONENT.users.new"
-          :description="TITLE_SECTION_COMPONENT.users.newDescription"
+          :title="TITLE_SECTION_COMPONENT.clients.new"
+          :description="TITLE_SECTION_COMPONENT.clients.newDescription"
           :show-logo="true"
         />
 
@@ -82,8 +81,8 @@ const saveUser = async () => {
       </div>
 
       <div class="flex-grow-1">
-        <form id="userForm" @submit.prevent="saveUser">
-          <UserForm :form="form" :is-edit="false" />
+        <form id="clientForm" @submit.prevent="saveUser">
+          <ClientForm :form="form" :is-edit="false" />
         </form>
       </div>
 
@@ -93,14 +92,14 @@ const saveUser = async () => {
           <button
             type="button"
             class="btn btn-sm btn-light px-4 fw-medium rounded-pill"
-            @click="router.push('/users')"
+            @click="router.push('/clients')"
             :disabled="loading"
           >
             Cancelar
           </button>
           <button
             type="submit"
-            form="userForm"
+            form="clientForm"
             class="btn btn-sm btn-primary px-4 fw-medium d-flex align-items-center gap-2 rounded-pill shadow-sm"
             :disabled="loading"
           >

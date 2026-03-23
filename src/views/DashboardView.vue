@@ -30,7 +30,7 @@ const users = computed(() => {
 const statisticItems = ref([
   { value: 12, label: 'Farmacias activas', to: 'Farmacia' },
   { value: 34, label: 'Operadores activos', to: 'Operadores' },
-  { value: 234, label: 'Usuarios registrados', highlighted: true, to: 'Usuarios' },
+  { value: 234, label: 'Clientes registrados', highlighted: true, to: 'Clientes' },
   { value: 96, label: 'Cupones canjeados', to: 'Canjes' },
 ])
 
@@ -59,7 +59,7 @@ const handleViewAllUsers = async () => {
   isRedirecting.value = true
   // Doherty Threshold: Small delay to let the user see the "Redirection" state
   await new Promise((resolve) => setTimeout(resolve, 500))
-  router.push({ name: 'Usuarios' })
+  router.push({ name: 'Clientes' })
 }
 </script>
 
@@ -135,7 +135,7 @@ const handleViewAllUsers = async () => {
             class="card border border-light shadow-sm rounded-4 p-3 p-md-4 pb-5 pb-md-5 h-100 min-h-200"
           >
             <h6 class="fw-bold text-dark mb-4 text-center text-md-start" style="font-size: 1rem">
-              Usuarios registrados
+              Clientes registrados
             </h6>
             <div class="position-relative flex-grow-1 mt-2" style="min-height: 250px">
               <!-- Tooltip Mockup (Desktop only) -->
