@@ -41,11 +41,11 @@ export function useNotification() {
         pagination.totalPages = response.meta?.last_page || 1
         pagination.currentPage = response.meta?.current_page || 1
       } else {
-        swalToast.showError(response.message || 'Error al obtener las notificaciones')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching notifications:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener las notificaciones')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -60,12 +60,12 @@ export function useNotification() {
       if (response.code === 200) {
         return response.data
       } else {
-        swalToast.showError(response.message || 'Error al obtener la notificación')
+        swalToast.showError('Recursos no encontrados')
         return null
       }
     } catch (error: any) {
       console.error('Error fetching notification by id:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener la notificación')
+      swalToast.showError('Recursos no encontrados')
       return null
     } finally {
       loading.value = false
@@ -96,12 +96,12 @@ export function useNotification() {
         await getDataNotifications(pagination.currentPage)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar la notificación')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving notification:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar la notificación')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

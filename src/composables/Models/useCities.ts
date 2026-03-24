@@ -46,11 +46,11 @@ export function useCities() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener las ciudades')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching cities:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener las ciudades')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -129,12 +129,12 @@ export function useCities() {
         await getDataCities(pagination.currentPage)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar la ciudad')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving city:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar la ciudad')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

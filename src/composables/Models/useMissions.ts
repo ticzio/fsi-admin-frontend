@@ -41,11 +41,11 @@ export function useMissions() {
         pagination.totalPages = response.meta.last_page
         pagination.currentPage = response.meta.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener las misiones')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching missions:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener las misiones')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }

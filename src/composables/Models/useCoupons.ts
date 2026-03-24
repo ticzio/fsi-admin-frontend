@@ -47,7 +47,7 @@ export function useCoupons() {
       }
     } catch (error: any) {
       console.error('Error fetching coupons:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los cupones')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -89,12 +89,12 @@ export function useCoupons() {
         await getDataCoupons(pagination.currentPage)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar el cupón')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving coupon:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar el cupón')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

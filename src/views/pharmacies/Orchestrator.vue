@@ -20,7 +20,7 @@ const router = useRouter()
 const store = useStore()
 const logger = useLogger()
 
-const isLoading = ref(false)
+
 const localTitle = ref('Titulo por defecto')
 
 const title = computed(() => localTitle.value || store.getters['utils/isItem'] || '')
@@ -133,10 +133,9 @@ const clearLoadingTimeout = () => {
 }
 
 // Cargar datos de la farmacia usando el composable
-const { getPharmacy } = usePharmacy()
+const { getPharmacy, loading: isLoading } = usePharmacy()
 
 const loadPharmacyData = async () => {
-  isLoading.value = true
   try {
     const data = await getPharmacy(route.params.id_pharmacy as string)
     if (data) {
@@ -145,8 +144,6 @@ const loadPharmacyData = async () => {
     }
   } catch (error) {
     console.error('Error fetching pharmacy for Orchestrator:', error)
-  } finally {
-    isLoading.value = false
   }
 }
 

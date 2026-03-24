@@ -61,6 +61,9 @@ export function useUsers() {
   const getDataUsers = async (page = 1, search = '', extraParams: any = {}) => {
     currentSearch.value = search
     currentExtraParams.value = extraParams
+    // Reset stale state immediately on every new fetch to prevent showing
+    // data from a previous record when navigating between detail views
+    users.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -79,11 +82,14 @@ export function useUsers() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener los usuarios')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching users:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los usuarios')
+      swalToast.showError('Recursos no encontrados')
+      users.value = []
+      pagination.totalPages = 1
+      pagination.currentPage = 1
     } finally {
       loading.value = false
     }
@@ -181,12 +187,12 @@ export function useUsers() {
         await getDataUsers(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar el usuario')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving user:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar el usuario')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

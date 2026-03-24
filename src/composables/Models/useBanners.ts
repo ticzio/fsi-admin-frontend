@@ -42,11 +42,11 @@ export function useBanners() {
         pagination.totalPages = response.data.meta.last_page
         pagination.currentPage = response.data.meta.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener los banners')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching banners:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los banners')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -91,12 +91,12 @@ export function useBanners() {
         await getDataBanners(pagination.currentPage)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar el banner')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving banner:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar el banner')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -116,11 +116,11 @@ export function useBanners() {
       if (response.code === 200) {
         appUbication.value = response.data
       } else {
-        swalToast.showError(response.message || 'Error al obtener las app_ubication')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching app_ubication:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener las app_ubication')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }

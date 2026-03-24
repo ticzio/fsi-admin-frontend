@@ -33,11 +33,11 @@ export function useLevels() {
         level.value = response.data
         return response.data
       } else {
-        swalToast.showError(response.message || ERROR.errorGet)
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching level:', error)
-      swalToast.showError(error.message || ERROR.errorGet)
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -59,12 +59,12 @@ export function useLevels() {
         swalToast.showSuccess('Puntos del nivel actualizados correctamente')
         return true
       } else {
-        swalToast.showError(response.message || ERROR.errorUpdate)
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error updating level points:', error)
-      swalToast.showError(error.message || ERROR.errorUpdate)
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

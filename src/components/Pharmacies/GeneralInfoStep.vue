@@ -43,7 +43,7 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
               id="name"
               v-model="form.name"
               label="Nombre de la Farmacia *"
-              placeholder="Ej. Farmatodo Los Leones"
+              placeholder="Ej. Farmacia San Rafael"
               :rules="[(v) => !!v || 'El nombre es obligatorio']"
             />
           </div>

@@ -8,6 +8,7 @@ import { usePharmacy } from '@/composables/Models/usePharmacy'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import ProgressBar from '@/components/common/ProgressBar.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import GeneralInfoStep from '@/components/Pharmacies/GeneralInfoStep.vue'
 import ScheduleStep from '@/components/Pharmacies/ScheduleStep.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
@@ -163,15 +164,10 @@ const savePharmacy = async () => {
         <button
           type="submit"
           form="pharmacyForm"
-          class="btn btn-primary px-4 fw-medium d-flex align-items-center gap-2"
+          class="btn btn-dark px-4 fw-medium d-flex align-items-center gap-2"
           :disabled="loading"
         >
-          <span
-            v-if="loading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <LoadingSpinner v-if="loading" />
           <i v-else class="bi bi-save"></i>
           Guardar
         </button>
@@ -180,7 +176,7 @@ const savePharmacy = async () => {
           <button
             v-if="currentStep === 1"
             type="button"
-            class="btn btn-primary px-4 fw-medium d-flex align-items-center gap-2"
+            class="btn btn-outline-primary px-4 fw-medium d-flex align-items-center gap-2"
             @click="currentStep = 2"
           >
             Continuar

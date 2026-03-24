@@ -6,6 +6,7 @@ import { useSwalToast } from '@/composables/useSwalToast'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import ClientForm from '@/components/Clients/ClientForm.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 import { useClients } from '@/composables/Models/useClients'
 
@@ -103,12 +104,7 @@ const saveUser = async () => {
             class="btn btn-sm btn-primary px-4 fw-medium d-flex align-items-center gap-2 rounded-pill shadow-sm"
             :disabled="loading"
           >
-            <span
-              v-if="loading"
-              class="spinner-border spinner-border-sm"
-              role="status"
-              aria-hidden="true"
-            ></span>
+            <LoadingSpinner v-if="loading" />
             <i v-else class="bi bi-person-plus-fill"></i>
             Crear Usuario
           </button>

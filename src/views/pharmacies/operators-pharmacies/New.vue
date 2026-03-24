@@ -5,6 +5,7 @@ import { useSwalToast } from '@/composables/useSwalToast'
 import { useUsers } from '@/composables/Models/useUsers'
 
 import OperatorForm from '@/components/Operators/OperatorForm.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -67,12 +68,7 @@ const saveOperator = async () => {
         class="btn btn-primary px-4 fw-medium d-flex align-items-center gap-2"
         :disabled="loading"
       >
-        <span
-          v-if="loading"
-          class="spinner-border spinner-border-sm"
-          role="status"
-          aria-hidden="true"
-        ></span>
+        <LoadingSpinner v-if="loading" />
         <i v-else class="bi bi-save"></i>
         Guardar
       </button>

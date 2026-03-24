@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import CustomTable from '@/components/common/CustomTable.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
@@ -125,7 +126,7 @@ onMounted(() => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
-          <template #cell(url_image)="{ value, item }">
+          <template #cell(url_image_light)="{ value, item }">
             <div class="d-flex justify-content-center py-1">
               <AppImage
                 :src="value"
@@ -168,7 +169,7 @@ onMounted(() => {
           @click="stateFormRef?.handleSubmit()"
           :disabled="loading"
         >
-          <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
+          <LoadingSpinner v-if="loading" class="me-1" />
           {{ isEditing ? 'Guardar Cambios' : 'Crear Estado' }}
         </button>
       </template>

@@ -117,7 +117,7 @@ export const TABLE_HEADERS = {
   administrator: [
     ...maybeId('id'),
     { key: 'code', label: 'Código' },
-    { key: 'url_image', label: 'Foto' },
+    { key: 'url_image_light', label: 'Foto' },
     { key: 'full_name', label: 'Nombre y apellido' },
     { key: 'email', label: 'Correo' },
     { key: 'phone', label: 'Teléfono' },
@@ -126,7 +126,7 @@ export const TABLE_HEADERS = {
   ],
   pharmacy: [
     ...maybeId('id'),
-    { key: 'url_image', label: 'Logo' },
+    { key: 'url_image_light', label: 'Logo' },
     { key: 'code', label: 'Código' },
     { key: 'type_city.name', label: 'Ciudad' },
     { key: 'name', label: 'Nombre' },
@@ -140,7 +140,7 @@ export const TABLE_HEADERS = {
     { key: 'code', label: 'Código' },
 
     { key: 'id_pharma.name', label: 'Farmacia' },
-    { key: 'url_image', label: 'Foto' },
+    { key: 'url_image_light', label: 'Foto' },
     { key: 'full_name', label: 'Nombre y apellido' },
     { key: 'email', label: 'Correo' },
     { key: 'phone', label: 'Teléfono' },
@@ -178,6 +178,7 @@ export const TABLE_HEADERS = {
   clients: [
     ...maybeId('id_user'),
     { key: 'code', label: 'Código' },
+    { key: 'url_image_light', label: 'Foto' },
     { key: 'ci', label: 'Cédula' },
     { key: 'full_name', label: 'Nombre y apellido' },
     { key: 'email', label: 'Correo' },
@@ -210,7 +211,7 @@ export const TABLE_HEADERS = {
   ],
   states: [
     ...maybeId('id'),
-    { key: 'url_image', label: 'Imagen' },
+    { key: 'url_image_light', label: 'Imagen' },
     { key: 'name', label: 'Nombre' },
     { key: 'active', label: 'Estatus' },
   ],
@@ -231,7 +232,7 @@ export const TABLE_HEADERS = {
   ],
   banners: [
     ...maybeId('id'),
-    { key: 'url_image', label: 'Imagen' },
+    { key: 'url_image_light', label: 'Imagen' },
     { key: 'name', label: 'Título' },
     { key: 'id_app_ubication.name', label: 'Ubicación en la App' },
     { key: 'views', label: 'Visualizaciones' },
@@ -241,13 +242,13 @@ export const TABLE_HEADERS = {
   ],
   benefitsBanners: [
     ...maybeId('id'),
-    { key: 'url_image', label: 'Imagen' },
+    { key: 'url_image_light', label: 'Imagen' },
     { key: 'name', label: 'Título' },
     { key: 'active', label: 'Estatus' },
   ],
   couponsBanners: [
     ...maybeId('id'),
-    { key: 'url_image', label: 'Imagen' },
+    { key: 'url_image_light', label: 'Imagen' },
     { key: 'name', label: 'Título' },
     { key: 'active', label: 'Estatus' },
   ],

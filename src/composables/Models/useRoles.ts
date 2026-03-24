@@ -41,11 +41,11 @@ export function useRoles() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener los roles')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching roles:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los roles')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -64,11 +64,11 @@ export function useRoles() {
       if (response.code === 200) {
         roles.value = response.data
       } else {
-        swalToast.showError(response.message || 'Error al obtener los roles')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching roles:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los roles')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -98,12 +98,12 @@ export function useRoles() {
         await getDataRoles(pagination.currentPage)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar el rol')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving role:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar el rol')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

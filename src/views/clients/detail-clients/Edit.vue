@@ -3,6 +3,7 @@ import { ref, onMounted, reactive, inject, watch, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import ClientForm from '@/components/Clients/ClientForm.vue'
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { useClients, type ClientInterface } from '@/composables/Models/useClients'
 import { useSwalToast } from '@/composables/useSwalToast'
 
@@ -99,12 +100,7 @@ onMounted(() => {
           class="btn btn-primary d-flex align-items-center gap-2 rounded-pill px-4 shadow-sm"
           :disabled="isLoading"
         >
-          <span
-            v-if="isLoading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <LoadingSpinner v-if="isLoading" />
           <i v-else class="bi bi-save-fill"></i>
           Guardar Cambios
         </button>

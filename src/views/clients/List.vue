@@ -7,6 +7,7 @@ import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
+import AppImage from '@/components/common/AppImage.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -110,7 +111,12 @@ onMounted(() => {
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
           <FetchButton @fetch="fetchData" />
-          <RedirectButton :tooltip-title="BUTTONS_TOOLTIPS?.clients?.tooltipTitle || 'Nuevo cliente'" @redirect="goToNew" />
+          <!--  
+          <RedirectButton
+            :tooltip-title="BUTTONS_TOOLTIPS?.clients?.tooltipTitle || 'Nuevo cliente'"
+            @redirect="goToNew"
+          />
+          -->
         </div>
       </div>
 
@@ -132,6 +138,11 @@ onMounted(() => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
+          <template #cell(url_image_light)="{ value }">
+            <div class="d-flex justify-content-center">
+              <AppImage :src="value" type="user" />
+            </div>
+          </template>
           <template #cell(active)="{ value }">
             <StatusBadge :value="value" />
           </template>

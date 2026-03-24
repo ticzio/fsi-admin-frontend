@@ -4,25 +4,37 @@
       class="d-flex flex-column flex-md-row justify-content-between align-items-center p-3 rounded-3 mb-4 gap-3"
     >
       <DateTimeBadges :createdAt="pharmacy?.created_at" :updatedAt="pharmacy?.updated_at" />
-      <div class="d-flex gap-2">
-        <button
-          type="button"
-          class="btn btn-outline-primary rounded-3"
-          :disabled="loading"
-          @click="handleOpenModal"
-        >
-          <i class="bi bi-calendar-event me-2"></i>
-          Agregar Horarios
-        </button>
-        <button
-          type="button"
-          :class="BUTTONS.delete.class"
-          :disabled="loading"
-          @click="handleDelete"
-        >
-          <i :class="BUTTONS.delete.icon"></i>
-          {{ BUTTONS.delete.title }}
-        </button>
+      <div class="d-flex flex-column align-items-end">
+        <div class="d-flex gap-2">
+          <button
+            type="button"
+            class="btn btn-outline-primary rounded-3 position-relative"
+            :disabled="loading"
+            @click="handleOpenModal"
+          >
+            <i class="bi bi-calendar-event me-2"></i>
+            Agregar Horarios
+            <span
+              v-if="!hasSchedule"
+              class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+            >
+              !
+            </span>
+          </button>
+          <button
+            type="button"
+            :class="BUTTONS.delete.class"
+            :disabled="loading"
+            @click="handleDelete"
+          >
+            <i :class="BUTTONS.delete.icon"></i>
+            {{ BUTTONS.delete.title }}
+          </button>
+        </div>
+        <div v-if="!hasSchedule" class="text-danger mt-2 small fw-bold">
+          <i class="bi bi-exclamation-triangle me-1"></i>
+          Esta farmacia no tiene ningún horario cargado
+        </div>
       </div>
     </div>
 
@@ -30,12 +42,7 @@
       <GeneralInfoStep :form="form" :cityOptions="cityOptions" />
       <div class="d-flex justify-content-end mt-4">
         <button type="submit" :class="BUTTONS.new.class" :disabled="loading">
-          <span
-            v-if="loading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <LoadingSpinner v-if="loading" class="me-2" />
           <i v-else class="bi bi-save"></i>
           Guardar Cambios
         </button>
@@ -46,7 +53,7 @@
     <Modal id="scheduleModal" ref="modalRef" title="Gestionar Horarios" size="lg">
       <ScheduleStep :form="form" />
       <template #footer>
-        <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">
+        <button type="button" class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal">
           Cancelar
         </button>
         <button
@@ -55,12 +62,8 @@
           :disabled="loading"
           @click="handleSaveSchedule"
         >
-          <span
-            v-if="loading"
-            class="spinner-border spinner-border-sm me-2"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <LoadingSpinner v-if="loading" class="me-2" />
+
           <i v-else class="bi bi-save me-2"></i>
           Guardar Horarios
         </button>
@@ -70,7 +73,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePharmacy } from '@/composables/Models/usePharmacy'
 import { useCities } from '@/composables/Models/useCities'
@@ -79,6 +82,7 @@ import GeneralInfoStep from '@/components/Pharmacies/GeneralInfoStep.vue'
 import ScheduleStep from '@/components/Pharmacies/ScheduleStep.vue'
 import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import Modal from '@/components/common/Modal.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -108,6 +112,17 @@ const form = reactive({
   close_saturday: '',
   opening_sunday: '',
   close_sunday: '',
+})
+
+const hasSchedule = computed(() => {
+  return (
+    form.opening_week ||
+    form.close_week ||
+    form.opening_saturday ||
+    form.close_saturday ||
+    form.opening_sunday ||
+    form.close_sunday
+  )
 })
 
 const cityOptions = ref<any[]>([])

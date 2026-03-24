@@ -24,7 +24,7 @@
             :disabled="loading"
             @click="saveChanges"
           >
-            <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
+            <LoadingSpinner v-if="loading" class="me-1" />
             Guardar Cambios
           </button>
         </div>
@@ -38,6 +38,7 @@ import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useUsers } from '@/composables/Models/useUsers'
 import AdministratorForm from '@/components/Administrators/AdministratorForm.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 const route = useRoute()
 const router = useRouter()

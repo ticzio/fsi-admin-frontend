@@ -53,11 +53,11 @@ export function useBenefits() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || ERROR.errorGet)
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching benefits:', error)
-      swalToast.showError(error.message || ERROR.errorGet)
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -89,12 +89,12 @@ export function useBenefits() {
         )
         return true
       } else {
-        swalToast.showError(response.message || ERROR.errorCreate)
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving benefit:', error)
-      swalToast.showError(error.message || ERROR.errorCreate)
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

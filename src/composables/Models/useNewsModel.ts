@@ -41,11 +41,11 @@ export function useNewsModel() {
         pagination.totalPages = response.meta.last_page
         pagination.currentPage = response.meta.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener las noticias')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching news:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener las noticias')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -83,12 +83,12 @@ export function useNewsModel() {
         await getDataNews(pagination.currentPage)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar la noticia')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving news:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar la noticia')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

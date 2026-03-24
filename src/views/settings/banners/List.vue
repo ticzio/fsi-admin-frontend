@@ -10,6 +10,7 @@ import StatusBadge from '@/components/common/StatusBadge.vue'
 import Modal from '@/components/common/Modal.vue'
 import BannerForm from '@/components/Banners/BannerForm.vue'
 import AppImage from '@/components/common/AppImage.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 //Composables
 import { useStore } from 'vuex'
@@ -124,7 +125,7 @@ onMounted(() => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
-          <template #cell(url_image)="{ value, item }">
+          <template #cell(url_image_light)="{ value, item }">
             <div class="d-flex justify-content-center py-1">
               <AppImage
                 :src="value"
@@ -167,7 +168,7 @@ onMounted(() => {
           @click="bannerFormRef?.handleSubmit()"
           :disabled="loading"
         >
-          <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
+          <LoadingSpinner v-if="loading" class="me-1" />
           {{ isEditing ? 'Guardar Cambios' : 'Crear Banner' }}
         </button>
       </template>

@@ -123,7 +123,7 @@ onMounted(async () => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
-          <template #cell(url_image)="{ value }">
+          <template #cell(url_image_light)="{ value }">
             <div class="d-flex justify-content-center">
               <AppImage :src="value" type="user" />
             </div>

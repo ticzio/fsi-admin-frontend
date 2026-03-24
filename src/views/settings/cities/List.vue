@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import CustomTable from '@/components/common/CustomTable.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
@@ -154,7 +155,7 @@ onMounted(() => {
           @click="cityFormRef?.handleSubmit()"
           :disabled="loading"
         >
-          <span v-if="loading" class="spinner-border spinner-border-sm me-1"></span>
+          <LoadingSpinner v-if="loading" class="me-1" />
           {{ isEditing ? 'Guardar Cambios' : 'Crear Ciudad' }}
         </button>
       </template>

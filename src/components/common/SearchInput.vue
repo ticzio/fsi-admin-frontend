@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount, onMounted } from 'vue'
 import { useSwal } from '@/composables/useSwal'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 interface Props {
   /** v-model binding */
@@ -151,11 +152,7 @@ onBeforeUnmount(() => {
       <!-- Search icon or Spinner -->
       <span class="input-group-text search-icon-wrap" :class="{ 'text-primary': isFocused }">
         <template v-if="loading">
-          <span
-            class="spinner-border spinner-border-sm text-primary"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <LoadingSpinner v-if="loading" class="text-primary" />
         </template>
         <template v-else>
           <i

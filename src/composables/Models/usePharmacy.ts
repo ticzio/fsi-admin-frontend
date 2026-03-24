@@ -32,22 +32,26 @@ export interface PharmacyInterface {
   [key: string]: any
 }
 
+// Estado compartido (Singleton) para el módulo de farmacias
+const loading = ref(false)
+const pharmacies = ref<PharmacyInterface[]>([])
+const pharmacy = ref<PharmacyInterface | null>(null)
+const pagination = reactive({
+  currentPage: TABLE_PAGINATION.currentPage,
+  totalPages: TABLE_PAGINATION.totalPages,
+  limit: TABLE_PAGINATION.limit,
+})
+
+// Mapa para de-duplicar peticiones en vuelo por ID
+const pendingRequests = new Map<string | number, Promise<any>>()
+
 export function usePharmacy() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
   const logger = useLogger()
 
-  const loading = ref(false)
-  const pharmacies = ref<PharmacyInterface[]>([])
-  const pharmacy = ref<PharmacyInterface | null>(null)
-
   const paginationKey = 'pharmacy-list'
-  const pagination = reactive({
-    currentPage: TABLE_PAGINATION.currentPage,
-    totalPages: TABLE_PAGINATION.totalPages,
-    limit: TABLE_PAGINATION.limit,
-  })
 
   /**
    * Obtiene la lista de farmacias paginada y filtrada.
@@ -57,6 +61,9 @@ export function usePharmacy() {
     search = '',
     cityId: number | string | null = null,
   ) => {
+    // Reset stale state immediately on every new fetch to prevent showing
+    // data from a previous record when navigating between detail views
+    pharmacies.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -75,11 +82,14 @@ export function usePharmacy() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener las farmacias')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching pharmacies:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener las farmacias')
+      swalToast.showError('Recursos no encontrados')
+      pharmacies.value = []
+      pagination.totalPages = 1
+      pagination.currentPage = 1
     } finally {
       loading.value = false
     }
@@ -87,27 +97,48 @@ export function usePharmacy() {
 
   /**
    * Obtiene una farmacia específica mediante su ID.
+   * Implementa de-duplicación para evitar peticiones HTTP concurrentes al mismo ID.
    */
-  const getPharmacy = async (id: string | number) => {
-    loading.value = true
-    try {
-      const response: any = await store.dispatch('getData', {
-        url: URLS.pharmacy.prefix + '/' + id,
-        params: {},
-      })
-
-      if (response.code === 200) {
-        pharmacy.value = response.data
-        return response.data
-      } else {
-        swalToast.showError(response.message || 'Error al obtener la farmacia')
-      }
-    } catch (error: any) {
-      console.error('Error fetching pharmacy:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener la farmacia')
-    } finally {
-      loading.value = false
+  const getPharmacy = async (id: string | number, forceRefresh = false) => {
+    // Si ya hay una petición en vuelo para este ID, devolvemos la misma promesa
+    if (pendingRequests.has(id)) {
+      return pendingRequests.get(id)
     }
+
+    // Si ya tenemos los datos y no se requiere refresco, los devolvemos directamente
+    if (!forceRefresh && pharmacy.value && String(pharmacy.value.id) === String(id)) {
+      return pharmacy.value
+    }
+
+    const requestPromise = (async () => {
+      loading.value = true
+      try {
+        const response: any = await store.dispatch('getData', {
+          url: URLS.pharmacy.prefix + '/' + id,
+          params: {},
+        })
+
+        if (response.code === 200) {
+          pharmacy.value = response.data
+          return response.data
+        } else {
+          swalToast.showError('Recursos no encontrados')
+          return null
+        }
+      } catch (error: any) {
+        console.error('Error fetching pharmacy:', error)
+        swalToast.showError('Recursos no encontrados')
+        return null
+      } finally {
+        loading.value = false
+        // Limpiamos la promesa del mapa una vez finalizada
+        pendingRequests.delete(id)
+      }
+    })()
+
+    // Registramos la promesa en el mapa de peticiones pendientes
+    pendingRequests.set(id, requestPromise)
+    return requestPromise
   }
 
   /**
@@ -186,18 +217,27 @@ export function usePharmacy() {
         formData.append('url_image', data.url_image)
       }
 
+      // Aplicamos la Ley de Doherty: asegurar un tiempo mínimo de carga para feedback visual
+      const minDelay = new Promise((resolve) => setTimeout(resolve, 400))
+
       let response: any
       if (isEditing && id) {
-        response = await store.dispatch('updateData', {
-          url: URLS.pharmacy.update,
-          id: id,
-          data: formData,
-        })
+        ;[response] = await Promise.all([
+          store.dispatch('updateData', {
+            url: URLS.pharmacy.update,
+            id: id,
+            data: formData,
+          }),
+          minDelay,
+        ])
       } else {
-        response = await store.dispatch('createData', {
-          url: URLS.pharmacy.save,
-          data: formData,
-        })
+        ;[response] = await Promise.all([
+          store.dispatch('createData', {
+            url: URLS.pharmacy.save,
+            data: formData,
+          }),
+          minDelay,
+        ])
       }
 
       if (response.code === 200 || response.code === 201) {
@@ -206,12 +246,12 @@ export function usePharmacy() {
         )
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar la farmacia')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving pharmacy:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar la farmacia')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -296,39 +336,57 @@ export function usePharmacy() {
   const savePharmacySchedule = async (data: any, id: string | number) => {
     loading.value = true
     try {
-      const formData = new FormData()
-      const scheduleFields = [
-        'opening_week',
-        'close_week',
-        'opening_saturday',
-        'close_saturday',
-        'opening_sunday',
-        'close_sunday',
-      ]
+      // Map id_type_city to id_type_cities for backend consistency
+      const cityId =
+        data.id_type_city && typeof data.id_type_city === 'object'
+          ? (data.id_type_city as any).id
+          : data.id_type_city
 
-      scheduleFields.forEach((key) => {
-        const value = data[key]
-        if (value !== undefined && value !== null && value !== '') {
-          formData.append(key, String(value))
-        }
-      })
+      // Prepare payload as JSON object
+      // We include all required fields to ensure backend validation passes
+      const payload = {
+        name: data.name,
+        code: data.code,
+        phone: data.phone,
+        id_type_cities: cityId,
+        description: data.description || '',
+        ubication: data.ubication || '',
+        url_google_map: data.url_google_map || '',
+        opening_week: data.opening_week,
+        close_week: data.close_week,
+        opening_saturday: data.opening_saturday,
+        close_saturday: data.close_saturday,
+        opening_sunday: data.opening_sunday,
+        close_sunday: data.close_sunday,
+        lat: data.lat || '',
+        lon: data.lon || '',
+        url_instagram: data.url_instagram || '',
+        url_whatsapp: data.url_whatsapp || '',
+      }
 
-      const response: any = await store.dispatch('updateData', {
-        url: URLS.pharmacy.update,
-        id: id,
-        data: formData,
-      })
+      // Aplicamos la Ley de Doherty: asegurar un tiempo mínimo de carga para feedback visual
+      const minDelay = new Promise((resolve) => setTimeout(resolve, 400))
+
+      const [response]: any = await Promise.all([
+        store.dispatch('updateData', {
+          url: URLS.pharmacy.update,
+          id: id,
+          data: payload,
+        }),
+        minDelay,
+      ])
 
       if (response.code === 200 || response.code === 201) {
         swalToast.showSuccess('Horarios actualizados correctamente')
+        await getPharmacy(id, true)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al actualizar los horarios')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving pharmacy schedule:', error)
-      swalToast.showError(error.message || 'Error de conexión al actualizar los horarios')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

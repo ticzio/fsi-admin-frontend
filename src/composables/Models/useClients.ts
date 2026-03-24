@@ -67,6 +67,9 @@ export function useClients() {
   const getDataClients = async (page = 1, search = '', extraParams: any = {}) => {
     currentSearch.value = search
     currentExtraParams.value = extraParams
+    // Reset stale state immediately on every new fetch to prevent showing
+    // data from a previous record when navigating between detail views
+    clients.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -85,11 +88,14 @@ export function useClients() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener los clientes')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching clients:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los clientes')
+      swalToast.showError('Recursos no encontrados')
+      clients.value = []
+      pagination.totalPages = 1
+      pagination.currentPage = 1
     } finally {
       loading.value = false
     }
@@ -191,12 +197,12 @@ export function useClients() {
         await getDataClients(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar el cliente')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving client:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar el cliente')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

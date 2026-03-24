@@ -42,11 +42,11 @@ export function useStates() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener los estados')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching states:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los estados')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -65,11 +65,11 @@ export function useStates() {
       if (response.code === 200) {
         states.value = response.data
       } else {
-        swalToast.showError(response.message || 'Error al obtener los estados')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching states:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los estados')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -106,12 +106,12 @@ export function useStates() {
         await getDataStates(pagination.currentPage)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar el estado')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving state:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar el estado')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

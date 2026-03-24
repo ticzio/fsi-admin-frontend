@@ -38,7 +38,7 @@ export const BUTTONS_TOOLTIPS: Record<ButtonKey, ButtonConfig> = Object.fromEntr
 
 export const BUTTONS = {
   new: {
-    icon: 'bi bi-save text-white me-2',
+    icon: 'bi bi-plus text-white me-2',
     class: 'btn btn-dark border-radius-right border-radius-left py-2 fw-medium text-light',
     tooltipPos: 'left',
   },

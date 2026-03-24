@@ -222,7 +222,7 @@ watch(selectedCity, () => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
-          <template #cell(url_image)="{ value }">
+          <template #cell(url_image_light)="{ value }">
             <AppImage :src="value" type="entity" width="50px" height="50px" />
           </template>
           <template #cell(active)="{ value }">

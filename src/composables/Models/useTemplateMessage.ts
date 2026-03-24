@@ -42,11 +42,11 @@ export function useTemplateMessage() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener las plantillas')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching templates:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener las plantillas')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -75,12 +75,12 @@ export function useTemplateMessage() {
         )
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar la plantilla')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving template:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar la plantilla')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

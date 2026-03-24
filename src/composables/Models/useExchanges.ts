@@ -58,11 +58,11 @@ export function useExchanges() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener los registros')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching exchanges:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los registros')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -90,11 +90,11 @@ export function useExchanges() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError(response.message || 'Error al obtener los registros')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching exchanges by client id:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener los registros')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -115,11 +115,11 @@ export function useExchanges() {
         exchange.value = response.data
         return response.data
       } else {
-        swalToast.showError(response.message || 'Error al obtener el registro')
+        swalToast.showError('Recursos no encontrados')
       }
     } catch (error: any) {
       console.error('Error fetching exchange:', error)
-      swalToast.showError(error.message || 'Error de conexión al obtener el registro')
+      swalToast.showError('Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -159,12 +159,12 @@ export function useExchanges() {
         await getExchanges(pagination.currentPage, currentSearch.value)
         return true
       } else {
-        swalToast.showError(response.message || 'Error al guardar el registro')
+        swalToast.showError('Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       console.error('Error saving exchange:', error)
-      swalToast.showError(error.message || 'Error de conexión al guardar el registro')
+      swalToast.showError('Recursos no encontrados')
       return false
     } finally {
       loading.value = false

@@ -6,6 +6,7 @@ import { useSwalToast } from '@/composables/useSwalToast'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import OperatorForm from '@/components/Operators/OperatorForm.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 
 const router = useRouter()
@@ -78,12 +79,7 @@ const saveOperator = async () => {
           class="btn btn-primary px-4 fw-medium d-flex align-items-center gap-2"
           :disabled="loading"
         >
-          <span
-            v-if="loading"
-            class="spinner-border spinner-border-sm"
-            role="status"
-            aria-hidden="true"
-          ></span>
+          <LoadingSpinner v-if="loading" />
           <i v-else class="bi bi-save"></i>
           Guardar
         </button>
