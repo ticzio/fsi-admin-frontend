@@ -75,10 +75,10 @@ const showBackButton = computed(() => {
 
     <div v-if="showBackButton" :class="['mt-2 mt-lg-0', isMobile ? 'w-100 d-flex justify-content-end mb-n3' : '']">
       <button
-        class="btn btn-outline-secondary border-radius-left border-radius-right px-4"
+        class="btn btn-outline-secondary border-radius-left border-radius-right px-4 d-inline-flex align-items-center justify-content-center gap-2"
         @click="$router.go(-1)"
       >
-        <i class="bi bi-arrow-left"></i> {{ isMobile ? '' : 'Volver' }}
+        <i class="bi bi-arrow-left"></i><span v-if="!isMobile">Volver</span>
       </button>
     </div>
   </div>
