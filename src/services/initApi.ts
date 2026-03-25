@@ -32,7 +32,7 @@ export async function InitializeConfig() {
     if (urlDomain.includes('localhost:517') || urlDomain.includes('localhost:417')) {
       configUrl = import.meta.env.VITE_API_PATH_DEVELOP
     } else if (
-      urlDomain.includes('dashtest.miFSI.com') ||
+      urlDomain.includes('dashtest.redfsi.net') ||
       urlDomain.includes(import.meta.env.VITE_DOMAIN_DEVELOP)
     ) {
       configUrl = import.meta.env.VITE_API_PATH_DEVELOP
