@@ -1,14 +1,21 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useUsers } from '@/composables/Models/useUsers'
-
-import OperatorForm from '@/components/Operators/OperatorForm.vue'
+import { useStore } from 'vuex'
+import { BUTTONS } from '@/const/buttonConst'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
+import OperatorForm from '@/components/Operators/OperatorForm.vue'
+
 const router = useRouter()
+
 const route = useRoute()
+
+const store = useStore()
+const isMobile = computed(() => store.getters.isMobile)
+
 const swalToast = useSwalToast()
 const { loading, saveUser } = useUsers()
 
@@ -61,16 +68,11 @@ const saveOperator = async () => {
       </form>
     </div>
     <!-- BOTONES DE ACCIÓN -->
-    <div class="d-flex justify-content-end gap-3 mt-4">
-      <button
-        type="submit"
-        form="operatorForm"
-        class="btn btn-primary px-4 fw-medium d-flex align-items-center gap-2"
-        :disabled="loading"
-      >
+    <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
+      <button type="submit" :class="BUTTONS.save.class" :disabled="loading">
         <LoadingSpinner v-if="loading" />
-        <i v-else class="bi bi-save"></i>
-        Guardar
+        <i v-else :class="BUTTONS.save.icon"></i>
+        {{ BUTTONS.save.title }}
       </button>
     </div>
   </div>

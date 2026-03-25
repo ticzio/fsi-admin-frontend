@@ -30,12 +30,12 @@
             style="cursor: pointer"
           >
             <!-- Mostrar el primer y segundo header en el boton del accordion -->
-            <div class="d-flex w-100 align-items-center pe-2" v-if="displayableHeaders.length > 0">
-              <div class="d-flex flex-column align-items-start me-3" style="min-width: 60px">
-                <span class="text-secondary small mb-1" style="font-size: 0.75rem">{{
+            <div class="d-flex w-100 align-items-center gap-2 pe-1" v-if="displayableHeaders.length > 0">
+              <div class="d-flex flex-column align-items-start overflow-hidden" style="flex: 1; min-width: 0;">
+                <span class="text-secondary small mb-1 text-truncate w-100 text-start" style="font-size: 0.75rem">{{
                   displayableHeaders[0].label
                 }}</span>
-                <div class="text-truncate fw-bold">
+                <div class="text-truncate fw-bold w-100 text-start">
                   <slot
                     :name="`cell(${displayableHeaders[0].key})`"
                     :item="item"
@@ -46,13 +46,14 @@
                 </div>
               </div>
               <div
-                class="d-flex flex-column flex-grow-1 text-center overflow-hidden me-2"
-                v-if="displayableHeaders.length > 1"
+                class="d-flex flex-column align-items-start overflow-hidden"
+                style="flex: 1; min-width: 0;"
+                v-if="displayableHeaders.length > 1 && !isFirstColumnTooLong(item)"
               >
-                <span class="text-secondary small mb-1" style="font-size: 0.75rem">{{
+                <span class="text-secondary small mb-1 text-truncate w-100 text-start" style="font-size: 0.75rem">{{
                   displayableHeaders[1].label
                 }}</span>
-                <div class="text-truncate">
+                <div class="text-truncate w-100 text-start">
                   <slot
                     :name="`cell(${displayableHeaders[1].key})`"
                     :item="item"
@@ -65,7 +66,7 @@
               <!-- Acciones se han movido a la burbuja flotante para mejor UX en móvil -->
               <div
                 v-if="hasActions && getActionsForItem(item).length > 0"
-                class="d-flex justify-content-end gap-1 ms-auto align-items-center"
+                class="d-flex justify-content-end flex-shrink-0 ms-1 align-items-center"
               >
                 <!-- Acciones directas desde los tres puntos -->
                 <button
@@ -93,10 +94,7 @@
               <div class="d-flex flex-column h-100">
                 <div class="flex-grow-1 p-0 m-0">
                   <template v-for="(header, index) in displayableHeaders" :key="header.key">
-                    <div
-                      v-if="index > 1"
-                      class="d-flex justify-content-between align-items-center border-bottom p-3 text-center"
-                    >
+                    <div class="d-flex justify-content-between align-items-center border-bottom p-3 text-center">
                       <span class="fw-bold text-secondary small w-50 flex-shrink-0 pe-2">{{
                         header.label
                       }}</span>
@@ -216,6 +214,13 @@ const activeItem = computed(() => {
 })
 
 const displayableHeaders = computed(() => props.headers.filter((h) => h.key !== 'id'))
+
+const isFirstColumnTooLong = (item: EntityItem): boolean => {
+  if (displayableHeaders.value.length === 0) return false
+  const val = props.getNestedValue(item, displayableHeaders.value[0].key)
+  if (val === null || val === undefined) return false
+  return String(val).length > 20
+}
 
 const openActions = (item: EntityItem) => {
   expandedItemId.value = item.id

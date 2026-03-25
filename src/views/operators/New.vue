@@ -8,6 +8,7 @@ import titleSection from '@/components/common/titleSection.vue'
 import OperatorForm from '@/components/Operators/OperatorForm.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
+import { BUTTONS } from '@/const/buttonConst'
 
 const router = useRouter()
 const swalToast = useSwalToast()
@@ -73,15 +74,10 @@ const saveOperator = async () => {
       </div>
       <!-- BOTONES DE ACCIÓN -->
       <div class="d-flex justify-content-end gap-3 mt-4">
-        <button
-          type="submit"
-          form="operatorForm"
-          class="btn btn-primary px-4 fw-medium d-flex align-items-center gap-2"
-          :disabled="loading"
-        >
+        <button type="submit" form="operatorForm" :class="BUTTONS.save.class" :disabled="loading">
           <LoadingSpinner v-if="loading" />
-          <i v-else class="bi bi-save"></i>
-          Guardar
+          <i v-else :class="BUTTONS.save.icon"></i>
+          {{ BUTTONS.save.title }}
         </button>
       </div>
     </div>

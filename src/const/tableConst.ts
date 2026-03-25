@@ -219,7 +219,7 @@ export const TABLE_HEADERS = {
   // Nuevas secciones de settings
   missions: [
     ...maybeId('id'),
-    { key: 'name', label: 'Nombre' },
+    { key: 'title', label: 'Titulo' },
     { key: 'description', label: 'Descripción' },
     { key: 'active', label: 'Estatus' },
   ],

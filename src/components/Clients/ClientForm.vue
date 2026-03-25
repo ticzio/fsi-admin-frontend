@@ -12,11 +12,7 @@ const props = defineProps<{
 
 const { cities, getCities } = useCities()
 
-const genderOptions = [
-  { name: 'Masculino' },
-  { name: 'Femenino' },
-  { name: 'Otro' },
-]
+const genderOptions = [{ name: 'Masculino' }, { name: 'Femenino' }, { name: 'Otro' }]
 
 const selectedGender = computed({
   get: () => genderOptions.find((opt) => opt.name === props.form.gender) || null,
@@ -49,21 +45,6 @@ onMounted(async () => {
         accepted-formats="image/png, image/jpeg, image/jpg"
       />
 
-      <!-- Información del Nivel (Solo lectura) -->
-      <div v-if="isEdit" class="mt-4 p-3 bg-light rounded-4 border border-light shadow-sm">
-        <h6 class="fw-bold mb-3 text-primary d-flex align-items-center gap-2">
-          <i class="bi bi-star-fill"></i>
-          Información de Nivel
-        </h6>
-        <div class="mb-2">
-          <label class="small text-muted d-block p-0">Nivel Actual</label>
-          <span class="fw-bold text-dark">{{ form.type_level?.name || 'Cargando...' }}</span>
-        </div>
-        <div>
-          <label class="small text-muted d-block p-0">Puntos Acumulados</label>
-          <span class="fw-bold text-dark">{{ form.point_level || 0 }} pts</span>
-        </div>
-      </div>
     </div>
 
     <!-- General Data -->
@@ -90,7 +71,7 @@ onMounted(async () => {
         </div>
 
         <!-- CI y Fecha de Nacimiento -->
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 my-0">
           <BaseInput
             id="ci"
             v-model="form.ci"
@@ -98,7 +79,7 @@ onMounted(async () => {
             placeholder="Ej. 12345678"
           />
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 my-0">
           <BaseInput
             id="born_date"
             v-model="form.born_date"
@@ -108,7 +89,7 @@ onMounted(async () => {
         </div>
 
         <!-- Email y Teléfono -->
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 my-0">
           <BaseInput
             id="email"
             v-model="form.email"
@@ -118,7 +99,7 @@ onMounted(async () => {
             :rules="[(v) => !!v || 'Campo obligatorio']"
           />
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 my-0">
           <BaseInput
             id="phone"
             v-model="form.phone"
@@ -128,7 +109,7 @@ onMounted(async () => {
         </div>
 
         <!-- Género y Ciudad -->
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 my-0">
           <MultiselectCustom
             v-model="selectedGender"
             :options="genderOptions"
@@ -138,7 +119,7 @@ onMounted(async () => {
             :show-descriptions="false"
           />
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-6 my-0">
           <MultiselectCustom
             v-model="selectedCity"
             :options="cities"

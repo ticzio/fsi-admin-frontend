@@ -9,6 +9,7 @@ import titleSection from '@/components/common/titleSection.vue'
 import AdministratorForm from '@/components/Administrators/AdministratorForm.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
+import { BUTTONS } from '@/const/buttonConst'
 
 const router = useRouter()
 const swalToast = useSwalToast()
@@ -76,23 +77,10 @@ const saveAdministrator = async () => {
       <!-- BOTONES DE ACCIÓN COMPACTOS -->
       <div class="card border-0 shadow-sm rounded-4 p-2 bg-white sticky-bottom">
         <div class="d-flex justify-content-end gap-2">
-          <button
-            type="button"
-            class="btn btn-sm btn-light px-4 fw-medium rounded-pill"
-            @click="router.push('/administrators')"
-            :disabled="loading"
-          >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            form="adminForm"
-            class="btn btn-sm btn-primary px-4 fw-medium d-flex align-items-center gap-2 rounded-pill shadow-sm"
-            :disabled="loading"
-          >
+          <button type="submit" form="adminForm" :class="BUTTONS.save.class" :disabled="loading">
             <LoadingSpinner v-if="loading" />
-            <i v-else class="bi bi-person-plus-fill"></i>
-            Crear Administrador
+            <i v-else :class="BUTTONS.save.icon"></i>
+            {{ BUTTONS.save.title }}
           </button>
         </div>
       </div>
@@ -100,10 +88,4 @@ const saveAdministrator = async () => {
   </DashboardLayout>
 </template>
 
-<style scoped>
-.sticky-bottom {
-  position: sticky;
-  bottom: 0.5rem;
-  z-index: 10;
-}
-</style>
+<style scoped></style>

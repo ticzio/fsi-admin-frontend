@@ -20,7 +20,7 @@ onMounted(async () => {
 })
 
 const users = computed(() => {
-  return clients.value.map(client => ({
+  return clients.value.map((client) => ({
     id: Number(client.id),
     name: `${client.first_name || ''} ${client.last_name || ''}`.trim(),
     email: client.email || '',
@@ -52,7 +52,7 @@ const handleUserClick = async (user: { id: number }) => {
   isRedirecting.value = true
   // Doherty Threshold: Small delay to let the user see the "Redirection" state
   await new Promise((resolve) => setTimeout(resolve, 500))
-  router.push({ name: 'Detalle Usuario', params: { id: user.id } })
+  router.push({ name: 'Detalle Cliente', params: { id: user.id } })
 }
 
 const handleViewAllUsers = async () => {
@@ -160,7 +160,11 @@ const handleViewAllUsers = async () => {
         </div>
 
         <!-- RIGHT COLUMN: Users List -->
-        <LatestUsers :users="users" @click-user="handleUserClick" @click-view-all="handleViewAllUsers" />
+        <LatestUsers
+          :users="users"
+          @click-user="handleUserClick"
+          @click-view-all="handleViewAllUsers"
+        />
       </div>
     </div>
   </DashboardLayout>

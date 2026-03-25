@@ -38,8 +38,7 @@ $input-border-width: 2px;
   ),
 
   // AQUÍ fuerzas cómo se generan los *-bg-subtle
-  $theme-colors-bg-subtle:
-    (
+  $theme-colors-bg-subtle: (
       'primary': rgba($primary, 0.7),
       'secondary': rgba($secondary, 0.7),
       'info': rgba($info, 0.7),
@@ -83,8 +82,11 @@ body {
   z-index: 99999;
   visibility: hidden;
   border-radius: var(--bs-border-radius-xl);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(151, 187, 255, 0.55),
-    inset 0 -1px 0 rgba(5, 18, 64, 0.6), inset 0 0 18px 11px rgba(48, 92, 210, 0.35);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(151, 187, 255, 0.55),
+    inset 0 -1px 0 rgba(5, 18, 64, 0.6),
+    inset 0 0 18px 11px rgba(48, 92, 210, 0.35);
 
   // Default: show above
   top: -30px;
@@ -136,7 +138,9 @@ body {
 /* Izquierda a derecha */
 .slide-left-enter-active,
 .slide-left-leave-active {
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 .slide-left-enter-from {
   opacity: 0;
@@ -150,7 +154,9 @@ body {
 /* Derecha a izquierda */
 .slide-right-enter-active,
 .slide-right-leave-active {
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 .slide-right-enter-from {
   opacity: 0;
@@ -190,5 +196,12 @@ body {
 .border-radius-left {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
+}
+
+//Para los botones de accion
+.sticky-bottom {
+  position: sticky;
+  bottom: 0.5rem;
+  z-index: 10;
 }
 </style>

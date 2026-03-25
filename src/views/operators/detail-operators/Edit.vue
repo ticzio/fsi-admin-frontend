@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import OperatorForm from '@/components/Operators/OperatorForm.vue'
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
 import { useRoute } from 'vue-router'
 import { useUsers } from '@/composables/Models/useUsers'
+import { useStore } from 'vuex'
+import { BUTTONS } from '@/const/buttonConst'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 
 const route = useRoute()
+const store = useStore()
+const isMobile = computed(() => store.getters.isMobile)
 const { saveUser } = useUsers()
 
 const props = defineProps({
@@ -83,19 +89,16 @@ onMounted(async () => {
 <template>
   <div class="bg-white p-4 rounded-4 border shadow-sm position-relative">
     <LoadingOverlay v-if="isLoading" />
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h5 class="mb-0 fw-bold text-primary">Información General del Operador</h5>
-      <button
-        class="btn btn-primary px-4 rounded-3 d-flex align-items-center gap-2"
-        @click="handleSubmit"
-        :disabled="isLoading"
-      >
-        <i class="bi bi-save"></i>
-        Guardar Cambios
+    <div class="d-flex justify-content-end mb-4">
+      <DateTimeBadges :createdAt="operatorData?.created_at" :updatedAt="operatorData?.updated_at" />
+    </div>
+    <OperatorForm :form="form" :roleOptions="[]" />
+    <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
+      <button type="submit" :class="BUTTONS.save.class" :disabled="isLoading">
+        <LoadingSpinner v-if="isLoading" />
+        <i v-else :class="BUTTONS.save.icon"></i>
+        {{ BUTTONS.save.title }}
       </button>
     </div>
-
-    <OperatorForm :form="form" :roleOptions="[]" />
   </div>
 </template>

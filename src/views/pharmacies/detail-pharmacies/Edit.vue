@@ -13,7 +13,8 @@
             @click="handleOpenModal"
           >
             <i class="bi bi-calendar-event me-2"></i>
-            Agregar Horarios
+            <span class="d-none d-md-inline">Agregar Horarios</span>
+            <span class="d-md-none">Horarios</span>
             <span
               v-if="!hasSchedule"
               class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
@@ -28,7 +29,8 @@
             @click="handleDelete"
           >
             <i :class="BUTTONS.delete.icon"></i>
-            {{ BUTTONS.delete.title }}
+            <span class="d-none d-md-inline">{{ BUTTONS.delete.title }}</span>
+            <span class="d-md-none">Eliminar</span>
           </button>
         </div>
         <div v-if="!hasSchedule" class="text-danger mt-2 small fw-bold">
@@ -40,11 +42,11 @@
 
     <form @submit.prevent="handleSave" class="flex-grow-1">
       <GeneralInfoStep :form="form" :cityOptions="cityOptions" />
-      <div class="d-flex justify-content-end mt-4">
-        <button type="submit" :class="BUTTONS.new.class" :disabled="loading">
-          <LoadingSpinner v-if="loading" class="me-2" />
-          <i v-else class="bi bi-save"></i>
-          Guardar Cambios
+      <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
+        <button type="submit" :class="BUTTONS.save.class" :disabled="loading">
+          <LoadingSpinner v-if="loading" />
+          <i v-else :class="BUTTONS.save.icon"></i>
+          {{ BUTTONS.save.title }}
         </button>
       </div>
     </form>
@@ -83,9 +85,12 @@ import ScheduleStep from '@/components/Pharmacies/ScheduleStep.vue'
 import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import Modal from '@/components/common/Modal.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { useStore } from 'vuex'
 
 const route = useRoute()
 const router = useRouter()
+const store = useStore()
+const isMobile = computed(() => store.getters.isMobile)
 const { getPharmacy, savePharmacy, savePharmacySchedule, deletePharmacy, pharmacy, loading } =
   usePharmacy()
 const { cities, getCities } = useCities()

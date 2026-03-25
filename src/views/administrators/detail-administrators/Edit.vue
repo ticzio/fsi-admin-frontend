@@ -2,6 +2,10 @@
   <div class="container-fluid p-0">
     <div class="card border-0 shadow-sm">
       <div class="card-body p-4">
+        <div class="mb-4 d-flex justify-content-end" v-if="!loading">
+          <DateTimeBadges :createdAt="form.created_at || form.timestamp" :updatedAt="form.updated_at" />
+        </div>
+
         <AdministratorForm
           v-if="!loading"
           :form="form"
@@ -14,18 +18,16 @@
           </div>
         </div>
 
-        <div class="d-flex justify-content-end gap-2 mt-4">
-          <button type="button" class="btn btn-light px-4" @click="router.push('/administrators')">
-            Cancelar
-          </button>
+        <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
           <button
             type="button"
-            class="btn btn-primary px-4"
+            :class="BUTTONS.save.class"
             :disabled="loading"
             @click="saveChanges"
           >
             <LoadingSpinner v-if="loading" class="me-1" />
-            Guardar Cambios
+            <i v-else :class="BUTTONS.save.icon"></i>
+            {{ BUTTONS.save.title }}
           </button>
         </div>
       </div>
@@ -36,12 +38,18 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { useUsers } from '@/composables/Models/useUsers'
 import AdministratorForm from '@/components/Administrators/AdministratorForm.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
+import { BUTTONS } from '@/const/buttonConst'
 
 const route = useRoute()
 const router = useRouter()
+const store = useStore()
+
+const isMobile = computed(() => store.getters.isMobile)
 
 const { loading, roles, getRoles, getUser, saveUser } = useUsers()
 
@@ -55,6 +63,9 @@ const form = ref({
   url_image: '' as string | File,
   password: '',
   password_confirmation: '',
+  created_at: '',
+  updated_at: '',
+  timestamp: '',
 })
 
 const filteredRoles = computed(() => {
