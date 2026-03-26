@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import CustomTable from '@/components/common/CustomTable.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import Modal from '@/components/common/Modal.vue'
@@ -13,7 +14,7 @@ import { useStore } from 'vuex'
 import { useTableActions } from '@/composables/useTableActions'
 import { useExchanges } from '@/composables/Models/useExchanges'
 
-import { TITLE_SECTION_COMPONENT, TABLE_HEADERS } from '@/const/tableConst'
+import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_ACTIONS } from '@/const/tableConst'
 
 interface Item {
   id: string | number
@@ -24,14 +25,8 @@ const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
-const {
-  loading,
-  exchanges,
-  pagination,
-  getExchanges,
-  deactivateExchange,
-  deleteExchange,
-} = useExchanges()
+const { loading, exchanges, pagination, getExchanges, deactivateExchange, deleteExchange } =
+  useExchanges()
 
 const search = ref('')
 const paginationKey = 'coupons-list'
@@ -43,15 +38,11 @@ const handleTableAction = async ({ actionName, item }: { actionName: string; ite
   if (actionName === 'view' || actionName === 'edit') {
     selectedCoupon.value = { ...item }
     couponModalDialog.value?.openModal()
-  } else if (actionName === 'deactivate') {
-    await deactivateExchange(item)
-  } else if (actionName === 'delete') {
-    await deleteExchange(item)
   }
 }
 
-const getTableActions = async (item: any) => {
-  return getDefaultActions(item)
+const getTableActions = async () => {
+  return [TABLE_ACTIONS.edit]
 }
 
 const handleTablePagination = (page: number) => {
@@ -119,16 +110,21 @@ onMounted(() => {
           :change-page="handleTablePagination"
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
-        />
+        >
+          <template #cell(coupon_client.coupon.code)="{ value }">
+            <span class="fw-bold text-dark">{{ value }}</span>
+          </template>
+          <template #cell(exchanged_at)="{ value }">
+            <span v-format-date="value"></span>
+          </template>
+          <template #cell(created_at)="{ value }">
+            <span v-format-time="value"></span>
+          </template>
+        </CustomTable>
       </div>
 
       <!-- Modal Detalles de Cupón -->
-      <Modal
-        id="couponDetailsModal"
-        ref="couponModalDialog"
-        title="Detalles del Canje"
-        size="lg"
-      >
+      <Modal id="couponDetailsModal" ref="couponModalDialog" title="Detalles del Canje" size="lg">
         <RedeemedCoupon :exchange="selectedCoupon" />
       </Modal>
     </div>

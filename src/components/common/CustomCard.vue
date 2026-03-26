@@ -153,11 +153,6 @@ const statusClass = computed(() => {
             <i :class="action.icon"></i>
           </button>
         </div>
-        <div v-else class="actions-container">
-          <button class="btn btn-light" style="border-radius: 10px" disabled>
-            <i class="bi bi-arrow-right-circle fs-5"></i>
-          </button>
-        </div>
       </div>
 
       <!-- Info Area -->
@@ -172,14 +167,16 @@ const statusClass = computed(() => {
       <div class="divider border-bottom border-dashed mb-3"></div>
 
       <!-- Footer Area -->
-      <div class="d-flex justify-content-between align-items-center mt-auto">
-        <div class="date-range small text-muted fw-medium">
-          {{ formattedStartDate }} - {{ formattedFinishDate }}
+      <slot name="footer">
+        <div class="d-flex justify-content-between align-items-center mt-auto">
+          <div class="date-range small text-muted fw-medium">
+            {{ formattedStartDate }} - {{ formattedFinishDate }}
+          </div>
+          <div :class="['status-badge small fw-bold', statusClass]">
+            {{ statusLabel }}
+          </div>
         </div>
-        <div :class="['status-badge small fw-bold', statusClass]">
-          {{ statusLabel }}
-        </div>
-      </div>
+      </slot>
     </div>
   </div>
 </template>

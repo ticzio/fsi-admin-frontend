@@ -191,6 +191,10 @@ export function useUsers() {
         return false
       }
     } catch (error: any) {
+      if (error.code === 400) {
+        swalToast.showError('Usuario ya existente')
+        return false
+      }
       console.error('Error saving user:', error)
       swalToast.showError('Recursos no encontrados')
       return false
