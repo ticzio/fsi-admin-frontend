@@ -50,8 +50,39 @@ $input-border-width: 2px;
     )
 );
 
-html {
+:root {
+  --app-zoom: 1;
+  --app-vh: 100vh;
+}
+
+@media screen and (min-width: 1025px) {
+  :root {
+    --app-zoom: 0.75;
+    --app-vh: calc(100vh / 0.75);
+  }
+}
+
+html, body {
   overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* El zoom se aplica al contenedor de Vue, NO al html/body.
+   Así Bootstrap puede posicionar modales (fixed) correctamente. */
+#app {
+  zoom: var(--app-zoom);
+}
+
+/* Compensa el zoom dinámico para que los utilitarios de bootstrap ocupen toda la pantalla */
+.min-vh-100 {
+  min-height: var(--app-vh) !important;
+}
+
+.vh-100 {
+  height: var(--app-vh) !important;
 }
 
 body {
@@ -79,7 +110,7 @@ body {
   padding: 5px 20px;
   border: 1px solid rgba(251, 253, 255, 0.7);
   opacity: 0;
-  z-index: 99999;
+  z-index: 1040;
   visibility: hidden;
   border-radius: var(--bs-border-radius-xl);
   box-shadow:
@@ -203,5 +234,17 @@ body {
   position: sticky;
   bottom: 0.5rem;
   z-index: 10;
+}
+
+// Ocultar tooltips cuando hay un modal abierto
+body.modal-open [data-title]:after {
+  display: none !important;
+}
+
+// El modal y el backdrop los inserta Bootstrap directamente en el body (fuera del #app).
+// Como el body no tiene zoom, aplicamos el mismo zoom aquí para que todo se vea uniforme.
+.modal,
+.modal-backdrop {
+  zoom: var(--app-zoom);
 }
 </style>

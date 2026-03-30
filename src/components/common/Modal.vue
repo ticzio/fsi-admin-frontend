@@ -70,7 +70,7 @@ defineExpose({ openModal, closeModal })
     class="modal fade"
     :id="id"
     ref="modalRef"
-    data-bs-backdrop="static"
+    data-bs-backdrop="true"
     data-bs-keyboard="false"
     tabindex="-1"
     :aria-labelledby="`${id}Label`"
@@ -103,9 +103,3 @@ defineExpose({ openModal, closeModal })
     </div>
   </div>
 </template>
-
-<style scoped>
-.modal-content {
-  overflow: visible;
-}
-</style>

@@ -380,7 +380,7 @@ onMounted(() => {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: calc(100vh / 0.75);
   background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(4px);
   z-index: 1050;
@@ -402,7 +402,7 @@ onMounted(() => {
   right: 24px;
   width: calc(100vw - 48px);
   max-width: 400px;
-  max-height: calc(100vh - 140px);
+  max-height: calc(calc(100vh / 0.75) - 140px);
   background: #f8fafc;
   border-radius: 28px;
   z-index: 1055;

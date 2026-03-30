@@ -33,15 +33,6 @@ const form = reactive({
 })
 
 const saveOperator = async () => {
-  if (!form.first_name || !form.last_name || !form.email) {
-    swalToast.showError('Por favor, completa los campos obligatorios.')
-    return
-  }
-  if (form.password && form.password !== form.password_confirmation) {
-    swalToast.showError('Las contraseñas no coinciden.')
-    return
-  }
-
   try {
     const payload: any = {
       ...form,
@@ -63,13 +54,13 @@ const saveOperator = async () => {
 <template>
   <div class="d-flex flex-column h-100 gap-4">
     <div class="card border border-light shadow-sm rounded-4 p-4 flex-grow-1 overflow-auto">
-      <form id="operatorForm" @submit.prevent="saveOperator" class="d-flex flex-column gap-4">
+      <form id="operatorForm" class="d-flex flex-column gap-4">
         <OperatorForm :form="form" :roleOptions="roleOptions" />
       </form>
     </div>
     <!-- BOTONES DE ACCIÓN -->
     <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
-      <button type="submit" :class="BUTTONS.save.class" :disabled="loading">
+      <button type="button" @click="saveOperator" :class="BUTTONS.save.class" :disabled="loading">
         <LoadingSpinner v-if="loading" />
         <i v-else :class="BUTTONS.save.icon"></i>
         {{ BUTTONS.save.title }}
