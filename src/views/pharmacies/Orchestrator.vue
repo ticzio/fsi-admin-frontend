@@ -20,7 +20,6 @@ const router = useRouter()
 const store = useStore()
 const logger = useLogger()
 
-
 const localTitle = ref('Titulo por defecto')
 
 const title = computed(() => localTitle.value || store.getters['utils/isItem'] || '')
@@ -120,7 +119,7 @@ const startLoadingTimeout = () => {
   loadingTimeout = setTimeout(() => {
     if (isLoading.value) {
       console.warn('Loading timeout alcanzado, cargando datos directamente...')
-      loadPharmacyData()
+      //loadPharmacyData()
     }
   }, 3000) // 3 segundos de espera máxima
 }
@@ -136,14 +135,12 @@ const clearLoadingTimeout = () => {
 const { getPharmacy, loading: isLoading } = usePharmacy()
 
 const loadPharmacyData = async () => {
-  try {
-    const data = await getPharmacy(route.params.id_pharmacy as string)
-    if (data) {
-      localTitle.value = data.name || data.trade_name || ''
-      store.dispatch('utils/setIsItem', localTitle.value)
-    }
-  } catch (error) {
-    console.error('Error fetching pharmacy for Orchestrator:', error)
+  const data = await getPharmacy(route.params.id_pharmacy as string)
+  if (data) {
+    localTitle.value = data.name || data.trade_name || ''
+    store.dispatch('utils/setIsItem', localTitle.value)
+  } else {
+    router.replace('/pharmacy')
   }
 }
 

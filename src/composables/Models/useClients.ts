@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
 import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
@@ -48,6 +49,7 @@ export function useClients() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
   const logger = useLogger()
   const { roles, getRoles } = useRoles()
 
@@ -88,11 +90,10 @@ export function useClients() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching clients:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       clients.value = []
       pagination.totalPages = 1
       pagination.currentPage = 1
@@ -197,12 +198,11 @@ export function useClients() {
         await getDataClients(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return false
       }
     } catch (error: any) {
-      console.error('Error saving client:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -241,9 +241,7 @@ export function useClients() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.client.changeStatus, {}, error)
-      swalToast.showError(
-        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.first_name}`,
-      )
+      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.first_name}`)
       return false
     }
   }
@@ -278,7 +276,7 @@ export function useClients() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.client.changeStatus, {}, error)
-      swalToast.showError(`${ERROR.errorDelete} ${item.first_name}`)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.first_name}`)
       return false
     }
   }

@@ -119,7 +119,7 @@ const startLoadingTimeout = () => {
   loadingTimeout = setTimeout(() => {
     if (isLoading.value) {
       console.warn('Loading timeout alcanzado, cargando datos directamente...')
-      //loadPharmacyData()
+      //loadOperatorData()
     }
   }, 3000) // 3 segundos de espera máxima
 }
@@ -139,9 +139,12 @@ const loadOperatorData = async () => {
     if (data) {
       localTitle.value = data.first_name + ' ' + data.last_name || data.full_name || ''
       store.dispatch('utils/setIsItem', localTitle.value)
+    } else {
+      router.replace('/operators')
     }
   } catch (error) {
     logger.logRequest(URLS.user.prefix + '/' + route.params.id, {}, error)
+    router.replace('/operators')
   } finally {
     isLoading.value = false
   }

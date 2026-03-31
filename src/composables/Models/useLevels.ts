@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
+import { useHandleError } from '@/composables/useHandleError'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
 
@@ -15,6 +16,7 @@ export interface LevelInterface {
 export function useLevels() {
   const store = useStore()
   const swalToast = useSwalToast()
+  const { handleErrorResponse } = useHandleError()
 
   const loading = ref(false)
   const level = ref<LevelInterface | null>(null)
@@ -33,11 +35,10 @@ export function useLevels() {
         level.value = response.data
         return response.data
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching level:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -59,12 +60,11 @@ export function useLevels() {
         swalToast.showSuccess('Puntos del nivel actualizados correctamente')
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return false
       }
     } catch (error: any) {
-      console.error('Error updating level points:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return false
     } finally {
       loading.value = false

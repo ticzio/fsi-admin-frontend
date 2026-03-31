@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
 import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
@@ -45,10 +46,14 @@ const pagination = reactive({
 // Mapa para de-duplicar peticiones en vuelo por ID
 const pendingRequests = new Map<string | number, Promise<any>>()
 
+// Set para evitar múltiples peticiones de IDs que ya sabemos que no existen (404)
+const notFoundPharmacies = ref<Set<string | number>>(new Set())
+
 export function usePharmacy() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
   const logger = useLogger()
 
   const paginationKey = 'pharmacy-list'
@@ -82,11 +87,10 @@ export function usePharmacy() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching pharmacies:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       pharmacies.value = []
       pagination.totalPages = 1
       pagination.currentPage = 1
@@ -100,6 +104,11 @@ export function usePharmacy() {
    * Implementa de-duplicación para evitar peticiones HTTP concurrentes al mismo ID.
    */
   const getPharmacy = async (id: string | number, forceRefresh = false) => {
+    // Si ya se determinó previamente que esta farmacia no existe, evitar peticiones adicionales
+    if (notFoundPharmacies.value.has(String(id))) {
+      return null
+    }
+
     // Si ya hay una petición en vuelo para este ID, devolvemos la misma promesa
     if (pendingRequests.has(id)) {
       return pendingRequests.get(id)
@@ -121,13 +130,13 @@ export function usePharmacy() {
         if (response.code === 200) {
           pharmacy.value = response.data
           return response.data
-        } else {
-          swalToast.showError('Recursos no encontrados')
-          return null
         }
+        
+        notFoundPharmacies.value.add(String(id))
+        return null
       } catch (error: any) {
-        console.error('Error fetching pharmacy:', error)
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(error, 'Farmacia no encontrada')
+        notFoundPharmacies.value.add(String(id))
         return null
       } finally {
         loading.value = false
@@ -246,12 +255,11 @@ export function usePharmacy() {
         )
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Error al guardar la farmacia')
         return false
       }
     } catch (error: any) {
-      console.error('Error saving pharmacy:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Error al guardar la farmacia')
       return false
     } finally {
       loading.value = false
@@ -290,7 +298,7 @@ export function usePharmacy() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.pharmacy.changeStatus, {}, error)
-      swalToast.showError(`${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
+      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
       return false
     }
   }
@@ -325,7 +333,7 @@ export function usePharmacy() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.pharmacy.changeStatus, {}, error)
-      swalToast.showError(`${ERROR.errorDelete} ${item.name}`)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.name}`)
       return false
     }
   }
@@ -381,12 +389,11 @@ export function usePharmacy() {
         await getPharmacy(id, true)
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Error al guardar los horarios')
         return false
       }
     } catch (error: any) {
-      console.error('Error saving pharmacy schedule:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Error al guardar los horarios')
       return false
     } finally {
       loading.value = false

@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
 import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
@@ -11,6 +12,7 @@ export function useCoupons() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
   const logger = useLogger()
 
   const loading = ref(false)
@@ -41,13 +43,12 @@ export function useCoupons() {
         pagination.totalPages = response.meta.last_page
         pagination.currentPage = response.meta.current_page
       } else if (response.code === 404) {
-        swalToast.showError('No se encontraron registros de cupones')
+        handleErrorResponse(null, 'No se encontraron registros de cupones')
       } else {
-        swalToast.showError('Error al obtener los registros de cupones')
+        handleErrorResponse(null, 'Error al obtener los registros de cupones')
       }
     } catch (error: any) {
-      console.error('Error fetching coupons:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -89,12 +90,11 @@ export function useCoupons() {
         await getDataCoupons(pagination.currentPage)
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return false
       }
     } catch (error: any) {
-      console.error('Error saving coupon:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -130,7 +130,7 @@ export function useCoupons() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.coupon.changeStatus, {}, error)
-      swalToast.showError(`${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
+      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
       return false
     }
   }
@@ -162,7 +162,7 @@ export function useCoupons() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.coupon.changeStatus, {}, error)
-      swalToast.showError(`${ERROR.errorDelete} ${item.name}`)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.name}`)
       return false
     }
   }

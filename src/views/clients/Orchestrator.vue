@@ -119,7 +119,7 @@ const startLoadingTimeout = () => {
   loadingTimeout = setTimeout(() => {
     if (isLoading.value) {
       console.warn('Loading timeout alcanzado, cargando datos directamente...')
-      loadUserData()
+      //loadUserData()
     }
   }, 3000) // 3 segundos de espera máxima
 }
@@ -138,6 +138,8 @@ const loadUserData = async () => {
   if (data) {
     localTitle.value = data.first_name + ' ' + data.last_name || data.full_name || ''
     store.dispatch('utils/setIsItem', localTitle.value)
+  } else {
+    router.replace('/clients')
   }
   isLoading.value = false
 }
@@ -157,7 +159,14 @@ watch(
 
 onMounted(async () => {
   await determineVisibleTabs()
-  loadUserData()
+
+  if (isGetting.value) {
+    // Si ya está cargando (por el store), iniciamos el timeout de seguridad
+    startLoadingTimeout()
+  } else {
+    // Si no está cargando, cargamos los datos inmediatamente
+    loadUserData()
+  }
 })
 
 onBeforeUnmount(() => {

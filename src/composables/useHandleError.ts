@@ -2,7 +2,7 @@ import { useSwal } from '@/composables/useSwal'
 import { useSwalToast } from '@/composables/useSwalToast'
 
 export interface BackendErrorResponse {
-  status?: string
+  status?: string | number
   code?: number
   message?: string
   alert?: string
@@ -44,15 +44,15 @@ export function useHandleError() {
         return
       }
 
-      // CASO GENERAL: Utilizar el atributo 'alert' provisto por la estructura de backend
-      if (errData.alert) {
-        swalToast.showError(errData.alert)
+      // CASO 404 NOT FOUND: Recurso no encontrado
+      if (errData.status === 404) {
+        swalToast.showError('Error en la URL solicitada.')
         return
       }
 
-      // Si no hay 'alert' pero hay un 'message' que es string, lo usamos
-      if (errData.message && typeof errData.message === 'string') {
-        swalToast.showError(errData.message)
+      // CASO GENERAL: Utilizar el atributo 'alert' provisto por la estructura de backend
+      if (errData.alert) {
+        swalToast.showError(errData.alert)
         return
       }
     }

@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 import { useStore } from 'vuex'
-import { useSwalToast } from '@/composables/useSwalToast'
+import { useHandleError } from '@/composables/useHandleError'
 
 export function useAnalytics() {
   const store = useStore()
-  const swalToast = useSwalToast()
+  const { handleErrorResponse } = useHandleError()
   const loading = ref(false)
 
   /**
@@ -22,12 +22,11 @@ export function useAnalytics() {
       if (response.code === 200) {
         return response.data
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return null
       }
     } catch (error: any) {
-      console.error('Error fetching back office analytics:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return null
     } finally {
       loading.value = false

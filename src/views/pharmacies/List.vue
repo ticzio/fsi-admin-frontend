@@ -103,7 +103,7 @@ const clearFilters = () => {
   const shouldFetch = selectedCity.value === null
   selectedState.value = null
   selectedCity.value = null
-  
+
   if (shouldFetch) {
     fetchData()
   }

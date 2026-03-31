@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
 import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
@@ -37,11 +38,13 @@ const sharedPagination = reactive({
 })
 
 const pendingGetUser = new Map<string | number, Promise<any>>()
+const notFoundUsers = ref<Set<string | number>>(new Set())
 
 export function useUsers() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
   const logger = useLogger()
   const { roles, getRoles } = useRoles()
 
@@ -82,11 +85,10 @@ export function useUsers() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching users:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       users.value = []
       pagination.totalPages = 1
       pagination.currentPage = 1
@@ -105,7 +107,12 @@ export function useUsers() {
       return user.value
     }
 
-    // 2. Si hay una petición en curso para este ID, compartir la misma promesa
+    // 2. Si ya se determinó previamente que este usuario no existe, evitar peticiones adicionales
+    if (notFoundUsers.value.has(String(id))) {
+      return null
+    }
+
+    // 3. Si hay una petición en curso para este ID, compartir la misma promesa
     if (pendingGetUser.has(id)) {
       return pendingGetUser.get(id)
     }
@@ -122,9 +129,11 @@ export function useUsers() {
           user.value = response.data
           return response.data
         }
+        notFoundUsers.value.add(String(id))
         return null
       } catch (error) {
-        console.error('Error in getUser:', error)
+        handleErrorResponse(error, 'Usuario no encontrado')
+        notFoundUsers.value.add(String(id))
         return null
       } finally {
         loading.value = false
@@ -187,16 +196,15 @@ export function useUsers() {
         await getDataUsers(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return false
       }
     } catch (error: any) {
       if (error.code === 400) {
-        swalToast.showError('Usuario ya existente')
+        handleErrorResponse(error, 'Usuario ya existente')
         return false
       }
-      console.error('Error saving user:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -235,7 +243,8 @@ export function useUsers() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.user.changeStatus, {}, error)
-      swalToast.showError(
+      handleErrorResponse(
+        error,
         `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.first_name}`,
       )
       return false
@@ -272,7 +281,7 @@ export function useUsers() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.user.changeStatus, {}, error)
-      swalToast.showError(`${ERROR.errorDelete} ${item.first_name}`)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.first_name}`)
       return false
     }
   }

@@ -11,13 +11,14 @@ import { useLogger } from '@/composables/useLogger'
 import { useCookies } from '@/composables/useCookies'
 import { decodeRole } from '@/composables/useAccessControl'
 import { useUsers } from '@/composables/Models/useUsers'
+import { useSwal } from '@/composables/useSwal'
 
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 
 const route = useRoute()
 const router = useRouter()
 const store = useStore()
-const logger = useLogger()
+const swal = useSwal()
 const { getUser, loading: isUserLoading } = useUsers()
 
 const isLoading = computed(() => isUserLoading.value)
@@ -130,14 +131,12 @@ const clearLoadingTimeout = () => {
 
 // Cargar datos del usuario directamente si es necesario (ej: recarga de página)
 const loadAdminData = async () => {
-  try {
-    const data = await getUser(route.params.id as string)
-    if (data) {
-      localTitle.value = data.first_name + ' ' + data.last_name || data.full_name || ''
-      store.dispatch('utils/setIsItem', localTitle.value)
-    }
-  } catch (error) {
-    console.error('Error loading admin data:', error)
+  const data = await getUser(route.params.id as string)
+  if (data) {
+    localTitle.value = data.first_name + ' ' + data.last_name || data.full_name || ''
+    store.dispatch('utils/setIsItem', localTitle.value)
+  } else {
+    router.replace('/administrators')
   }
 }
 

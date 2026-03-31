@@ -3,7 +3,10 @@
     <div class="card border-0 shadow-sm">
       <div class="card-body p-4">
         <div class="mb-4 d-flex justify-content-end" v-if="!loading">
-          <DateTimeBadges :createdAt="form.created_at || form.timestamp" :updatedAt="form.updated_at" />
+          <DateTimeBadges
+            :createdAt="form.created_at || form.timestamp"
+            :updatedAt="form.updated_at"
+          />
         </div>
 
         <AdministratorForm

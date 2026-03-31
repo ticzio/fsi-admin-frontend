@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
 import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
@@ -11,6 +12,7 @@ export function useNewsModel() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
   const logger = useLogger()
 
   const loading = ref(false)
@@ -41,11 +43,10 @@ export function useNewsModel() {
         pagination.totalPages = response.meta.last_page
         pagination.currentPage = response.meta.current_page
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching news:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -83,12 +84,11 @@ export function useNewsModel() {
         await getDataNews(pagination.currentPage)
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return false
       }
     } catch (error: any) {
-      console.error('Error saving news:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -124,7 +124,7 @@ export function useNewsModel() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.news.changeStatus, {}, error)
-      swalToast.showError(`${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.title}`)
+      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.title}`)
       return false
     }
   }
@@ -156,7 +156,7 @@ export function useNewsModel() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.news.changeStatus, {}, error)
-      swalToast.showError(`${ERROR.errorDelete} ${item.title}`)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.title}`)
       return false
     }
   }

@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
 import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
@@ -11,6 +12,7 @@ export function useRoles() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
   const logger = useLogger()
 
   const loading = ref(false)
@@ -41,11 +43,10 @@ export function useRoles() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching roles:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -64,11 +65,10 @@ export function useRoles() {
       if (response.code === 200) {
         roles.value = response.data
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching roles:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -98,12 +98,11 @@ export function useRoles() {
         await getDataRoles(pagination.currentPage)
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return false
       }
     } catch (error: any) {
-      console.error('Error saving role:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -139,7 +138,7 @@ export function useRoles() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.role.changeStatus, {}, error)
-      swalToast.showError(`${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
+      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
       return false
     }
   }
@@ -171,7 +170,7 @@ export function useRoles() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.role.changeStatus, {}, error)
-      swalToast.showError(`${ERROR.errorDelete} ${item.name}`)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.name}`)
       return false
     }
   }

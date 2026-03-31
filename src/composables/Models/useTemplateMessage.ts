@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
 import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
@@ -11,6 +12,7 @@ export function useTemplateMessage() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
   const logger = useLogger()
 
   const loading = ref(false)
@@ -42,11 +44,10 @@ export function useTemplateMessage() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching templates:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -75,12 +76,11 @@ export function useTemplateMessage() {
         )
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return false
       }
     } catch (error: any) {
-      console.error('Error saving template:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -115,9 +115,7 @@ export function useTemplateMessage() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.template_message.changeStatus, {}, error)
-      swalToast.showError(
-        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name || item.title}`,
-      )
+      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name || item.title}`)
       return false
     }
   }
@@ -148,7 +146,7 @@ export function useTemplateMessage() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.template_message.changeStatus, {}, error)
-      swalToast.showError(`${ERROR.errorDelete} ${item.name || item.title}`)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.name || item.title}`)
       return false
     }
   }

@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue'
 import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
 import { useLogger } from '@/composables/useLogger'
 import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
@@ -21,6 +22,7 @@ export function useExchanges() {
   const store = useStore()
   const swalToast = useSwalToast()
   const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
   const logger = useLogger()
 
   const loading = ref(false)
@@ -58,11 +60,10 @@ export function useExchanges() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching exchanges:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -90,11 +91,10 @@ export function useExchanges() {
         pagination.totalPages = response.meta?.last_page || response.last_page
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching exchanges by client id:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -115,11 +115,10 @@ export function useExchanges() {
         exchange.value = response.data
         return response.data
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
       }
     } catch (error: any) {
-      console.error('Error fetching exchange:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
     } finally {
       loading.value = false
     }
@@ -159,12 +158,11 @@ export function useExchanges() {
         await getExchanges(pagination.currentPage, currentSearch.value)
         return true
       } else {
-        swalToast.showError('Recursos no encontrados')
+        handleErrorResponse(null, 'Recursos no encontrados')
         return false
       }
     } catch (error: any) {
-      console.error('Error saving exchange:', error)
-      swalToast.showError('Recursos no encontrados')
+      handleErrorResponse(error, 'Recursos no encontrados')
       return false
     } finally {
       loading.value = false
@@ -203,7 +201,7 @@ export function useExchanges() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.exchange.changeStatus, {}, error)
-      swalToast.showError(`${isActive ? ERROR.errorDeactive : ERROR.errorActive} canje ID: ${item.id}`)
+      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} canje ID: ${item.id}`)
       return false
     }
   }
@@ -238,7 +236,7 @@ export function useExchanges() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.exchange.changeStatus, {}, error)
-      swalToast.showError(`${ERROR.errorDelete} canje ID: ${item.id}`)
+      handleErrorResponse(error, `${ERROR.errorDelete} canje ID: ${item.id}`)
       return false
     }
   }
