@@ -24,6 +24,7 @@ const emit = defineEmits(['update:modelValue'])
 const internalErrors = ref<string[]>([])
 const isPasswordVisible = ref(false)
 
+
 const inputType = computed(() => {
   if (props.type === 'password') {
     return isPasswordVisible.value ? 'text' : 'password'
@@ -137,11 +138,11 @@ const togglePasswordVisibility = () => {
 
 <style scoped>
 .form-group-custom label {
-  font-size: 0.9rem;
+  font-size: 1rem;
 }
 
 .custom-input {
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   padding: 0.8rem 1.2rem;
   border: 1px solid #e5e7eb;
   border-radius: 10px;
@@ -152,7 +153,7 @@ const togglePasswordVisibility = () => {
 
 .custom-input::placeholder {
   color: #6b7280;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
 .custom-input:focus {

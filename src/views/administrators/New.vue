@@ -35,21 +35,6 @@ const form = reactive({
 })
 
 const saveAdministrator = async () => {
-  if (!form.first_name || !form.last_name || !form.email || !form.id_type_rol_user) {
-    swalToast.showError('Por favor, completa los campos obligatorios.')
-    return
-  }
-
-  if (form.password && form.password !== form.password_confirmation) {
-    swalToast.showError('Las contraseñas no coinciden.')
-    return
-  }
-
-  if (!form.password) {
-    swalToast.showError('La contraseña es obligatoria para nuevos administradores.')
-    return
-  }
-
   const success = await saveUser(form as any, false)
   if (success) {
     router.push('/administrators')
@@ -69,7 +54,7 @@ const saveAdministrator = async () => {
       </div>
 
       <div class="flex-grow-1">
-        <form id="adminForm" @submit.prevent="saveAdministrator">
+        <form id="adminForm">
           <AdministratorForm :form="form" :roleOptions="filteredRoles" :is-edit="false" />
         </form>
       </div>
@@ -77,7 +62,12 @@ const saveAdministrator = async () => {
       <!-- BOTONES DE ACCIÓN COMPACTOS -->
       <div class="card border-0 shadow-sm rounded-4 p-2 bg-white sticky-bottom">
         <div class="d-flex justify-content-end gap-2">
-          <button type="submit" form="adminForm" :class="BUTTONS.save.class" :disabled="loading">
+          <button
+            type="button"
+            @click="saveAdministrator"
+            :class="BUTTONS.save.class"
+            :disabled="loading"
+          >
             <LoadingSpinner v-if="loading" />
             <i v-else :class="BUTTONS.save.icon"></i>
             {{ BUTTONS.save.title }}

@@ -134,30 +134,31 @@ defineExpose({
       <div class="col-12 col-lg-6 d-flex flex-column pe-lg-4 form-section">
         <h6
           class="fw-bold text-primary mb-3 text-uppercase"
-          style="font-size: 0.85rem; letter-spacing: 0.5px"
+          style="font-size: 1rem; letter-spacing: 0.5px"
         >
           Configuración de la Noticia
         </h6>
 
         <div class="mb-4 d-flex flex-column">
-          <label class="form-label fw-bold mb-2">Imagen de Portada</label>
+          <label class="form-label fw-bold mb-2 fs-5">Imagen de Portada</label>
           <ImageUploader
             v-model="imageFile"
             :round="false"
             :initialImageUrl="formData.url_image"
             class="w-100"
             placeholder="Buscar o arrastrar imagen"
+            :rules="[(v) => !!v || 'La imagen es obligatoria']"
           />
         </div>
 
         <div class="row g-3 mb-1">
-          <div class="col-12 col-md-8">
+          <div class="col-12 col-md-10">
             <BaseInput
               id="title"
               v-model="formData.title"
               label="Título de la Noticia"
               placeholder="Ej: Nueva Actualización del Sistema"
-              :rules="[(v) => !!v || 'El título es requerido']"
+              :rules="[(v) => !!v || 'El título es obligatorio']"
             />
           </div>
           <div
@@ -183,7 +184,7 @@ defineExpose({
         </div>
 
         <div class="mt-1 flex-grow-1 d-flex flex-column">
-          <label class="form-label fw-bold mb-2">Contenido de la Noticia</label>
+          <label class="form-label fw-bold mb-2 fs-5">Contenido de la Noticia</label>
           <div
             class="quill-wrapper bg-white rounded-3 shadow-sm border transition-all flex-grow-1 d-flex flex-column"
             :class="{ 'border-danger': !isFormValid && !formData.content.trim() }"
@@ -204,10 +205,12 @@ defineExpose({
       </div>
 
       <!-- Columna Derecha: Vista Previa (Simulación de Mobile/Tarjeta) -->
-      <div class="col-12 col-lg-6 border-start ps-lg-4 preview-section d-none d-lg-block">
+      <div
+        class="col-12 col-lg-6 border-start ps-lg-4 preview-section d-none d-lg-block d-flex flex-column"
+      >
         <h6
           class="fw-bold text-secondary mb-3 text-uppercase d-flex align-items-center justify-content-between"
-          style="font-size: 0.85rem; letter-spacing: 0.5px"
+          style="font-size: 1rem; letter-spacing: 0.5px"
         >
           <span>Vista Previa en Tiempo Real</span>
           <span
@@ -219,7 +222,7 @@ defineExpose({
         </h6>
 
         <div
-          class="preview-container bg-light rounded-4 border p-4 h-100 overflow-auto position-relative custom-scrollbar"
+          class="preview-container bg-light rounded-4 border p-4 flex-grow-1 overflow-auto position-relative custom-scrollbar"
         >
           <!-- Mockup Tarjeta Noticia -->
           <div
@@ -244,11 +247,8 @@ defineExpose({
             </div>
 
             <div class="p-4">
-              <div
-                class="d-flex align-items-center gap-2 mb-3 text-muted"
-                style="font-size: 0.85rem"
-              >
-                <i class="bi bi-calendar3"></i>
+              <div class="d-flex align-items-center gap-2 mb-3 text-muted" style="font-size: 1rem">
+                <i class="bi bi-calendar3 fs-5"></i>
                 <span>{{
                   new Date().toLocaleDateString('es-ES', {
                     day: 'numeric',
@@ -257,7 +257,7 @@ defineExpose({
                   })
                 }}</span>
               </div>
-              <h3 class="fw-bold mb-3" style="font-size: 1.4rem; color: #1a1a1a; line-height: 1.3">
+              <h3 class="fw-bold mb-3" style="font-size: 1.8rem; color: #1a1a1a; line-height: 1.2">
                 {{ displayTitle }}
               </h3>
 
@@ -269,7 +269,6 @@ defineExpose({
         </div>
       </div>
     </div>
-
   </form>
 </template>
 
@@ -278,6 +277,8 @@ defineExpose({
   font-family: inherit;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
 }
 
 /* Scrollbar personalizada para la vista previa */
@@ -293,7 +294,7 @@ defineExpose({
 }
 
 .preview-container {
-  max-height: 600px;
+  min-height: 400px;
 }
 
 .preview-image-wrapper {
@@ -319,7 +320,7 @@ defineExpose({
 }
 :deep(.ql-container.ql-snow) {
   border: none;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-family: inherit;
   border-radius: 0 0 0.5rem 0.5rem;
   flex-grow: 1;

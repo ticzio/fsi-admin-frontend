@@ -172,14 +172,14 @@ onMounted(() => {
           <div class="d-flex justify-content-end gap-3 w-100">
             <button
               type="button"
-              class="btn btn-outline-secondary px-4 rounded-3 shadow-sm fw-medium"
+              class="btn btn-outline-secondary px-4 rounded-3 shadow-sm fw-medium fs-5"
               @click="formModal?.closeModal()"
             >
               Cancelar
             </button>
             <button
               type="button"
-              class="btn btn-primary px-4 rounded-3 text-white fw-bold shadow-sm d-flex align-items-center"
+              class="btn btn-primary px-4 rounded-3 text-white fw-bold shadow-sm d-flex align-items-center fs-5"
               @click="newsFormRef?.handleSubmit()"
             >
               <i class="bi bi-save me-2"></i>

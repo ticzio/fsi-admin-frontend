@@ -70,7 +70,7 @@ defineExpose({ openModal, closeModal })
     class="modal fade"
     :id="id"
     ref="modalRef"
-    data-bs-backdrop="true"
+    data-bs-backdrop="static"
     data-bs-keyboard="false"
     tabindex="-1"
     :aria-labelledby="`${id}Label`"
@@ -82,7 +82,7 @@ defineExpose({ openModal, closeModal })
     >
       <div class="modal-content border-0 shadow-lg rounded-4" :class="background">
         <div class="modal-header border-bottom-0 pb-0">
-          <h5 class="modal-title fw-bold" :id="`${id}Label`" v-if="title">
+          <h5 class="modal-title fw-bold fs-4" :id="`${id}Label`" v-if="title">
             {{ title }}
           </h5>
           <slot name="header"></slot>

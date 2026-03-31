@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSwalToast } from '@/composables/useSwalToast'
+import { useUsers } from '@/composables/Models/useUsers'
 
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
@@ -11,9 +12,7 @@ import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 import { BUTTONS } from '@/const/buttonConst'
 
 const router = useRouter()
-const swalToast = useSwalToast()
-
-const loading = ref(false)
+const { saveUser, loading } = useUsers()
 
 const roleOptions = ref([
   { id: 1, name: 'Operador Principal' },
@@ -26,33 +25,15 @@ const form = reactive({
   last_name: '',
   email: '',
   phone: '',
-  role_id: null as any,
+  id_type_rol_user: null as any,
   password: '',
   password_confirmation: '',
 })
 
 const saveOperator = async () => {
-  if (!form.first_name || !form.last_name || !form.email || !form.role_id) {
-    swalToast.showError('Por favor, completa los campos obligatorios.')
-    return
-  }
-  if (form.password && form.password !== form.password_confirmation) {
-    swalToast.showError('Las contraseñas no coinciden.')
-    return
-  }
-
-  loading.value = true
-  try {
-    console.log('Guardando operador:', form)
-    // Aquí iría el dispatch al action de Vuex o llamada API
-    // await store.dispatch('operators/createOperator', form)
-    swalToast.showSuccess('Operador creado exitosamente')
+  const success = await saveUser(form as any, false)
+  if (success) {
     router.push('/operators')
-  } catch (error) {
-    console.error('Error al guardar:', error)
-    swalToast.showError('Ocurrió un error al intentar guardar el operador.')
-  } finally {
-    loading.value = false
   }
 }
 </script>

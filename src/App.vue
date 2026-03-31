@@ -241,10 +241,15 @@ body.modal-open [data-title]:after {
   display: none !important;
 }
 
-// El modal y el backdrop los inserta Bootstrap directamente en el body (fuera del #app).
-// Como el body no tiene zoom, aplicamos el mismo zoom aquí para que todo se vea uniforme.
-.modal,
 .modal-backdrop {
+  zoom: 1 !important;
+}
+
+.modal {
+  zoom: 1 !important;
+}
+
+.modal-dialog {
   zoom: var(--app-zoom);
 }
 </style>

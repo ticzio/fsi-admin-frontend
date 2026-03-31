@@ -30,13 +30,6 @@ const currentStepText = computed(() => {
   return currentStep.value === 1 ? 'Información General' : 'Horarios de Atención de la Farmacia'
 })
 
-// Simulación de opciones para el Multiselect de Ciudades (idealmente cargar desde API/Store)
-const cityOptions = ref([
-  { id: 1, name: 'Caracas' },
-  { id: 2, name: 'Maracaibo' },
-  { id: 3, name: 'Valencia' },
-  { id: 4, name: 'Barquisimeto' },
-])
 
 const form = reactive({
   id: 0,
@@ -104,12 +97,6 @@ const handlePhoneError = (error: string) => {
 }
 
 const savePharmacy = async () => {
-  // Validate basic requirements before sending
-  if (phoneError.value) {
-    swalToast.showError('Por favor, ingresa un número de teléfono válido.')
-    return
-  }
-
   const success = await savePharmacyApi(form, false)
   if (success) {
     router.push('/pharmacy')
@@ -140,7 +127,6 @@ const savePharmacy = async () => {
             <GeneralInfoStep
               v-if="currentStep === 1"
               :form="form"
-              :cityOptions="cityOptions"
               @update:phoneError="handlePhoneError"
             />
             <ScheduleStep v-else-if="currentStep === 2" :form="form" />

@@ -149,7 +149,28 @@ export function useUsers() {
    * Guarda o actualiza un usuario.
    * Maneja el envío de datos incluyendo la imagen.
    */
-  const saveUser = async (data: UserInterface, isEditing: boolean, id?: string | number) => {
+  const saveUser = async (data: any, isEditing: boolean, id?: string | number) => {
+    // 1. Validaciones lógicas iniciales
+    const roleId =
+      data.id_type_rol_user && typeof data.id_type_rol_user === 'object'
+        ? (data.id_type_rol_user as any).id
+        : data.id_type_rol_user
+
+    if (!data.first_name || !data.last_name || !data.email || !roleId) {
+      swalToast.showError('Por favor, completa los campos obligatorios.')
+      return false
+    }
+
+    if (data.password && data.password !== data.password_confirmation) {
+      swalToast.showError('Las contraseñas no coinciden.')
+      return false
+    }
+
+    if (!isEditing && !data.password) {
+      swalToast.showError('La contraseña es obligatoria para nuevos registros.')
+      return false
+    }
+
     loading.value = true
     try {
       const formData = new FormData()

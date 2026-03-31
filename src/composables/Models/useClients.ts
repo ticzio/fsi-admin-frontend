@@ -147,7 +147,23 @@ export function useClients() {
    * Guarda o actualiza un cliente.
    * Maneja el envío de datos incluyendo la imagen.
    */
-  const saveClient = async (data: ClientInterface, isEditing: boolean, id?: string | number) => {
+  const saveClient = async (data: any, isEditing: boolean, id?: string | number) => {
+    // 1. Validaciones lógicas iniciales
+    if (!data.first_name || !data.last_name || !data.email) {
+      swalToast.showError('Por favor, completa los campos obligatorios.')
+      return false
+    }
+
+    if (data.password && data.password !== data.password_confirmation) {
+      swalToast.showError('Las contraseñas no coinciden.')
+      return false
+    }
+
+    if (!isEditing && !data.password) {
+      swalToast.showError('La contraseña es obligatoria para nuevos registros.')
+      return false
+    }
+
     loading.value = true
     try {
       const formData = new FormData()

@@ -30,7 +30,7 @@ const props = defineProps<{
           <BaseInput
             id="first_name"
             v-model="form.first_name"
-            label="Nombres *"
+            label="Nombres"
             placeholder="Ej. Juan Carlos"
             :rules="[(v) => !!v || 'Campo obligatorio']"
           />
@@ -39,7 +39,7 @@ const props = defineProps<{
           <BaseInput
             id="last_name"
             v-model="form.last_name"
-            label="Apellidos *"
+            label="Apellidos"
             placeholder="Ej. Pérez"
             :rules="[(v) => !!v || 'Campo obligatorio']"
           />
@@ -49,7 +49,7 @@ const props = defineProps<{
             id="email"
             v-model="form.email"
             type="email"
-            label="Correo Electrónico *"
+            label="Correo Electrónico"
             placeholder="Ej. juan.perez@ejemplo.com"
             :rules="[(v) => !!v || 'Campo obligatorio']"
           />
@@ -60,13 +60,14 @@ const props = defineProps<{
             v-model="form.phone"
             label="Teléfono"
             placeholder="Ej. 04141234567"
+            :rules="[(v) => !!v || 'Campo obligatorio']"
           />
         </div>
         <div class="col-12 col-md-12">
           <MultiselectCustom
             v-model="form.id_type_rol_user"
             :options="roleOptions"
-            label="Rol *"
+            label="Rol"
             placeholder="Selecciona el rol"
             labelKey="name"
             trackBy="id"
@@ -74,6 +75,7 @@ const props = defineProps<{
             helperType="custom"
             customDefaultIcon="bi bi-person-badge"
             :clearable="true"
+            :rules="[(v) => !!v || 'Campo obligatorio']"
           />
         </div>
 

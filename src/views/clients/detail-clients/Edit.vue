@@ -77,11 +77,6 @@ watch(
 )
 
 const updateClient = async () => {
-  if (!form.first_name || !form.last_name || !form.email) {
-    swalToast.showError('Por favor, completa los campos obligatorios.')
-    return
-  }
-
   isLoading.value = true
   const clientData = {
     ...form,

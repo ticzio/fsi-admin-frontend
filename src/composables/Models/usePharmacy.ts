@@ -183,6 +183,14 @@ export function usePharmacy() {
         return false
       }
 
+      // Validación simple de formato de teléfono (puedes ajustar el regex según tus necesidades)
+      const phoneRegex = /^[0-9+() -]{7,20}$/
+      if (data.phone && !phoneRegex.test(data.phone)) {
+        swalToast.showError('Por favor, ingresa un número de teléfono válido.')
+        loading.value = false
+        return false
+      }
+
       const formData = new FormData()
 
       // Mapear campos base

@@ -124,7 +124,7 @@ onMounted(() => {
       </div>
 
       <!-- Modal Detalles de Cupón -->
-      <Modal id="couponDetailsModal" ref="couponModalDialog" title="Detalles del Canje" size="lg">
+      <Modal id="couponDetailsModal" ref="couponModalDialog" title="Detalles del Canje" size="xl">
         <RedeemedCoupon :exchange="selectedCoupon" />
       </Modal>
     </div>

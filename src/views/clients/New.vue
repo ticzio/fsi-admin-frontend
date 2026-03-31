@@ -31,21 +31,6 @@ const form = reactive({
 })
 
 const saveUser = async () => {
-  if (!form.first_name || !form.last_name || !form.email) {
-    swalToast.showError('Por favor, completa los campos obligatorios.')
-    return
-  }
-
-  if (form.password && form.password !== form.password_confirmation) {
-    swalToast.showError('Las contraseñas no coinciden.')
-    return
-  }
-
-  if (!form.password) {
-    swalToast.showError('La contraseña es obligatoria para nuevos usuarios.')
-    return
-  }
-
   loading.value = true
 
   const clientData = {

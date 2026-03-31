@@ -26,8 +26,8 @@
 .multiselect-custom .multiselect__tags {
   border: none !important;
   border-radius: var(--multiselect-radius) !important;
-  padding: 0.65rem 1rem !important; /* matches SearchInput vertical padding */
-  min-height: 2.5rem !important;
+  padding: 0.8rem 1.2rem !important; /* matches BaseInput vertical padding */
+  min-height: 3rem !important;
   background: transparent !important;
   display: flex !important;
   align-items: center !important;
@@ -41,7 +41,7 @@
 /* ── Placeholder ─────────────────────────────────────────────────────────── */
 .multiselect-custom .multiselect__placeholder {
   color: #9ca3af !important; /* matches SearchInput placeholder */
-  font-size: 0.93rem !important;
+  font-size: 0.95rem !important; /* matches BaseInput */
   margin-bottom: 0 !important;
   padding-top: 0 !important;
   transition: color 0.3s ease !important;
@@ -62,8 +62,8 @@
 
 /* ── Caret / arrow ───────────────────────────────────────────────────────── */
 .multiselect-custom .multiselect__select {
-  height: 2.5rem !important;
-  width: 2.5rem !important;
+  height: 3rem !important;
+  width: 3rem !important;
   background: none !important;
   transition: color 0.3s ease !important;
 }

@@ -18,6 +18,7 @@ const props = defineProps<{
   statusKey?: string
   actions?: Action[]
   imagePlaceholder?: string
+  centeredContent?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -121,27 +122,44 @@ const statusClass = computed(() => {
     class="custom-card card h-100 border-0 shadow-sm rounded-4 overflow-hidden"
     @click="$emit('card-click', item)"
   >
-    <div class="card-body p-3 d-flex flex-column">
-      <div class="d-flex justify-content-between align-items-start mb-3">
+    <div
+      :class="[
+        'card-body p-4 d-flex flex-column',
+        { 'align-items-center text-center justify-content-center': centeredContent },
+      ]"
+    >
+      <div
+        :class="[
+          'd-flex justify-content-between align-items-start mb-3 w-100',
+          { 'justify-content-center': centeredContent },
+        ]"
+      >
         <!-- Coupon/Image Side -->
         <div
-          class="coupon-badge-container d-flex align-items-center justify-content-center bg-primary rounded-3 text-white"
-          style="width: 80px; height: 80px"
+          class="coupon-badge-container d-flex align-items-center justify-content-center bg-primary rounded-4 text-white shadow-sm"
+          :style="{
+            width: centeredContent ? '140px' : '80px',
+            height: centeredContent ? '140px' : '80px',
+          }"
         >
           <template v-if="imageUrl">
-            <img :src="imageUrl" class="w-100 h-100 object-fit-cover rounded-3" alt="Coupon" />
+            <img :src="imageUrl" class="w-100 h-100 object-fit-cover rounded-4" alt="Coupon" />
           </template>
           <template v-else>
             <div class="text-center">
-              <div class="fw-bold" style="font-size: 0.8rem">DCTO</div>
-              <div class="fw-bold h4 mb-0">30%</div>
-              <div class="small" style="font-size: 0.6rem">OFF</div>
+              <div class="fw-bold" :style="{ fontSize: centeredContent ? '1.2rem' : '0.8rem' }">
+                DCTO
+              </div>
+              <div :class="['fw-bold mb-0', centeredContent ? 'h1' : 'h4']">30%</div>
+              <div class="small" :style="{ fontSize: centeredContent ? '0.9rem' : '0.6rem' }">
+                OFF
+              </div>
             </div>
           </template>
         </div>
 
         <!-- Action Button -->
-        <div v-if="actions && actions.length > 0" class="d-flex gap-2">
+        <div v-if="actions && actions.length > 0 && !centeredContent" class="d-flex gap-2">
           <button
             v-for="action in actions"
             :key="action.name"
@@ -156,15 +174,32 @@ const statusClass = computed(() => {
       </div>
 
       <!-- Info Area -->
-      <div class="info-container mb-3 flex-grow-1">
-        <h6 class="card-title fw-bold mb-1 line-clamp-2">{{ title }}</h6>
-        <p class="card-text text-muted small line-clamp-2 mb-0" v-if="description">
+      <div
+        :class="[
+          'info-container mb-4',
+          centeredContent ? 'mt-3' : 'flex-grow-1',
+          { 'w-100': centeredContent },
+        ]"
+      >
+        <h5 v-if="centeredContent" class="card-title fw-bold mb-2 h4">{{ title }}</h5>
+        <h6 v-else class="card-title fw-bold mb-1 line-clamp-2">{{ title }}</h6>
+
+        <p
+          :class="[
+            'card-text text-muted mb-0',
+            centeredContent ? 'px-3' : 'small line-clamp-2',
+          ]"
+          v-if="description"
+        >
           {{ description }}
         </p>
       </div>
 
       <!-- Divider -->
-      <div class="divider border-bottom border-dashed mb-3"></div>
+      <div
+        v-if="!centeredContent"
+        class="divider border-bottom border-dashed mb-3 w-100"
+      ></div>
 
       <!-- Footer Area -->
       <slot name="footer">

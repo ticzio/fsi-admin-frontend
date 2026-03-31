@@ -41,7 +41,7 @@
     </div>
 
     <form @submit.prevent="handleSave" class="flex-grow-1">
-      <GeneralInfoStep :form="form" :cityOptions="cityOptions" />
+      <GeneralInfoStep :form="form" />
       <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
         <button type="submit" :class="BUTTONS.save.class" :disabled="loading">
           <LoadingSpinner v-if="loading" />
@@ -78,7 +78,6 @@
 import { reactive, ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePharmacy } from '@/composables/Models/usePharmacy'
-import { useCities } from '@/composables/Models/useCities'
 import { BUTTONS } from '@/const/buttonConst'
 import GeneralInfoStep from '@/components/Pharmacies/GeneralInfoStep.vue'
 import ScheduleStep from '@/components/Pharmacies/ScheduleStep.vue'
@@ -93,7 +92,6 @@ const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getPharmacy, savePharmacy, savePharmacySchedule, deletePharmacy, pharmacy, loading } =
   usePharmacy()
-const { cities, getCities } = useCities()
 
 const modalRef = ref<any>(null)
 
@@ -130,11 +128,8 @@ const hasSchedule = computed(() => {
   )
 })
 
-const cityOptions = ref<any[]>([])
 
 onMounted(async () => {
-  await getCities()
-  cityOptions.value = cities.value
 
   const data = await getPharmacy(route.params.id_pharmacy as string)
   if (data) {
@@ -146,13 +141,7 @@ onMounted(async () => {
 })
 
 const handleSave = async () => {
-  if (!form.name || !form.code) {
-    return
-  }
   const success = await savePharmacy(form as any, true, route.params.id_pharmacy as string)
-  if (success) {
-    // router.push('/pharmacy') // Se puede mantener aquí o ir atras
-  }
 }
 
 const handleDelete = async () => {

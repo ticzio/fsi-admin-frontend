@@ -90,12 +90,6 @@ const fetchAdminData = async () => {
 }
 
 const saveChanges = async () => {
-  if (form.value.password && form.value.password !== form.value.password_confirmation) {
-    // Note: The store dispatch handled errors, but we should probably use swalToast here if needed.
-    // However, saveUser in the composable already handles success/error toasts.
-    return
-  }
-
   const success = await saveUser(form.value as any, true, route.params.id as string)
   if (success) {
     router.push('/administrators')
