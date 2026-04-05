@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, computed, onMounted, onBeforeUnmount, provide } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import ScrollableTabs from '@/components/common/ScrollableTabs.vue'
@@ -132,7 +132,10 @@ const clearLoadingTimeout = () => {
 }
 
 // Cargar datos de la farmacia usando el composable
-const { getPharmacy, loading: isLoading } = usePharmacy()
+const { getPharmacy, pharmacy, loading: isLoading } = usePharmacy()
+
+// Proveer la farmacia a los componentes hijos (sub-vistas)
+provide('pharmacyData', pharmacy)
 
 const loadPharmacyData = async () => {
   const data = await getPharmacy(route.params.id_pharmacy as string)

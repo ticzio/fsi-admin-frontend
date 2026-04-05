@@ -94,7 +94,7 @@ onMounted(async () => {
     </div>
     <OperatorForm :form="form" :roleOptions="[]" />
     <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
-      <button type="submit" :class="BUTTONS.save.class" :disabled="isLoading">
+      <button type="button" :class="BUTTONS.save.class" :disabled="isLoading" @click="handleSubmit">
         <LoadingSpinner v-if="isLoading" />
         <i v-else :class="BUTTONS.save.icon"></i>
         {{ BUTTONS.save.title }}

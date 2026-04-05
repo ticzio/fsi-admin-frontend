@@ -18,50 +18,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, inject, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { usePharmacy } from '@/composables/Models/usePharmacy'
-import { useUsers } from '@/composables/Models/useUsers'
 import { useCookies } from '@/composables/useCookies'
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
 import ChatIframe from '@/components/common/ChatIframe.vue'
+import { type PharmacyInterface } from '@/composables/Models/usePharmacy'
 
 const route = useRoute()
-const { getPharmacy, pharmacy } = usePharmacy()
-const { getUser, user } = useUsers()
 const { getCookie } = useCookies()
+
+// Inyectar la farmacia provista por el Orchestrator
+const pharmacy = inject<Ref<PharmacyInterface | null>>('pharmacyData')
 
 const isLoading = ref(true)
 
-const adminCode = computed(() => {
-  if (user.value) {
-    return (user.value as any).code || 'No tiene'
-  }
-  return 'No tiene'
+const adminCode = computed(() => getCookie('fsi_admin_code_user') || 'No tiene')
+const pharmacyCode = computed(() => (pharmacy?.value as any)?.code || 'No tiene')
+
+onMounted(() => {
+  // Ya no necesitamos buscar al usuario por API, el código está en la cookie
+  isLoading.value = false
 })
-const pharmacyCode = computed(() => (pharmacy.value as any)?.code || 'No tiene')
 
-onMounted(async () => {
-  try {
-    isLoading.value = true
-
-    // Buscar al usuario por el ID de la cookie
-    const userId = getCookie('fsi_admin_id_user')
-    if (userId) {
-      await getUser(userId)
-    }
-
-    // Buscar la farmacia si aún no la tenemos cargada
-    if (!pharmacy.value) {
-      const idPharmacy = route.params.id_pharmacy as string
-      if (idPharmacy) {
-        await getPharmacy(idPharmacy)
-      }
-    }
-  } catch (error) {
-    console.error('Error al cargar datos para el Iframe de chat', error)
-  } finally {
-    isLoading.value = false
-  }
-})
 </script>

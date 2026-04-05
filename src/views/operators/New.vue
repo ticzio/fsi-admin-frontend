@@ -49,13 +49,13 @@ const saveOperator = async () => {
         />
       </div>
       <div class="card border border-light shadow-sm rounded-4 p-4 flex-grow-1 overflow-auto">
-        <form id="operatorForm" @submit.prevent="saveOperator" class="d-flex flex-column gap-4">
+        <form id="operatorForm" class="d-flex flex-column gap-4">
           <OperatorForm :form="form" :roleOptions="roleOptions" />
         </form>
       </div>
       <!-- BOTONES DE ACCIÓN -->
       <div class="d-flex justify-content-end gap-3 mt-4">
-        <button type="submit" form="operatorForm" :class="BUTTONS.save.class" :disabled="loading">
+        <button type="button" :class="BUTTONS.save.class" :disabled="loading" @click="saveOperator">
           <LoadingSpinner v-if="loading" />
           <i v-else :class="BUTTONS.save.icon"></i>
           {{ BUTTONS.save.title }}

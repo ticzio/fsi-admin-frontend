@@ -11,12 +11,16 @@ export function useAnalytics() {
    * Obtiene los datos de analítica para el back office.
    * Apunta al endpoint /analytics/back_office en la API configurada por VITE_CHAT_IFRAME_BACKEND.
    */
-  const getBackOfficeAnalytics = async () => {
+  const getBackOfficeAnalytics = async (code_pharmacy: string, code_user: string) => {
     loading.value = true
     try {
       const baseUrl = import.meta.env.VITE_CHAT_IFRAME_BACKEND
       const response: any = await store.dispatch('getData', {
-        url: `${baseUrl}/analytics/back_office`,
+        url: `${baseUrl}/api/1.0/analytics/back_office`,
+        params: {
+          code_pharmacy: code_pharmacy,
+          code_user: code_user,
+        },
       })
 
       if (response.code === 200) {

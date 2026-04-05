@@ -42,18 +42,27 @@
             />
 
             <!-- Content: Top de operadores -->
-            <OperatorsAnalytics
-              v-else-if="currentTab === 'operators'"
-              key="operators"
-              :operators="topOperators"
-            />
+            <div v-else-if="currentTab === 'operators'" key="operators" class="h-100">
+              <OperatorsAnalytics
+                v-if="topOperators.length > 0"
+                :operators="topOperators"
+              />
+              <div
+                v-else
+                class="h-100 d-flex flex-column align-items-center justify-content-center text-muted py-5"
+              >
+                <i class="bi bi-people mb-3 display-4 opacity-50"></i>
+                <p class="fs-5 fw-medium mb-0">No hay operadores para mostrar</p>
+                <p class="small opacity-75">No se encontraron estadísticas para este período</p>
+              </div>
+            </div>
 
-            <!-- Content: Cupones canjeados -->
-            <CouponsAnalytics
+            <!-- Content: Cupones canjeados (En Desarrollo) -->
+            <UnderConstruction
               v-else-if="currentTab === 'coupons'"
               key="coupons"
-              :series="couponsSeries"
-              :labels="couponsLabels"
+              title="Estadísticas de Cupones"
+              description="Esta funcionalidad está siendo desarrollada para mostrar el rendimiento de tus promociones."
             />
           </transition>
         </div>
@@ -63,17 +72,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watch, computed, onMounted, inject, type Ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import type { ApexOptions } from 'apexcharts'
 import { useAnalytics } from '@/composables/Models/useAnalytics'
+import { type PharmacyInterface } from '@/composables/Models/usePharmacy'
+import { useCookies } from '@/composables/useCookies'
 import ScrollableTabs from '@/components/common/ScrollableTabs.vue'
 import ChatsAnalytics from '@/components/Pharmacies/ChatsAnalytics.vue'
 import OperatorsAnalytics from '@/components/Pharmacies/OperatorsAnalytics.vue'
-import CouponsAnalytics from '@/components/Pharmacies/CouponsAnalytics.vue'
+import UnderConstruction from '@/components/common/UnderConstruction.vue'
 
 const router = useRouter()
+const route = useRoute()
 const { getBackOfficeAnalytics, loading } = useAnalytics()
+const { getCookie } = useCookies()
+
+// Inyectar la farmacia provista por el Orchestrator
+const pharmacy = inject<Ref<PharmacyInterface | null>>('pharmacyData')
+
 const currentTab = ref('chats')
 const transitionName = ref('slide-left')
 
@@ -104,12 +121,12 @@ const logout = () => {
   console.log('Cerrando sesión...')
 }
 
-// Mock Data para KPIs
+// Mock Data para KPIs (Inicialmente en 0)
 const kpis = ref([
-  { title: 'Total Chats', value: '1,284', icon: 'bi-chat-dots-fill', color: '#0d6efd' },
-  { title: 'Chats Activos', value: '42', icon: 'bi-lightning-fill', color: '#ffc107' },
-  { title: 'Operadores On', value: '12', icon: 'bi-people-fill', color: '#198754' },
-  { title: 'Tiempo Promedio', value: '4m 20s', icon: 'bi-clock-fill', color: '#6610f2' },
+  { title: 'Chats Hoy', value: '0', icon: 'bi-chat-left-text-fill', color: '#0d6efd' },
+  { title: 'Chats del Mes', value: '0', icon: 'bi-calendar-check-fill', color: '#ffc107' },
+  { title: 'Operadores Activos', value: '0', icon: 'bi-people-fill', color: '#198754' },
+  { title: 'Tiempo de Respuesta', value: '0 min', icon: 'bi-clock-fill', color: '#6610f2' },
 ])
 
 // Mock Data para Gráfico de Chats
@@ -129,7 +146,7 @@ const chatsOptions = ref<ApexOptions>({
   colors: ['#0d6efd'],
   stroke: { curve: 'smooth' as const, width: 4 },
   xaxis: {
-    categories: ['Lun', 'Mar', 'Mie', 'Jue', 'Vie', 'Sab', 'Dom'],
+    categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
   },
   tooltip: { theme: 'light' },
   grid: { borderColor: '#f8f9fa' },
@@ -145,48 +162,52 @@ const topOperators = ref([
   { name: 'Lucia F.', rank: 6, chats: 75, image: 'https://i.pravatar.cc/150?u=lucia' },
 ])
 
-// Mock Data para Cupones
-const couponsSeries = ref([45, 25, 15, 15])
-const couponsLabels = ref(['Bienestar', 'Vitalidad', 'Cuidado', 'Otros'])
-const couponsColors = ['#0d6efd', '#6610f2', '#ffc107', '#adb5bd']
+// Mock Data para Cupones (Ya no se usa pero se limpia)
+const couponsSeries = ref([])
+const couponsLabels = ref([])
 
 /**
  * Inicializa los datos de analítica desde el servidor.
  */
 const initAnalytics = async () => {
-  const data = await getBackOfficeAnalytics()
-  if (data) {
-    // Mapeo de KPIs si vienen en la respuesta (ejemplo basado en mock)
-    if (data.kpis) {
-      kpis.value[0].value = data.kpis.total_chats || kpis.value[0].value
-      kpis.value[1].value = data.kpis.active_chats || kpis.value[1].value
-      kpis.value[2].value = data.kpis.online_operators || kpis.value[2].value
-      kpis.value[3].value = data.kpis.avg_time || kpis.value[3].value
-    }
+  const code_user = getCookie('fsi_admin_code_user')
 
-    // Mapeo de Gráfico de Chats
-    if (data.chats_chart) {
-      chatsSeries.value[0].data = data.chats_chart.data || chatsSeries.value[0].data
-      if (data.chats_chart.categories) {
-        chatsOptions.value = {
-          ...chatsOptions.value,
-          xaxis: {
-            ...chatsOptions.value.xaxis,
-            categories: data.chats_chart.categories,
-          },
-        }
-      }
+  if (!pharmacy?.value || !code_user) {
+    console.warn('Faltan datos requeridos para la analítica (pharmacy o code_user)')
+    return
+  }
+
+  const data = await getBackOfficeAnalytics(pharmacy.value.code, code_user)
+  if (data) {
+    // Mapeo de KPIs
+    kpis.value[0].value = String(data.chats_today || 0)
+    kpis.value[1].value = String(data.chats_month || 0)
+    kpis.value[2].value = String(data.active_operators || 0)
+    kpis.value[3].value = `${data.avg_response_time_minutes || 0} min`
+
+    // Mapeo de Gráfico de Chats Anual
+    if (data.chats_year) {
+      const monthNames = [
+        'january',
+        'february',
+        'march',
+        'april',
+        'may',
+        'june',
+        'july',
+        'august',
+        'september',
+        'october',
+        'november',
+        'december',
+      ]
+      const yearValues = monthNames.map((month) => data.chats_year[month] || 0)
+      chatsSeries.value[0].data = yearValues
     }
 
     // Mapeo de Operadores
     if (data.top_operators) {
       topOperators.value = data.top_operators
-    }
-
-    // Mapeo de Cupones
-    if (data.coupons) {
-      couponsSeries.value = data.coupons.series || couponsSeries.value
-      couponsLabels.value = data.coupons.labels || couponsLabels.value
     }
   }
 }

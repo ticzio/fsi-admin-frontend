@@ -1,11 +1,35 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
+import {
+  hasMinLength,
+  hasUpperCase,
+  hasLowerCase,
+  hasNumber,
+  hasSpecialChar,
+} from '@/utils/funcPassword'
 
 const props = defineProps<{
   form: any
   roleOptions: any[]
 }>()
+
+const isEdit = computed(() => !!props.form.id)
+
+const passwordRules = [
+  (v: string) => (isEdit.value ? true : !!v || 'La contraseña es obligatoria'),
+  (v: string) => !v || hasMinLength(v) || 'Debe tener al menos 8 caracteres',
+  (v: string) => !v || hasUpperCase(v) || 'Debe contener al menos una letra mayúscula (A-Z)',
+  (v: string) => !v || hasLowerCase(v) || 'Debe contener al menos una letra minúscula (a-z)',
+  (v: string) => !v || hasNumber(v) || 'Debe contener al menos un número (0-9)',
+  (v: string) => !v || hasSpecialChar(v) || 'Debe contener al menos un carácter especial (!@#$...)',
+]
+
+const passwordConfirmationRules = [
+  (v: string) => (props.form.password ? !!v || 'Debes confirmar la contraseña' : true),
+  (v: string) => v === props.form.password || 'Las contraseñas no coinciden',
+]
 </script>
 
 <template>
@@ -70,6 +94,7 @@ const props = defineProps<{
             label="Contraseña"
             placeholder="••••••••"
             autocomplete="new-password"
+            :rules="passwordRules"
           />
         </div>
         <div class="col-12 col-md-6">
@@ -80,6 +105,7 @@ const props = defineProps<{
             label="Confirmar Contraseña"
             placeholder="••••••••"
             autocomplete="new-password"
+            :rules="passwordConfirmationRules"
           />
         </div>
       </div>

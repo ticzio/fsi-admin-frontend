@@ -4,6 +4,7 @@ import BaseInput from '@/components/common/BaseInput.vue'
 import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import { useCities } from '@/composables/Models/useCities'
 import { useStates } from '@/composables/Models/useStates'
+import { ICONS_MULTISELECT } from '@/const/multiselectConst'
 
 interface CityData {
   id?: number | string
@@ -117,6 +118,9 @@ defineExpose({
             label-key="name"
             track-by="id"
             :loading="loadingStates"
+            helper-type="custom"
+            :custom-default-icon="ICONS_MULTISELECT.state"
+            :show-descriptions="false"
           />
         </div>
       </div>

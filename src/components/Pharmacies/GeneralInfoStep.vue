@@ -6,6 +6,7 @@ import BaseTextarea from '@/components/common/BaseTextarea.vue'
 import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import CustomLocation from '@/components/common/CustomLocation.vue'
 import { useCities } from '@/composables/Models/useCities'
+import { ICONS_MULTISELECT } from '@/const/multiselectConst'
 
 const props = defineProps<{
   form: any
@@ -75,7 +76,7 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
               trackBy="id"
               :showIcons="true"
               helperType="custom"
-              customDefaultIcon="bi bi-building"
+              :custom-default-icon="ICONS_MULTISELECT.city"
               :clearable="true"
               :rules="[(v) => !!v || 'La ciudad es obligatoria']"
             />
