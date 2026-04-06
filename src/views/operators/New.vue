@@ -10,9 +10,11 @@ import OperatorForm from '@/components/Operators/OperatorForm.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 import { BUTTONS } from '@/const/buttonConst'
+import { provideFormValidation } from '@/composables/useFormValidation'
 
 const router = useRouter()
 const { saveUser, loading } = useUsers()
+const { isFormValid } = provideFormValidation()
 
 const roleOptions = ref([
   { id: 1, name: 'Operador Principal' },
@@ -55,7 +57,12 @@ const saveOperator = async () => {
       </div>
       <!-- BOTONES DE ACCIÓN -->
       <div class="d-flex justify-content-end gap-3 mt-4">
-        <button type="button" :class="BUTTONS.save.class" :disabled="loading" @click="saveOperator">
+        <button
+          type="button"
+          :class="BUTTONS.save.class"
+          :disabled="loading || !isFormValid"
+          @click="saveOperator"
+        >
           <LoadingSpinner v-if="loading" />
           <i v-else :class="BUTTONS.save.icon"></i>
           {{ BUTTONS.save.title }}

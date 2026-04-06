@@ -171,6 +171,7 @@
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useStore } from 'vuex'
 import { useSwal } from '@/composables/useSwal'
+import { useFormValidation } from '@/composables/useFormValidation'
 
 // Control compartido entre instancias para 'global-active'
 let activePasteId: string | null = null
@@ -215,6 +216,22 @@ const instanceId = ref<string>(generateUniqueId())
 const errorMsg = ref<string | null>(null)
 const imageError = ref<boolean>(false)
 const internalErrors = ref<string[]>([])
+const validationContext = useFormValidation()
+
+onMounted(() => {
+  validationContext?.registerField(instanceId.value, internalErrors.value.length > 0)
+})
+
+onUnmounted(() => {
+  validationContext?.unregisterField(instanceId.value)
+})
+
+watch(
+  () => internalErrors.value.length,
+  (newCount) => {
+    validationContext?.updateFieldStatus(instanceId.value, newCount > 0)
+  },
+)
 
 const validate = (value: any) => {
   if (!props.rules || props.rules.length === 0) {

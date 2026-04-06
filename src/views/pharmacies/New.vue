@@ -12,12 +12,14 @@ import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import GeneralInfoStep from '@/components/Pharmacies/GeneralInfoStep.vue'
 import ScheduleStep from '@/components/Pharmacies/ScheduleStep.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
+import { provideFormValidation } from '@/composables/useFormValidation'
 
 const router = useRouter()
 const swalToast = useSwalToast()
 const store = useStore()
 
 const { savePharmacy: savePharmacyApi, loading } = usePharmacy()
+const { isFormValid } = provideFormValidation()
 
 const currentStep = ref(1)
 const transitionName = ref('slide-left')
@@ -151,7 +153,7 @@ const savePharmacy = async () => {
           type="submit"
           form="pharmacyForm"
           class="btn btn-dark px-4 fw-medium d-flex align-items-center gap-2"
-          :disabled="loading"
+          :disabled="loading || !isFormValid"
         >
           <LoadingSpinner v-if="loading" />
           <i v-else class="bi bi-save"></i>
@@ -164,6 +166,7 @@ const savePharmacy = async () => {
             type="button"
             class="btn btn-outline-primary px-4 fw-medium d-flex align-items-center gap-2"
             @click="currentStep = 2"
+            :disabled="!isFormValid"
           >
             Continuar
             <i class="bi bi-arrow-right"></i>

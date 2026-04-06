@@ -7,6 +7,7 @@ import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import CustomLocation from '@/components/common/CustomLocation.vue'
 import { useCities } from '@/composables/Models/useCities'
 import { ICONS_MULTISELECT } from '@/const/multiselectConst'
+import { isValidPhone } from '@/utils/funcPhones'
 
 const props = defineProps<{
   form: any
@@ -62,7 +63,10 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
               v-model="form.phone"
               label="Teléfono Principal"
               placeholder="Ej. 04141234567"
-              :rules="[(v) => !!v || 'El teléfono es obligatorio']"
+              :rules="[
+                (v) => !!v || 'El teléfono es obligatorio',
+                (v) => !v || isValidPhone(v) || 'El formato del teléfono es inválido',
+              ]"
             />
           </div>
           <div class="col-12 col-md-4">

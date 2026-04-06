@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { useFormValidation } from '@/composables/useFormValidation'
 
 interface Props {
   modelValue: string | number
@@ -23,6 +24,22 @@ const emit = defineEmits(['update:modelValue'])
 
 const internalErrors = ref<string[]>([])
 const isPasswordVisible = ref(false)
+const validationContext = useFormValidation()
+
+onMounted(() => {
+  validationContext?.registerField(props.id, internalErrors.value.length > 0)
+})
+
+onUnmounted(() => {
+  validationContext?.unregisterField(props.id)
+})
+
+watch(
+  () => internalErrors.value.length,
+  (newCount) => {
+    validationContext?.updateFieldStatus(props.id, newCount > 0)
+  },
+)
 
 
 const inputType = computed(() => {

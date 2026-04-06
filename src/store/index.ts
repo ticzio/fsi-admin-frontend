@@ -52,7 +52,7 @@ const store = createStore({
       return new Promise((resolve, reject) => {
         apiClient
           .get(finalUrl, {
-            params: { active: 1, ...(form.params || {}) },
+            params: { active: 1, order_value: 'desc', ...(form.params || {}) },
           })
           .then((response) => resolve(response.data))
           .catch((error) => reject(error?.response?.data || error))

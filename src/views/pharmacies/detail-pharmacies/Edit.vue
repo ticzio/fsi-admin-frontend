@@ -43,7 +43,7 @@
     <form @submit.prevent="handleSave" class="flex-grow-1">
       <GeneralInfoStep :form="form" />
       <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
-        <button type="submit" :class="BUTTONS.save.class" :disabled="loading">
+        <button type="submit" :class="BUTTONS.save.class" :disabled="loading || !isFormValid">
           <LoadingSpinner v-if="loading" />
           <i v-else :class="BUTTONS.save.icon"></i>
           {{ BUTTONS.save.title }}
@@ -61,7 +61,7 @@
         <button
           type="button"
           class="btn btn-dark rounded-3"
-          :disabled="loading"
+          :disabled="loading || !isFormValid"
           @click="handleSaveSchedule"
         >
           <LoadingSpinner v-if="loading" class="me-2" />
@@ -84,6 +84,7 @@ import ScheduleStep from '@/components/Pharmacies/ScheduleStep.vue'
 import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import Modal from '@/components/common/Modal.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import { provideFormValidation } from '@/composables/useFormValidation'
 import { useStore } from 'vuex'
 
 const route = useRoute()
@@ -92,6 +93,7 @@ const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getPharmacy, savePharmacy, savePharmacySchedule, deletePharmacy, pharmacy, loading } =
   usePharmacy()
+const { isFormValid } = provideFormValidation()
 
 const modalRef = ref<any>(null)
 

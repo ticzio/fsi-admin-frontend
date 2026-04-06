@@ -199,8 +199,8 @@ export const TABLE_HEADERS = {
 
   news: [
     ...maybeId('id'),
+    { key: 'url_image', label: 'Imagen' },
     { key: 'title', label: 'Titulo' },
-    { key: 'body_only_text', label: 'Descripción' },
     { key: 'id_creator.full_name', label: 'Nombre del creador' },
     { key: 'active', label: 'Estatus' },
   ],

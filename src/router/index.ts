@@ -45,6 +45,35 @@ const router = createRouter({
   ],
 })
 
+/**
+ * Stale Chunk Handler
+ *
+ * Problem: Vite generates JS chunks with content-hash filenames (e.g. List-cb6ae253.js).
+ * When a new build is deployed, old hash filenames are deleted from the server.
+ * If a user keeps the app open across a deployment and then navigates via the sidebar,
+ * Vue Router tries to lazy-import the OLD chunk hash → server returns 404 →
+ * "TypeError: Failed to fetch dynamically imported module".
+ *
+ * Solution: intercept every router navigation error. If it's a chunk-load failure
+ * (TypeError or ChunkLoadError), force a full hard-reload to the destination URL so
+ * the browser fetches the fresh index.html and the new chunk hashes.
+ */
+router.onError((error, to) => {
+  const isChunkLoadError =
+    error instanceof TypeError ||
+    error.name === 'ChunkLoadError' ||
+    /Loading chunk|Failed to fetch dynamically imported module/i.test(error.message)
+
+  if (isChunkLoadError) {
+    // Avoid infinite reload loops: track if we already reloaded for this path
+    const reloadedKey = `chunk_reload_${to.fullPath}`
+    if (!sessionStorage.getItem(reloadedKey)) {
+      sessionStorage.setItem(reloadedKey, '1')
+      window.location.href = to.fullPath
+    }
+  }
+})
+
 /* Navigation guards
 router.beforeEach((to, from, next) => {
   const roleId = getRoleIdFromCookie()

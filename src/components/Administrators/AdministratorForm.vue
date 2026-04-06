@@ -10,6 +10,7 @@ import {
   hasNumber,
   hasSpecialChar,
 } from '@/utils/funcPassword'
+import { isValidPhone } from '@/utils/funcPhones'
 
 const props = defineProps<{
   form: any
@@ -82,7 +83,10 @@ const passwordConfirmationRules = [
             v-model="form.phone"
             label="Teléfono"
             placeholder="Ej. 04141234567"
-            :rules="[(v) => !!v || 'Campo obligatorio']"
+            :rules="[
+              (v) => !!v || 'Campo obligatorio',
+              (v) => !v || isValidPhone(v) || 'El formato del teléfono es inválido',
+            ]"
           />
         </div>
         <div class="col-12 col-md-12">

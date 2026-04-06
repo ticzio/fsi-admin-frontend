@@ -9,11 +9,13 @@ import { useClients, type ClientInterface } from '@/composables/Models/useClient
 import { useSwalToast } from '@/composables/useSwalToast'
 import { BUTTONS } from '@/const/buttonConst'
 import { useStore } from 'vuex'
+import { provideFormValidation } from '@/composables/useFormValidation'
 
 const route = useRoute()
 const store = useStore()
 const { getClient, saveClient } = useClients()
 const swalToast = useSwalToast()
+const { isFormValid } = provideFormValidation()
 const isLoading = ref(false)
 
 const targetClient = inject<Ref<ClientInterface | null>>('targetClient')
@@ -125,7 +127,7 @@ onMounted(() => {
         <button
           type="button"
           :class="BUTTONS.save.class"
-          :disabled="isLoading"
+          :disabled="isLoading || !isFormValid"
           @click="updateClient"
         >
           <LoadingSpinner v-if="isLoading" />

@@ -9,6 +9,7 @@ import RedirectButton from '@/components/common/RedirectButton.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import Modal from '@/components/common/Modal.vue'
 import NewsForm from '@/components/News/NewsForm.vue'
+import AppImage from '@/components/common/AppImage.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -146,6 +147,9 @@ onMounted(() => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
+          <template #cell(url_image)="{ value }">
+            <AppImage :src="value" type="entity" />
+          </template>
           <template #cell(active)="{ value }">
             <StatusBadge :value="value" />
           </template>

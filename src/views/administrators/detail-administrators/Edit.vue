@@ -25,7 +25,7 @@
           <button
             type="button"
             :class="BUTTONS.save.class"
-            :disabled="loading"
+            :disabled="loading || !isFormValid"
             @click="saveChanges"
           >
             <LoadingSpinner v-if="loading" class="me-1" />
@@ -47,6 +47,7 @@ import AdministratorForm from '@/components/Administrators/AdministratorForm.vue
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import { BUTTONS } from '@/const/buttonConst'
+import { provideFormValidation } from '@/composables/useFormValidation'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,6 +56,7 @@ const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 
 const { loading, roles, getRoles, getUser, saveUser } = useUsers()
+const { isFormValid } = provideFormValidation()
 
 const form = ref({
   id: '',

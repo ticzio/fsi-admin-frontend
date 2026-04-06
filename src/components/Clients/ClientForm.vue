@@ -12,6 +12,7 @@ import {
   hasNumber,
   hasSpecialChar,
 } from '@/utils/funcPassword'
+import { isValidPhone } from '@/utils/funcPhones'
 
 const props = defineProps<{
   form: any
@@ -127,6 +128,7 @@ onMounted(async () => {
             v-model="form.phone"
             label="Teléfono"
             placeholder="Ej. 04141234567"
+            :rules="[(v) => !v || isValidPhone(v) || 'El formato del teléfono es inválido']"
           />
         </div>
 

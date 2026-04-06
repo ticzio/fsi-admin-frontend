@@ -9,10 +9,13 @@ import ClientForm from '@/components/Clients/ClientForm.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 import { useClients } from '@/composables/Models/useClients'
+import { provideFormValidation } from '@/composables/useFormValidation'
 
 const router = useRouter()
 const swalToast = useSwalToast()
 const { saveClient } = useClients()
+
+const { isFormValid } = provideFormValidation()
 
 const loading = ref(false)
 
@@ -87,7 +90,7 @@ const saveUser = async () => {
             type="submit"
             form="clientForm"
             class="btn btn-sm btn-primary px-4 fw-medium d-flex align-items-center gap-2 rounded-pill shadow-sm"
-            :disabled="loading"
+            :disabled="loading || !isFormValid"
           >
             <LoadingSpinner v-if="loading" />
             <i v-else class="bi bi-person-plus-fill"></i>

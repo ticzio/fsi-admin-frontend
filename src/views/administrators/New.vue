@@ -10,10 +10,12 @@ import AdministratorForm from '@/components/Administrators/AdministratorForm.vue
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 import { BUTTONS } from '@/const/buttonConst'
+import { provideFormValidation } from '@/composables/useFormValidation'
 
 const router = useRouter()
 const swalToast = useSwalToast()
 const { loading, roles, getRoles, saveUser } = useUsers()
+const { isFormValid } = provideFormValidation()
 
 onMounted(async () => {
   await getRoles()
@@ -66,7 +68,7 @@ const saveAdministrator = async () => {
             type="button"
             @click="saveAdministrator"
             :class="BUTTONS.save.class"
-            :disabled="loading"
+            :disabled="loading || !isFormValid"
           >
             <LoadingSpinner v-if="loading" />
             <i v-else :class="BUTTONS.save.icon"></i>

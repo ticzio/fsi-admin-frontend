@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { useFormValidation } from '@/composables/useFormValidation'
 
 interface Props {
   modelValue: string | number
@@ -24,6 +25,22 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits(['update:modelValue'])
 
 const internalErrors = ref<string[]>([])
+const validationContext = useFormValidation()
+
+onMounted(() => {
+  validationContext?.registerField(props.id, internalErrors.value.length > 0)
+})
+
+onUnmounted(() => {
+  validationContext?.unregisterField(props.id)
+})
+
+watch(
+  () => internalErrors.value.length,
+  (newCount) => {
+    validationContext?.updateFieldStatus(props.id, newCount > 0)
+  },
+)
 
 const validate = (value: any) => {
   if (!props.rules || props.rules.length === 0) {

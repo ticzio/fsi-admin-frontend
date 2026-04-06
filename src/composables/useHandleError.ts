@@ -50,6 +50,11 @@ export function useHandleError() {
         return
       }
 
+      if (errData.code === 400) {
+        swalToast.showError('Error en los datos enviados.')
+        return
+      }
+
       // CASO GENERAL: Utilizar el atributo 'alert' provisto por la estructura de backend
       if (errData.alert) {
         swalToast.showError(errData.alert)

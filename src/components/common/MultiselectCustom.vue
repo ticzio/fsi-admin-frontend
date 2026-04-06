@@ -84,9 +84,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import Multiselect from 'vue-multiselect'
 import { useMultiselectDefaults, useRoleHelpers } from '@/composables/useMultiselect'
+import { useFormValidation } from '@/composables/useFormValidation'
 
 interface Props {
   modelValue?: any
@@ -132,6 +133,23 @@ const emit = defineEmits<{
 const { defaultProps, defaultClasses } = useMultiselectDefaults()
 
 const internalErrors = ref<string[]>([])
+const uniqueId = ref(`multiselect-${Math.random().toString(36).slice(2, 9)}`)
+const validationContext = useFormValidation()
+
+onMounted(() => {
+  validationContext?.registerField(uniqueId.value, internalErrors.value.length > 0)
+})
+
+onUnmounted(() => {
+  validationContext?.unregisterField(uniqueId.value)
+})
+
+watch(
+  () => internalErrors.value.length,
+  (newCount) => {
+    validationContext?.updateFieldStatus(uniqueId.value, newCount > 0)
+  },
+)
 
 const validate = (value: any) => {
   if (!props.rules || props.rules.length === 0) {

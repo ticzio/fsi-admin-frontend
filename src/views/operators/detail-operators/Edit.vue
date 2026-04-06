@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, watch, computed } from 'vue'
+import { provideFormValidation } from '@/composables/useFormValidation'
 import OperatorForm from '@/components/Operators/OperatorForm.vue'
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
 import { useRoute } from 'vue-router'
@@ -13,6 +14,7 @@ const route = useRoute()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { saveUser } = useUsers()
+const { isFormValid } = provideFormValidation()
 
 const props = defineProps({
   operatorData: {
@@ -94,7 +96,12 @@ onMounted(async () => {
     </div>
     <OperatorForm :form="form" :roleOptions="[]" />
     <div :class="['d-flex justify-content-end gap-2 mt-4', { 'sticky-bottom': isMobile }]">
-      <button type="button" :class="BUTTONS.save.class" :disabled="isLoading" @click="handleSubmit">
+      <button
+        type="button"
+        :class="BUTTONS.save.class"
+        :disabled="isLoading || !isFormValid"
+        @click="handleSubmit"
+      >
         <LoadingSpinner v-if="isLoading" />
         <i v-else :class="BUTTONS.save.icon"></i>
         {{ BUTTONS.save.title }}
