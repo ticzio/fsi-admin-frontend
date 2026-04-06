@@ -43,10 +43,12 @@ const formModal = ref<InstanceType<typeof Modal> | null>(null)
 const isEditingForm = ref(false)
 const formData = ref<any>(null)
 const newsFormRef = ref<InstanceType<typeof NewsForm> | null>(null)
+const formKey = ref(0)
 
 const openModal = (isEdit = false, data = null) => {
   isEditingForm.value = isEdit
   formData.value = data
+  formKey.value++
   formModal.value?.openModal()
 }
 
@@ -166,6 +168,7 @@ onMounted(() => {
       >
         <NewsForm
           v-if="formModal"
+          :key="formKey"
           ref="newsFormRef"
           :is-editing="isEditingForm"
           :initial-data="formData"
