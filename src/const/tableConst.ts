@@ -192,9 +192,9 @@ export const TABLE_HEADERS = {
   notifications: [
     ...maybeId('id'),
     { key: 'title', label: 'Titulo' },
-    { key: 'description', label: 'Descripción' },
-    { key: 'scheduled_date', label: 'Fecha programada' },
-    { key: 'active', label: 'Estatus' },
+    { key: 'message', label: 'Mensaje' },
+    { key: 'audience', label: 'Dirigido a' },
+    { key: 'created_at', label: 'Fecha de creación' },
   ],
 
   news: [

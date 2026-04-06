@@ -75,24 +75,13 @@ export function useNotification() {
   const saveNotification = async (data: any, isEditing: boolean, id?: string | number) => {
     loading.value = true
     try {
-      let response: any
-      if (isEditing && id) {
-        response = await store.dispatch('updateData', {
-          url: URLS.notification.update,
-          id: id,
-          data: data,
-        })
-      } else {
-        response = await store.dispatch('createData', {
-          url: URLS.notification.save,
-          data: data,
-        })
-      }
+      const response: any = await store.dispatch('createData', {
+        url: URLS.notification.save,
+        data: data,
+      })
 
       if (response.code === 200 || response.code === 201) {
-        swalToast.showSuccess(
-          isEditing ? 'Notificación actualizada correctamente' : 'Notificación creada correctamente'
-        )
+        swalToast.showSuccess('Notificación creada correctamente')
         await getDataNotifications(pagination.currentPage)
         return true
       } else {
@@ -144,6 +133,41 @@ export function useNotification() {
     }
   }
 
+  const deleteNotification = async (item: any) => {
+    const result = await swal.showConfirm(
+      `¿Estás seguro de eliminar la notificación?`,
+      `Esta acción eliminará "${item.title}".`,
+      {
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+      }
+    )
+
+    if (!result) return false
+
+    loading.value = true
+    try {
+      const response = await store.dispatch('changeStatus', {
+        url: URLS.notification.changeStatus,
+        id: item.id,
+        status: 2,
+      })
+      if (response.code === 200 || response.code === 201) {
+        logger.logRequest(URLS.notification.changeStatus, {}, response)
+        swalToast.showSuccess('Notificación eliminada exitosamente')
+        await getDataNotifications(pagination.currentPage)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      logger.logRequest(URLS.notification.changeStatus, {}, error)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.title}`)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     notifications,
@@ -153,5 +177,6 @@ export function useNotification() {
     getNotificationById,
     saveNotification,
     changeStatusNotification,
+    deleteNotification,
   }
 }

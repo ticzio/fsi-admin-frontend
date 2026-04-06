@@ -22,6 +22,32 @@ export function useLevels() {
   const level = ref<LevelInterface | null>(null)
 
   /**
+   * Obtiene todos los niveles activos.
+   */
+  const getLevels = async () => {
+    loading.value = true
+    try {
+      const response: any = await store.dispatch('getData', {
+        url: URLS.level.getAll,
+        params: {
+          limit: 100,
+          active: 1
+        }
+      })
+
+      if (response.code === 200) {
+        return response.data
+      }
+      return []
+    } catch (error: any) {
+      console.error('Error in getLevels:', error)
+      return []
+    } finally {
+      loading.value = false
+    }
+  }
+
+  /**
    * Obtiene un nivel por su ID.
    */
   const getLevelById = async (id: string | number) => {
@@ -74,7 +100,9 @@ export function useLevels() {
   return {
     loading,
     level,
+    getLevels,
     getLevelById,
     updateLevelPoints,
   }
 }
+
