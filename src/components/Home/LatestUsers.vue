@@ -2,7 +2,7 @@
 import defaultProfileImage from '@/assets/images/default-profile.png'
 
 defineProps<{
-  users: Array<{ id: number; name: string; email: string }>
+  users: Array<{ id: number; name: string; email: string; url_image?: string | null }>
 }>()
 
 defineEmits<{
@@ -37,7 +37,7 @@ defineEmits<{
       >
         <div v-for="user in users" :key="user.id" class="d-flex align-items-center gap-3 user-card" @click="$emit('click-user', user)">
           <img
-            :src="defaultProfileImage"
+            :src="user.url_image || defaultProfileImage"
             :alt="user.name"
             class="rounded-circle shadow-sm user-avatar"
             style="width: 44px; height: 44px; object-fit: cover"

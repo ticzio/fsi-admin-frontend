@@ -4,6 +4,23 @@
     <div class="row g-3 flex-grow-1 overflow-hidden pb-3">
       <!-- Columna Izquierda (25%): KPIs Principales (Vertical Pills) -->
       <div class="col-12 col-xl-3 d-flex flex-column gap-3 h-100 overflow-y-auto custom-scrollbar">
+        <!-- Filtro de Operadores -->
+        <div class="bg-white rounded-4 shadow-sm border p-3">
+          <MultiselectCustom
+            v-model="selectedOperators"
+            :options="operatorOptions"
+            label="Filtrar por operador"
+            placeholder="Todos los operadores"
+            label-key="label"
+            track-by="id"
+            helper-type="custom"
+            :show-icons="false"
+            :show-descriptions="false"
+            :multiple="true"
+            :clearable="true"
+          />
+        </div>
+
         <div
           v-for="kpi in kpis"
           :key="kpi.title"
@@ -57,12 +74,12 @@
               </div>
             </div>
 
-            <!-- Content: Cupones canjeados (En Desarrollo) -->
-            <UnderConstruction
+            <!-- Content: Canjes por niveles -->
+            <ExchangesAnalytics
               v-else-if="currentTab === 'coupons'"
               key="coupons"
-              title="Estadísticas de Cupones"
-              description="Esta funcionalidad está siendo desarrollada para mostrar el rendimiento de tus promociones."
+              :total-exchanges="totalExchanges"
+              :exchanges-by-level="exchangesByLevel"
             />
           </transition>
         </div>
@@ -77,19 +94,42 @@ import { useRouter, useRoute } from 'vue-router'
 import type { ApexOptions } from 'apexcharts'
 import { useAnalytics } from '@/composables/Models/useAnalytics'
 import { type PharmacyInterface } from '@/composables/Models/usePharmacy'
+import { useUsers } from '@/composables/Models/useUsers'
 import { useCookies } from '@/composables/useCookies'
 import ScrollableTabs from '@/components/common/ScrollableTabs.vue'
 import ChatsAnalytics from '@/components/Pharmacies/ChatsAnalytics.vue'
 import OperatorsAnalytics from '@/components/Pharmacies/OperatorsAnalytics.vue'
-import UnderConstruction from '@/components/common/UnderConstruction.vue'
+import ExchangesAnalytics from '@/components/Exchanges/ExchangesAnalytics.vue'
+import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 
 const router = useRouter()
 const route = useRoute()
-const { getBackOfficeAnalytics, loading } = useAnalytics()
+const { getBackOfficeAnalytics, getPharmacyExchangesAnalytics, loading } = useAnalytics()
+const { users, getDataUsers } = useUsers()
 const { getCookie } = useCookies()
 
 // Inyectar la farmacia provista por el Orchestrator
 const pharmacy = inject<Ref<PharmacyInterface | null>>('pharmacyData')
+
+// ─── Operadores ────────────────────────────────────────────────────────────
+/** Ref del multiselect; permite selección múltiple */
+const selectedOperators = ref<{ id: number | string; label: string }[]>([])
+
+/** Opciones formateadas con nombre completo para el multiselect */
+const operatorOptions = computed(() =>
+  users.value.map((u) => ({
+    id: u.id,
+    label: `${u.first_name} ${u.last_name}`,
+  }))
+)
+
+/**
+ * Carga los operadores (usuarios) asociados a la farmacia actual.
+ */
+const loadOperators = async () => {
+  if (!route.params.id_pharmacy) return
+  await getDataUsers(1, '', { id_pharmacy: route.params.id_pharmacy, limit: 100 })
+}
 
 const currentTab = ref('chats')
 const transitionName = ref('slide-left')
@@ -162,9 +202,13 @@ const topOperators = ref([
   { name: 'Lucia F.', rank: 6, chats: 75, image: 'https://i.pravatar.cc/150?u=lucia' },
 ])
 
-// Mock Data para Cupones (Ya no se usa pero se limpia)
+// Mock Data para Cupones (Ya no se usa)
 const couponsSeries = ref([])
 const couponsLabels = ref([])
+
+// Datos reactivos para Canjes por Farmacia
+const totalExchanges = ref(0)
+const exchangesByLevel = ref<Array<{ label: string; value: number }>>([])
 
 /**
  * Inicializa los datos de analítica desde el servidor.
@@ -177,7 +221,11 @@ const initAnalytics = async () => {
     return
   }
 
-  const data = await getBackOfficeAnalytics(pharmacy.value.code, code_user)
+  const id_operator = selectedOperators.value.length
+    ? selectedOperators.value.map(op => op.id).join(',')
+    : undefined
+
+  const data = await getBackOfficeAnalytics(pharmacy.value.code, code_user, id_operator)
   if (data) {
     // Mapeo de KPIs
     kpis.value[0].value = String(data.chats_today || 0)
@@ -212,9 +260,46 @@ const initAnalytics = async () => {
   }
 }
 
+/**
+ * Inicializa los datos de canjes por farmacia desde el servidor.
+ */
+const initExchangesAnalytics = async () => {
+  if (!pharmacy?.value?.id) {
+    console.warn('Falta el ID de farmacia para cargar analytics de canjes')
+    return
+  }
+
+  const data = await getPharmacyExchangesAnalytics(pharmacy.value.id)
+  if (data) {
+    totalExchanges.value = data.total_exchanges ?? 0
+    exchangesByLevel.value = data.exchanges_by_level ?? []
+  }
+}
+
 onMounted(() => {
   initAnalytics()
+  initExchangesAnalytics()
+  loadOperators()
 })
+
+// Carga reactiva de datos si el inject de pharmacy llega tarde
+watch(
+  () => pharmacy?.value?.id,
+  (newId) => {
+    if (newId) {
+      initAnalytics()
+      initExchangesAnalytics()
+    }
+  },
+)
+
+watch(
+  selectedOperators,
+  () => {
+    initAnalytics()
+  },
+  { deep: true }
+)
 </script>
 
 <style scoped>
