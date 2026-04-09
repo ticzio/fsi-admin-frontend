@@ -7,7 +7,7 @@
         <!-- Filtro de Operadores -->
         <div class="bg-white rounded-4 shadow-sm border p-3">
           <MultiselectCustom
-            v-model="selectedOperators"
+            v-model="selectedOperator"
             :options="operatorOptions"
             label="Filtrar por operador"
             placeholder="Todos los operadores"
@@ -16,7 +16,7 @@
             helper-type="custom"
             :show-icons="false"
             :show-descriptions="false"
-            :multiple="true"
+            :multiple="false"
             :clearable="true"
           />
         </div>
@@ -112,14 +112,15 @@ const { getCookie } = useCookies()
 const pharmacy = inject<Ref<PharmacyInterface | null>>('pharmacyData')
 
 // ─── Operadores ────────────────────────────────────────────────────────────
-/** Ref del multiselect; permite selección múltiple */
-const selectedOperators = ref<{ id: number | string; label: string }[]>([])
+/** Ref del multiselect; permite seleccionar un solo operador a la vez */
+const selectedOperator = ref<{ id: number | string; label: string; name?: string } | null>(null)
 
 /** Opciones formateadas con nombre completo para el multiselect */
 const operatorOptions = computed(() =>
   users.value.map((u) => ({
     id: u.id,
     label: `${u.first_name} ${u.last_name}`,
+    name: `${u.first_name} ${u.last_name}`,
   }))
 )
 
@@ -221,8 +222,8 @@ const initAnalytics = async () => {
     return
   }
 
-  const id_operator = selectedOperators.value.length
-    ? selectedOperators.value.map(op => op.id).join(',')
+  const id_operator = selectedOperator.value?.id
+    ? String(selectedOperator.value.id)
     : undefined
 
   const data = await getBackOfficeAnalytics(pharmacy.value.code, code_user, id_operator)
@@ -285,18 +286,24 @@ onMounted(() => {
 // Carga reactiva de datos si el inject de pharmacy llega tarde
 watch(
   () => pharmacy?.value?.id,
-  (newId) => {
-    if (newId) {
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
       initAnalytics()
       initExchangesAnalytics()
     }
   },
 )
 
+const lastSelectedId = ref('')
+
 watch(
-  selectedOperators,
-  () => {
-    initAnalytics()
+  selectedOperator,
+  (newVal) => {
+    const currentId = newVal?.id ? String(newVal.id) : ''
+    if (currentId !== lastSelectedId.value) {
+      lastSelectedId.value = currentId
+      initAnalytics()
+    }
   },
   { deep: true }
 )
