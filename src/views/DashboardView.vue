@@ -81,8 +81,8 @@ onMounted(async () => {
 
   // Latest clients → LatestUsers component
   latestUsers.value = (data.last_clients ?? []).map(
-    (c: { full_name: string; email: string; url_image: string | null }, idx: number) => ({
-      id: idx,
+    (c: { id: number; full_name: string; email: string; url_image: string | null }) => ({
+      id: c.id,
       name: c.full_name?.trim() ?? '',
       email: c.email ?? '',
       url_image: c.url_image ?? null,
@@ -131,11 +131,11 @@ const handleCardClick = async (item: StatisticItem) => {
   }
 }
 
-// No real user id available from last_clients, so we just navigate to the clients list
-const handleUserClick = async () => {
+// Navigate to the client details since the backend now returns the ID
+const handleUserClick = async (user: { id: number }) => {
   isRedirecting.value = true
   await new Promise((resolve) => setTimeout(resolve, 500))
-  router.push({ name: 'Clientes' })
+  router.push({ name: 'Detalle Cliente', params: { id: user.id.toString() } })
 }
 
 const handleViewAllUsers = async () => {
