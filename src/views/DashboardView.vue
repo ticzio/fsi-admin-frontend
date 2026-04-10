@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import TitleSection from '@/components/common/titleSection.vue'
@@ -9,6 +9,7 @@ import AreaChart from '@/components/common/Charts/AreaChart.vue'
 import StackedBarChart from '@/components/common/Charts/StackedBarChart.vue'
 import LatestUsers from '@/components/Home/LatestUsers.vue'
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
+import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import { useAnalytics } from '@/composables/Models/useAnalytics'
 import type { StatisticItem } from '@/components/Home/StatisticCards.vue'
 
@@ -26,14 +27,10 @@ const statisticItems = ref<StatisticItem[]>([
 // ── Charts (reactive state driven by backend) ─────────────────────────────────
 const totalExchange = ref<number | string>('—')
 
-const exchangesChartSeries = ref([
-  { name: 'Canjeados', data: [] as number[] },
-])
+const exchangesChartSeries = ref([{ name: 'Canjeados', data: [] as number[] }])
 const exchangesChartCategories = ref<string[]>([])
 
-const registrationsChartSeries = ref([
-  { name: 'Clientes registrados', data: [] as number[] },
-])
+const registrationsChartSeries = ref([{ name: 'Clientes registrados', data: [] as number[] }])
 const registrationsChartCategories = ref<string[]>([])
 
 // Last tooltip data (most recent month with registrations)
@@ -62,11 +59,21 @@ const registrationsChartOptions = ref<ApexOptions>({
 })
 
 // ── Latest users ──────────────────────────────────────────────────────────────
-const latestUsers = ref<Array<{ id: number; name: string; email: string; url_image: string | null }>>([])
+const latestUsers = ref<
+  Array<{ id: number; name: string; email: string; url_image: string | null }>
+>([])
+
+// ── Range Selection ───────────────────────────────────────────────────────────
+const selectedRange = ref({ id: '6', name: '6 meses' })
+const rangeOptions = [
+  { id: '3', name: '3 meses' },
+  { id: '6', name: '6 meses' },
+  { id: '', name: '1 año' },
+]
 
 // ── Data loading ──────────────────────────────────────────────────────────────
-onMounted(async () => {
-  const data = await getDashboardAnalytics()
+const loadDashboardData = async () => {
+  const data = await getDashboardAnalytics(selectedRange.value.id)
   if (!data) return
 
   // Statistic cards
@@ -117,6 +124,14 @@ onMounted(async () => {
     ...exchangesChartOptions.value,
     xaxis: { categories: exchangesChartCategories.value },
   }
+}
+
+watch(selectedRange, () => {
+  loadDashboardData()
+})
+
+onMounted(async () => {
+  await loadDashboardData()
 })
 
 // ── Navigation ────────────────────────────────────────────────────────────────
@@ -181,10 +196,16 @@ const handleViewAllUsers = async () => {
                 <p class="text-dark fw-bold mb-0" style="font-size: 0.9rem">Cupones canjeados</p>
               </div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
-                <div
-                  class="border rounded px-3 py-1 text-muted small d-flex align-items-center gap-2 ms-2 user-select-none border-light"
-                >
-                  6 meses <i class="bi bi-caret-down-fill text-muted" style="margin-top: 1px"></i>
+                <div style="min-width: 140px">
+                  <MultiselectCustom
+                    v-model="selectedRange"
+                    :options="rangeOptions"
+                    label-key="name"
+                    track-by="id"
+                    :show-icons="false"
+                    :show-descriptions="false"
+                    placeholder="Rango"
+                  />
                 </div>
               </div>
             </div>
@@ -215,16 +236,25 @@ const handleViewAllUsers = async () => {
                 style="left: 45.4%; top: 5%; width: 80px"
               >
                 <span class="text-muted" style="font-size: 0.65rem">{{ tooltipMonth }}</span>
-                <span class="fw-bold text-dark lh-1 mt-1" style="font-size: 0.9rem">{{ tooltipValue }}</span>
+                <span class="fw-bold text-dark lh-1 mt-1" style="font-size: 0.9rem">{{
+                  tooltipValue
+                }}</span>
               </div>
 
               <!-- Desktop Chart -->
               <div class="d-none d-md-block">
-                <LineChart type="area" :series="registrationsChartSeries" :options="registrationsChartOptions" />
+                <LineChart
+                  type="area"
+                  :series="registrationsChartSeries"
+                  :options="registrationsChartOptions"
+                />
               </div>
               <!-- Mobile Chart (Intelligent Markers) -->
               <div class="d-block d-md-none">
-                <AreaChart :series="registrationsChartSeries" :options="registrationsChartOptions" />
+                <AreaChart
+                  :series="registrationsChartSeries"
+                  :options="registrationsChartOptions"
+                />
               </div>
             </div>
           </div>
