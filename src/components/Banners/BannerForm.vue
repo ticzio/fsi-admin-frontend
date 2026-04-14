@@ -110,7 +110,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="banner-form-container pb-2">
+  <div class="banner-form-container pb-2 fs-5">
     <div class="row g-4">
       <!-- Columna Izquierda: Imagen -->
       <div class="col-12 col-md-5 d-flex flex-column pe-md-3 border-md-end">
@@ -122,6 +122,7 @@ defineExpose({
             class="image-wrapper bg-light rounded-4 border d-flex align-items-center justify-content-center overflow-hidden p-2"
           >
             <ImageUploader
+              :key="isCreationMode ? 'new' : `edit-${formData.id}`"
               v-model="imageFile"
               :round="false"
               :initialImageUrl="formData.url_image"
@@ -176,7 +177,7 @@ defineExpose({
 
 <style scoped>
 .small-title {
-  font-size: 0.85rem;
+  font-size: 1.1rem;
   letter-spacing: 0.5px;
 }
 

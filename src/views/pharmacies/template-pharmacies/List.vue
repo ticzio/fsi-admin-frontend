@@ -172,7 +172,8 @@ onMounted(() => {
       size="lg"
     >
       <TemplateForm
-        :initial-data="modalMode === 'edit' ? selectedTemplate : undefined"
+        :key="modalMode === 'edit' ? `edit-${selectedTemplate?.id || '0'}` : 'create'"
+        :initial-data="modalMode === 'edit' ? selectedTemplate : null"
         @close="templateModalRef?.closeModal()"
         @submit="handleTemplateSubmit"
       />

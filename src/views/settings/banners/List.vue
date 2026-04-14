@@ -150,7 +150,7 @@ onMounted(() => {
       ref="modalFormRef"
       id="modalBannerForm"
       :title="isEditing ? 'Editar Banner' : 'Nuevo Banner'"
-      size="lg"
+      size="xl"
     >
       <BannerForm ref="bannerFormRef" :initial-data="selectedBanner" @submit="handleFormSubmit" />
       <template #footer>

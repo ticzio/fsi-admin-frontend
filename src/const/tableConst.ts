@@ -121,7 +121,7 @@ export const TABLE_HEADERS = {
     { key: 'full_name', label: 'Nombre y apellido' },
     { key: 'email', label: 'Correo' },
     { key: 'phone', label: 'Teléfono' },
-    { key: 'id_type_rol.name', label: 'Rol' },
+    { key: 'id_type_rol_user.name', label: 'Rol' },
     { key: 'active', label: 'Estatus' },
   ],
   pharmacy: [
@@ -207,7 +207,7 @@ export const TABLE_HEADERS = {
   cities: [
     ...maybeId('id'),
     { key: 'type_state.name', label: 'Estado' },
-    { key: 'name', label: 'Nombre' },
+    { key: 'name', label: 'Nombre de la ciudad' },
     { key: 'active', label: 'Estatus' },
   ],
   states: [
