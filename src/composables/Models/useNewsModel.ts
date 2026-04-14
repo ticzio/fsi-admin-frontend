@@ -124,7 +124,10 @@ export function useNewsModel() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.news.changeStatus, {}, error)
-      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.title}`)
+      handleErrorResponse(
+        error,
+        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.title}`,
+      )
       return false
     }
   }

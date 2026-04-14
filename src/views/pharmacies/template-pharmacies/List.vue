@@ -94,6 +94,11 @@ const fetchData = async () => {
   await getDataTemplates(pagination.currentPage, search.value, idPharmacy)
 }
 
+const resetSearchAndFetch = async () => {
+  search.value = ''
+  await fetchData()
+}
+
 const handleTemplateSubmit = async (formData: any) => {
   const isEditing = modalMode.value === 'edit'
   const payload = { ...formData, id_pharmacies: idPharmacy }
@@ -128,13 +133,15 @@ onMounted(() => {
           placeholder="Título de la plantilla"
           :loading="loading"
           :infoTexts="['Puedes buscar por título', 'O por descripción de la plantilla']"
+          @search="fetchData"
+          only-on-enter
         />
       </div>
 
       <div
         class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
       >
-        <FetchButton @fetch="fetchData" />
+        <FetchButton @fetch="resetSearchAndFetch" />
         <RedirectButton
           :tooltip-title="TITLE_SECTION_COMPONENT.template_pharmacies.new"
           @redirect="goToNew"
