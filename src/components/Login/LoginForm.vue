@@ -59,6 +59,7 @@ const handleLogin = () => {
           placeholder="Ingresar correo electrónico"
           v-model="credentials.email"
           :disabled="showNetworkError"
+          autocomplete="email"
           :rules="emailRules"
         />
 
@@ -69,6 +70,7 @@ const handleLogin = () => {
           placeholder="Ingresar contraseña"
           v-model="credentials.password"
           :disabled="showNetworkError"
+          autocomplete="current-password"
           :rules="passwordRules"
           class="mb-4"
         />

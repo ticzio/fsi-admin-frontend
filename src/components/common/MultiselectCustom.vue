@@ -7,6 +7,8 @@
 
     <div class="multiselect-container">
       <Multiselect
+        ref="multiselectRef"
+        :id="uniqueId"
         :model-value="modelValue"
         @update:model-value="handleUpdate"
         @close="handleClose"
@@ -20,6 +22,7 @@
         :allow-empty="defaultProps.allowEmpty"
         :multiple="multiple"
         :class="[defaultClasses.container, variant ? `multiselect-${variant}` : '', { 'is-invalid': internalErrors.length > 0 }]"
+        autocomplete="off"
         v-bind="$attrs"
       >
         <!-- Slot para opciones personalizadas -->
@@ -136,8 +139,17 @@ const internalErrors = ref<string[]>([])
 const uniqueId = ref(`multiselect-${Math.random().toString(36).slice(2, 9)}`)
 const validationContext = useFormValidation()
 
+const multiselectRef = ref<any>(null)
+
 onMounted(() => {
   validationContext?.registerField(uniqueId.value, internalErrors.value.length > 0)
+
+  // Prevent browser autofill by setting attributes on the internal input
+  const input = multiselectRef.value?.$el?.querySelector('input')
+  if (input) {
+    input.setAttribute('autocomplete', 'new-password')
+    input.setAttribute('name', `ms-${Math.random().toString(36).slice(2, 9)}`)
+  }
 })
 
 onUnmounted(() => {

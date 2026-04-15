@@ -9,6 +9,7 @@ interface Props {
   id: string
   placeholder?: string
   disabled?: boolean
+  autocomplete?: string
   rules?: Array<(val: any) => string | boolean>
 }
 
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
   label: '',
   placeholder: '',
   disabled: false,
+  autocomplete: 'off',
   rules: () => [],
 })
 
@@ -113,6 +115,7 @@ const togglePasswordVisibility = () => {
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
+        :autocomplete="autocomplete"
         @input="handleInput"
         @blur="handleBlur"
       />

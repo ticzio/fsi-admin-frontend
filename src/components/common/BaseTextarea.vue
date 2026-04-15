@@ -8,6 +8,7 @@ interface Props {
   id: string
   placeholder?: string
   disabled?: boolean
+  autocomplete?: string
   rows?: number | string
   rules?: Array<(val: any) => string | boolean>
   resize?: 'none' | 'both' | 'horizontal' | 'vertical'
@@ -17,6 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
   label: '',
   placeholder: '',
   disabled: false,
+  autocomplete: 'off',
   rows: 3,
   rules: () => [],
   resize: 'none',
@@ -98,6 +100,7 @@ const handleBlur = (event: Event) => {
         :value="modelValue"
         :placeholder="placeholder"
         :disabled="disabled"
+        :autocomplete="autocomplete"
         :rows="rows"
         :style="{ resize: resize }"
         @input="handleInput"
