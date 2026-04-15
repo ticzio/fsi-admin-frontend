@@ -55,8 +55,8 @@ watch(
     } else if (newVal.id === 'niveles') {
       isLoadingOptions.value = true
       try {
-        const levels = await getLevels()
-        dynamicOptions.value = levels.map((l: any) => ({ id: l.id, name: l.name }))
+        const response = await getLevels()
+        dynamicOptions.value = response.data.map((l: any) => ({ id: l.id, name: l.name }))
       } catch (error) {
         console.error(error)
       } finally {

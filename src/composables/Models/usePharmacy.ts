@@ -88,6 +88,9 @@ export function usePharmacy() {
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        pharmacies.value = []
+        pagination.totalPages = 1
+        pagination.currentPage = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')

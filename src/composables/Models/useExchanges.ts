@@ -43,6 +43,7 @@ export function useExchanges() {
    */
   const getExchanges = async (page = 1, search = '') => {
     currentSearch.value = search
+    exchanges.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -61,9 +62,13 @@ export function useExchanges() {
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        exchanges.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      exchanges.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }
@@ -74,6 +79,7 @@ export function useExchanges() {
    */
   const getExchangesByClientId = async (idClient: string | number, page = 1, search = '') => {
     currentSearch.value = search
+    exchanges.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -92,9 +98,13 @@ export function useExchanges() {
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        exchanges.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      exchanges.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }

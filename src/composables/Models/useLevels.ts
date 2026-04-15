@@ -24,24 +24,18 @@ export function useLevels() {
   /**
    * Obtiene todos los niveles activos.
    */
-  const getLevels = async () => {
+  const getLevels = async (params: any = { limit: 100, active: 1 }) => {
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
         url: URLS.level.getAll,
-        params: {
-          limit: 100,
-          active: 1
-        }
+        params,
       })
 
-      if (response.code === 200) {
-        return response.data
-      }
-      return []
+      return response
     } catch (error: any) {
       console.error('Error in getLevels:', error)
-      return []
+      return { code: 500, message: error.message || 'Error', data: [] }
     } finally {
       loading.value = false
     }

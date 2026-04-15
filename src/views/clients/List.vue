@@ -67,6 +67,11 @@ const goToNew = () => {
   router.push({ name: 'Nuevo Cliente' })
 }
 
+const clearFilters = () => {
+  search.value = ''
+  fetchData()
+}
+
 const fetchData = () => {
   getDataClients(1, search.value)
 }
@@ -104,13 +109,14 @@ onMounted(() => {
               'Puedes buscar por correo electrónico',
               'O por número de teléfono',
             ]"
+            @search="fetchData"
           />
         </div>
 
         <div
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
-          <FetchButton @fetch="fetchData" />
+          <FetchButton @fetch="clearFilters" />
           <!--  
           <RedirectButton
             :tooltip-title="BUTTONS_TOOLTIPS?.clients?.tooltipTitle || 'Nuevo cliente'"

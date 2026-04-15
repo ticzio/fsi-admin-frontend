@@ -26,6 +26,7 @@ export function useMissions() {
   })
 
   const getDataMissions = async (page = 1, search = '') => {
+    missions.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -44,9 +45,13 @@ export function useMissions() {
         pagination.currentPage = response.meta.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        missions.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      missions.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }

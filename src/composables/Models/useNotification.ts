@@ -26,6 +26,7 @@ export function useNotification() {
   })
 
   const getDataNotifications = async (page = 1, search = '') => {
+    notifications.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -44,9 +45,13 @@ export function useNotification() {
         pagination.currentPage = response.meta?.current_page || 1
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        notifications.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      notifications.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }

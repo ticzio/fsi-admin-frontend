@@ -26,6 +26,7 @@ export function useCoupons() {
   })
 
   const getDataCoupons = async (page = 1, search = '') => {
+    coupons.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -42,13 +43,15 @@ export function useCoupons() {
         coupons.value = response.data
         pagination.totalPages = response.meta.last_page
         pagination.currentPage = response.meta.current_page
-      } else if (response.code === 404) {
-        handleErrorResponse(null, 'No se encontraron registros de cupones')
       } else {
-        handleErrorResponse(null, 'Error al obtener los registros de cupones')
+        handleErrorResponse(null, 'No se encontraron registros de cupones')
+        coupons.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      coupons.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }

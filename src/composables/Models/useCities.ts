@@ -31,6 +31,7 @@ export function useCities() {
   const pagination = sharedPagination
 
   const getDataCities = async (page = 1, search = '') => {
+    cities.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -49,9 +50,13 @@ export function useCities() {
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        cities.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      cities.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }

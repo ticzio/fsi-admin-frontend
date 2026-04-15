@@ -74,6 +74,11 @@ const goToNew = () => {
   newNotificationModalRef.value?.openModal()
 }
 
+const clearFilters = () => {
+  search.value = ''
+  fetchData()
+}
+
 const fetchData = async () => {
   pagination.currentPage = 1
   store.dispatch('pagination/updatePagination', {
@@ -124,7 +129,7 @@ onMounted(async () => {
         <div
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
-          <FetchButton @fetch="fetchData" />
+          <FetchButton @fetch="clearFilters" />
           <RedirectButton
             :tooltip-title="BUTTONS_TOOLTIPS.notification.tooltipTitle"
             @redirect="goToNew"

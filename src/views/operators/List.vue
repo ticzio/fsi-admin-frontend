@@ -64,6 +64,11 @@ const handleTablePagination = async (page: number) => {
   })
 }
 
+const clearFilters = () => {
+  search.value = ''
+  fetchData()
+}
+
 const fetchData = async () => {
   await getDataUsers(1, search.value, extraParams)
 }
@@ -108,7 +113,7 @@ onMounted(async () => {
         <div
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
-          <FetchButton @fetch="fetchData" />
+          <FetchButton @fetch="clearFilters" />
           <!-- 
           <RedirectButton
             :tooltip-title="BUTTONS_TOOLTIPS.operator.tooltipTitle"

@@ -27,6 +27,7 @@ export function useBanners() {
   })
 
   const getDataBanners = async (page = 1, search = '') => {
+    banners.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -45,9 +46,13 @@ export function useBanners() {
         pagination.currentPage = response.data.meta.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        banners.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      banners.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }

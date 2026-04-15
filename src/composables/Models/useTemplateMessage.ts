@@ -26,6 +26,7 @@ export function useTemplateMessage() {
   })
 
   const getDataTemplates = async (page = 1, search = '', idPharmacy?: string | number) => {
+    templates.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -45,9 +46,13 @@ export function useTemplateMessage() {
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        templates.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      templates.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }

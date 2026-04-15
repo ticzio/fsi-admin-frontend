@@ -10,6 +10,7 @@ import StatusBadge from '@/components/common/StatusBadge.vue'
 //Composables
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useLevels } from '@/composables/Models/useLevels'
 
 import {
   TITLE_SECTION_COMPONENT,
@@ -18,14 +19,13 @@ import {
   TABLE_ACTIONS,
 } from '@/const/tableConst'
 import { useSwalToast } from '@/composables/useSwalToast'
-import { URLS } from '@/const/api'
 
 const router = useRouter()
 const store = useStore()
 const swalToast = useSwalToast()
+const { getLevels, loading } = useLevels()
 const isMobile = computed(() => store.getters.isMobile)
 
-const loading = ref(false)
 const levels = ref<any[]>([])
 const search = ref('')
 
@@ -55,16 +55,18 @@ const handleTablePagination = (page: number) => {
   getDataLevels(page)
 }
 
+const clearFilters = () => {
+  search.value = ''
+  getDataLevels(1)
+}
+
 
 const getDataLevels = async (page = 1) => {
-  loading.value = true
+  levels.value = []
   try {
-    const response: any = await store.dispatch('getData', {
-      url: URLS.level.getAll,
-      params: {
-        page: page,
-        limit: pagination.limit,
-      },
+    const response: any = await getLevels({
+      page: page,
+      limit: pagination.limit,
     })
 
     if (response.code === 200) {
@@ -73,12 +75,14 @@ const getDataLevels = async (page = 1) => {
       pagination.currentPage = response.meta.current_page
     } else {
       swalToast.showError(response.message || 'Error al obtener los niveles')
+      levels.value = []
+      pagination.totalPages = 1
     }
   } catch (error: any) {
     console.error('Error fetching levels:', error)
     swalToast.showError(error.message || 'Error de conexión al obtener los niveles')
-  } finally {
-    loading.value = false
+    levels.value = []
+    pagination.totalPages = 1
   }
 }
 
@@ -114,7 +118,7 @@ onMounted(() => {
         <div
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
-          <FetchButton @fetch="getDataLevels" />
+          <FetchButton @fetch="clearFilters" />
         </div>
       </div>
 

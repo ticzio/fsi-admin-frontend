@@ -44,6 +44,11 @@ const handleTablePagination = (page: number) => {
   fetchData(page)
 }
 
+const clearFilters = () => {
+  search.value = ''
+  fetchData(1)
+}
+
 const fetchData = async (page = 1) => {
   if (idClient.value) {
     await getExchangesByClientId(idClient.value, page, search.value)
@@ -88,7 +93,7 @@ watch(search, (newSearch) => {
       <div
         class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
       >
-        <FetchButton :loading="loading" @fetch="fetchData(1)" />
+        <FetchButton :loading="loading" @fetch="clearFilters" />
       </div>
     </div>
 

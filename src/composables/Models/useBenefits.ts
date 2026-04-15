@@ -38,6 +38,7 @@ export function useBenefits() {
    * Obtiene la lista de beneficios filtrada por id_level.
    */
   const getDataBenefits = async (idLevel: string | number, page = 1, search = '') => {
+    benefits.value = []
     loading.value = true
     try {
       const response: any = await store.dispatch('getData', {
@@ -56,9 +57,13 @@ export function useBenefits() {
         pagination.currentPage = response.meta?.current_page || response.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
+        benefits.value = []
+        pagination.totalPages = 1
       }
     } catch (error: any) {
       handleErrorResponse(error, 'Recursos no encontrados')
+      benefits.value = []
+      pagination.totalPages = 1
     } finally {
       loading.value = false
     }
