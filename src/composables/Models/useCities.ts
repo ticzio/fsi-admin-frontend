@@ -71,7 +71,7 @@ export function useCities() {
     const promise = (async () => {
       loading.value = true
       try {
-        const params: any = { limit: 100, active: 1 }
+        const params: any = { limit: 100, active: 1, order_value: 'asc', order_key: 'name' }
         if (id_state) {
           params.id_state = id_state
         }
@@ -98,7 +98,6 @@ export function useCities() {
     if (!id_state) pendingGetCities = promise
     return promise
   }
-
 
   const saveCity = async (data: any, isEditing: boolean, id?: string | number) => {
     loading.value = true
@@ -170,7 +169,10 @@ export function useCities() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.city.changeStatus, {}, error)
-      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
+      handleErrorResponse(
+        error,
+        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`,
+      )
       return false
     }
   }

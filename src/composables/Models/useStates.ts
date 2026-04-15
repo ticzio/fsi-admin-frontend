@@ -60,6 +60,8 @@ export function useStates() {
         url: URLS.state.getAll,
         params: {
           limit: 100,
+          order_key: 'name',
+          order_value: 'asc',
         },
       })
 
@@ -146,7 +148,10 @@ export function useStates() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.state.changeStatus, {}, error)
-      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
+      handleErrorResponse(
+        error,
+        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`,
+      )
       return false
     }
   }

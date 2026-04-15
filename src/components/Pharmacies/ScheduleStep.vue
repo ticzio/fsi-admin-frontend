@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BaseInput from '@/components/common/BaseInput.vue'
+import { requiredIfPairFilled, closeMustBeAfterOpen } from '@/utils/funcSchedule'
 
 const props = defineProps<{
   form: any
@@ -66,6 +67,7 @@ const scheduleSections = [
             type="time"
             v-model="form[section.openModel]"
             label="Hora de Apertura"
+            :rules="[requiredIfPairFilled(form[section.closeModel])]"
           />
         </div>
         <div class="col-6 col-md-4">
@@ -74,6 +76,10 @@ const scheduleSections = [
             type="time"
             v-model="form[section.closeModel]"
             label="Hora de Cierre"
+            :rules="[
+              requiredIfPairFilled(form[section.openModel]),
+              closeMustBeAfterOpen(form[section.openModel]),
+            ]"
           />
         </div>
       </div>
