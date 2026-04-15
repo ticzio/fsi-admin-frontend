@@ -18,18 +18,8 @@
 
     <!-- Desglose por Nivel -->
     <div class="flex-grow-1 overflow-y-auto custom-scrollbar">
-      <!-- Estado vacío -->
-      <div
-        v-if="exchangesByLevel.length === 0"
-        class="h-100 d-flex flex-column align-items-center justify-content-center text-muted py-5"
-      >
-        <i class="bi bi-arrow-left-right mb-3 display-4 opacity-50"></i>
-        <p class="fs-5 fw-medium mb-0">No hay canjes para mostrar</p>
-        <p class="small opacity-75">No se encontraron estadísticas para este período</p>
-      </div>
-
       <!-- Lista de niveles -->
-      <template v-else>
+      <template>
         <p class="text-secondary small text-uppercase fw-bold mb-3 letter-spacing-1">
           Desglose por Nivel
         </p>
@@ -57,9 +47,7 @@
             </span>
             <span class="text-muted extra-small">
               {{
-                totalExchanges > 0
-                  ? ((item.value / totalExchanges) * 100).toFixed(0) + '%'
-                  : '0%'
+                totalExchanges > 0 ? ((item.value / totalExchanges) * 100).toFixed(0) + '%' : '0%'
               }}
             </span>
           </div>
