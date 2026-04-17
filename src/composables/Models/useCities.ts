@@ -39,6 +39,8 @@ export function useCities() {
         params: {
           page: page,
           limit: pagination.limit,
+          order_value: 'asc',
+          order_key: 'name',
           query: search || null,
           active: null,
         },

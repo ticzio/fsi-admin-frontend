@@ -16,13 +16,7 @@ const store = useStore()
 const route = useRoute()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
-const {
-  loading,
-  exchanges,
-  pagination,
-  paginationKey,
-  getExchangesByClientId,
-} = useExchanges()
+const { loading, exchanges, pagination, paginationKey, getExchangesByClientId } = useExchanges()
 
 const idClient = computed(() => route.params.id as string)
 const search = ref('')
@@ -106,15 +100,17 @@ watch(search, (newSearch) => {
       <CustomTable
         :data="exchanges"
         :headers="TABLE_HEADERS.exchangesClient || []"
-        :actions="getTableActions"
         :is-loading="loading"
         :current-page="pagination.currentPage"
         :total-pages="pagination.totalPages"
         :limit="pagination.limit"
         :change-page="handleTablePagination"
         @change-page="handleTablePagination"
-        @action-click="handleTableAction"
-      />
+      >
+        <template #cell(created_at)="{ value }">
+          <span v-format-date-time="value"></span>
+        </template>
+      </CustomTable>
     </div>
   </div>
 </template>

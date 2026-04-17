@@ -31,6 +31,7 @@ interface Item {
 const templateModalRef = ref<InstanceType<typeof Modal> | null>(null)
 const modalMode = ref<'create' | 'edit'>('create')
 const selectedTemplate = ref<Item | null>(null)
+const modalKey = ref(0)
 
 const router = useRouter()
 const route = useRoute()
@@ -57,6 +58,7 @@ const handleTableAction = async ({ actionName, item }: { actionName: string; ite
   if (actionName === 'edit') {
     modalMode.value = 'edit'
     selectedTemplate.value = item
+    modalKey.value++
     templateModalRef.value?.openModal()
   } else if (actionName === 'deactivate') {
     const success = await deactivateTemplate(item)
@@ -87,6 +89,7 @@ const handleTablePagination = async (page: number) => {
 const goToNew = () => {
   modalMode.value = 'create'
   selectedTemplate.value = null
+  modalKey.value++
   templateModalRef.value?.openModal()
 }
 
@@ -179,7 +182,7 @@ onMounted(() => {
       size="lg"
     >
       <TemplateForm
-        :key="modalMode === 'edit' ? `edit-${selectedTemplate?.id || '0'}` : 'create'"
+        :key="modalKey"
         :initial-data="modalMode === 'edit' ? selectedTemplate : null"
         @close="templateModalRef?.closeModal()"
         @submit="handleTemplateSubmit"

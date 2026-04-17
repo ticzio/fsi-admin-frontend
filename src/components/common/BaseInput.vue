@@ -269,6 +269,23 @@ const togglePasswordVisibility = () => {
   border-color: #dc3545 !important;
 }
 
+.is-valid {
+  border-color: #198754 !important;
+}
+
+/* Fix for overlapping icons in time/date inputs with validation */
+.custom-input[type='time'].is-valid,
+.custom-input[type='time'].is-invalid,
+.custom-input[type='date'].is-valid,
+.custom-input[type='date'].is-invalid,
+.custom-input[type='datetime-local'].is-valid,
+.custom-input[type='datetime-local'].is-invalid,
+.custom-input[type='month'].is-valid,
+.custom-input[type='month'].is-invalid {
+  background-image: none !important;
+  padding-right: 1.2rem !important;
+}
+
 /* Transición del bloque de errores completo */
 .fade-enter-active,
 .fade-leave-active {
