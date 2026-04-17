@@ -61,7 +61,7 @@ const mergedOptions = computed<ApexOptions>(() => {
     chart: {
       ...props.options?.chart,
       type: 'area',
-      toolbar: { show: false },
+      toolbar: { show: false, ...props.options?.chart?.toolbar },
     },
     markers: customMarkers,
     dataLabels: {

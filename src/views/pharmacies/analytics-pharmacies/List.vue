@@ -60,10 +60,7 @@
 
             <!-- Content: Top de operadores -->
             <div v-else-if="currentTab === 'operators'" key="operators" class="h-100">
-              <OperatorsAnalytics
-                v-if="topOperators.length > 0"
-                :operators="topOperators"
-              />
+              <OperatorsAnalytics v-if="topOperators.length > 0" :operators="topOperators" />
               <div
                 v-else
                 class="h-100 d-flex flex-column align-items-center justify-content-center text-muted py-5"
@@ -121,7 +118,7 @@ const operatorOptions = computed(() =>
     id: u.id,
     label: `${u.first_name} ${u.last_name}`,
     name: `${u.first_name} ${u.last_name}`,
-  }))
+  })),
 )
 
 /**
@@ -164,7 +161,7 @@ const logout = () => {
 
 // Mock Data para KPIs (Inicialmente en 0)
 const kpis = ref([
-  { title: 'Chats Hoy', value: '0', icon: 'bi-chat-left-text-fill', color: '#0d6efd' },
+  { title: 'Chats atendidos hoy', value: '0', icon: 'bi-chat-left-text-fill', color: '#0d6efd' },
   { title: 'Chats del Mes', value: '0', icon: 'bi-calendar-check-fill', color: '#ffc107' },
   { title: 'Operadores Activos', value: '0', icon: 'bi-people-fill', color: '#198754' },
   { title: 'Tiempo de Respuesta', value: '0 min', icon: 'bi-clock-fill', color: '#6610f2' },
@@ -180,6 +177,7 @@ const chatsSeries = ref([
 
 const chatsOptions = ref<ApexOptions>({
   chart: {
+    id: 'chats-analytics-chart',
     fontFamily: 'inherit',
     zoom: { enabled: false },
     toolbar: { show: false },
@@ -187,7 +185,20 @@ const chatsOptions = ref<ApexOptions>({
   colors: ['#0d6efd'],
   stroke: { curve: 'smooth' as const, width: 4 },
   xaxis: {
-    categories: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+    categories: [
+      'Ene',
+      'Feb',
+      'Mar',
+      'Abr',
+      'May',
+      'Jun',
+      'Jul',
+      'Ago',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ],
   },
   tooltip: { theme: 'light' },
   grid: { borderColor: '#f8f9fa' },
@@ -222,9 +233,7 @@ const initAnalytics = async () => {
     return
   }
 
-  const id_operator = selectedOperator.value?.id
-    ? String(selectedOperator.value.id)
-    : undefined
+  const id_operator = selectedOperator.value?.id ? String(selectedOperator.value.id) : undefined
 
   const data = await getBackOfficeAnalytics(pharmacy.value.code, code_user, id_operator)
   if (data) {
@@ -305,7 +314,7 @@ watch(
       initAnalytics()
     }
   },
-  { deep: true }
+  { deep: true },
 )
 </script>
 

@@ -17,21 +17,25 @@ const props = defineProps<{
 }>()
 
 const mergedOptions = computed<ApexCharts.ApexOptions>(() => ({
+  ...props.options,
   chart: {
+    ...props.options?.chart,
     type: 'donut',
-    toolbar: { show: false },
+    toolbar: { show: false, ...props.options?.chart?.toolbar },
   },
-  labels: props.labels ?? [],
-  legend: { position: 'bottom' },
-  dataLabels: { enabled: true },
+  labels: props.labels ?? props.options?.labels ?? [],
+  legend: { position: 'bottom', ...props.options?.legend },
+  dataLabels: { enabled: true, ...props.options?.dataLabels },
   plotOptions: {
     pie: {
       donut: {
         size: '65%',
+        ...props.options?.plotOptions?.pie?.donut,
       },
+      ...props.options?.plotOptions?.pie,
     },
+    ...props.options?.plotOptions,
   },
-  ...props.options,
 }))
 </script>
 

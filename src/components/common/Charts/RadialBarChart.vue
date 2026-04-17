@@ -47,7 +47,7 @@ const mergedOptions = computed<ApexOptions>(() => {
     chart: {
       ...props.options?.chart,
       type: 'radialBar',
-      toolbar: { show: false },
+      toolbar: { show: false, ...props.options?.chart?.toolbar },
       sparkline: { enabled: true },
     },
     labels,

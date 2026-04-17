@@ -16,21 +16,26 @@ const props = defineProps<{
 }>()
 
 const mergedOptions = computed<ApexCharts.ApexOptions>(() => ({
+  ...props.options,
   chart: {
+    ...props.options?.chart,
     type: 'bar',
-    toolbar: { show: false },
+    toolbar: { show: false, ...props.options?.chart?.toolbar },
   },
   plotOptions: {
     bar: {
       borderRadius: 4,
       columnWidth: '55%',
+      ...props.options?.plotOptions?.bar,
     },
+    ...props.options?.plotOptions,
   },
-  dataLabels: { enabled: false },
-  legend: { show: false },
+  dataLabels: { enabled: false, ...props.options?.dataLabels },
+  legend: { show: false, ...props.options?.legend },
   grid: {
     borderColor: '#f0f0f0',
     xaxis: { lines: { show: false } },
+    ...props.options?.grid,
   },
   xaxis: {
     axisBorder: { show: false },
@@ -38,14 +43,15 @@ const mergedOptions = computed<ApexCharts.ApexOptions>(() => ({
     labels: {
       style: { colors: '#999', fontSize: '10px' },
     },
+    ...props.options?.xaxis,
   },
   yaxis: {
     labels: {
       style: { colors: '#999', fontSize: '10px' },
     },
+    ...props.options?.yaxis,
   },
-  tooltip: { theme: 'light' },
-  ...props.options,
+  tooltip: { theme: 'light', ...props.options?.tooltip },
 }))
 </script>
 

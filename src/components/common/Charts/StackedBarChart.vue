@@ -29,7 +29,7 @@ const mergedOptions = computed<ApexOptions>(() => {
       ...props.options?.chart,
       type: 'bar',
       stacked: true,
-      toolbar: { show: false },
+      toolbar: { show: false, ...props.options?.chart?.toolbar },
       sparkline: { enabled: false },
     },
     plotOptions: {
