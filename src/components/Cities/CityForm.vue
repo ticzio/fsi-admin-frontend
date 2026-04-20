@@ -9,7 +9,7 @@ import { ICONS_MULTISELECT } from '@/const/multiselectConst'
 interface CityData {
   id?: number | string
   name: string
-  id_type_state: any
+  type_state: any
   active: boolean
 }
 
@@ -28,14 +28,18 @@ const { states, loading: loadingStates, getStates } = useStates()
 
 const formData = ref<CityData>({
   name: '',
-  id_type_state: null,
+  type_state: null,
   active: true,
 })
 
 const initForm = () => {
   if (props.initialData) {
-    // El backend puede enviar state o id_type_state
-    const stateObj = props.initialData.state || props.initialData.id_type_state
+    // El backend puede enviar type_state, state, id_state o id_type_state
+    const stateObj =
+      props.initialData.type_state ||
+      props.initialData.state ||
+      props.initialData.id_state ||
+      props.initialData.id_type_state
 
     // Mapear ID a objeto si es necesario
     const mappedState =
@@ -46,13 +50,13 @@ const initForm = () => {
     formData.value = {
       id: props.initialData.id,
       name: props.initialData.name || '',
-      id_type_state: mappedState || null,
+      type_state: mappedState || null,
       active: props.initialData.active !== undefined ? props.initialData.active : true,
     }
   } else {
     formData.value = {
       name: '',
-      id_type_state: null,
+      type_state: null,
       active: true,
     }
   }
@@ -110,7 +114,7 @@ defineExpose({
 
         <div class="mb-3">
           <MultiselectCustom
-            v-model="formData.id_type_state"
+            v-model="formData.type_state"
             :options="states"
             label="Estado / Departamento"
             placeholder="Seleccionar estado"

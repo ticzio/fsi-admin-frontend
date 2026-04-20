@@ -60,7 +60,7 @@ const extraData = computed(() => {
   <div class="redeemed-coupon-detail p-3">
     <div class="row g-4">
       <!-- Columna Izquierda: Tarjeta de Cupón -->
-      <div class="col-12 col-md-5 d-flex flex-column">
+      <div class="col-12 col-md-5 d-flex flex-column align-items-center">
         <CustomCard
           class="shadow-sm border-0 h-100"
           :centered-content="true"
@@ -77,10 +77,11 @@ const extraData = computed(() => {
               class="d-flex justify-content-between align-items-center w-100 p-3 bg-light rounded-4 mt-3"
             >
               <div class="date-range small text-secondary fw-medium">
-                <i class="bi bi-calendar3 me-2"></i>{{ startDate }} - {{ finishDate }}
+                <i class="bi bi-calendar3 me-2"></i> <span v-format-date="startDate"> </span> -
+                <span v-format-date="finishDate"></span>
               </div>
               <div class="coupon-code-footer d-flex align-items-center">
-                <span class="text-secondary small text-uppercase fw-bold me-2">COD:</span>
+                <span class="text-secondary small text-uppercase fw-bold mx-1">COD:</span>
                 <span class="fw-bold text-dark font-monospace">{{ couponCode }}</span>
               </div>
             </div>

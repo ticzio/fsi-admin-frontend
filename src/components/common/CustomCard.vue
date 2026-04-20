@@ -130,8 +130,9 @@ const statusClass = computed(() => {
     >
       <div
         :class="[
-          'd-flex justify-content-between align-items-start mb-3 w-100',
+          'd-flex align-items-start mb-3 w-100',
           { 'justify-content-center': centeredContent },
+          { 'justify-content-between': !centeredContent },
         ]"
       >
         <!-- Coupon/Image Side -->
@@ -185,10 +186,7 @@ const statusClass = computed(() => {
         <h6 v-else class="card-title fw-bold mb-1 line-clamp-2">{{ title }}</h6>
 
         <p
-          :class="[
-            'card-text text-muted mb-0',
-            centeredContent ? 'px-3' : 'small line-clamp-2',
-          ]"
+          :class="['card-text text-muted mb-0', centeredContent ? 'px-3' : 'small line-clamp-2']"
           v-if="description"
         >
           {{ description }}
@@ -196,10 +194,7 @@ const statusClass = computed(() => {
       </div>
 
       <!-- Divider -->
-      <div
-        v-if="!centeredContent"
-        class="divider border-bottom border-dashed mb-3 w-100"
-      ></div>
+      <div v-if="!centeredContent" class="divider border-bottom border-dashed mb-3 w-100"></div>
 
       <!-- Footer Area -->
       <slot name="footer">
