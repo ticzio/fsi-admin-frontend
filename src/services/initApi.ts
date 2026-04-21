@@ -43,7 +43,7 @@ export async function InitializeConfig() {
       }
     } else if (
       urlDomain.includes(import.meta.env.VITE_DOMAIN) ||
-      urlDomain.includes('dashmin.miFSI.com')
+      urlDomain.includes('dashmin.redfsi.net')
     ) {
       configUrl = import.meta.env.VITE_API_PATH
     } else {
