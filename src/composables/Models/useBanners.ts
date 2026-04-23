@@ -41,9 +41,9 @@ export function useBanners() {
       })
 
       if (response.code === 200) {
-        banners.value = response.data.data
-        pagination.totalPages = response.data.meta.last_page
-        pagination.currentPage = response.data.meta.current_page
+        banners.value = response.data
+        pagination.totalPages = response.meta?.last_page
+        pagination.currentPage = response.meta?.current_page
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
         banners.value = []
@@ -159,7 +159,10 @@ export function useBanners() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.banner.changeStatus, {}, error)
-      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
+      handleErrorResponse(
+        error,
+        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`,
+      )
       return false
     }
   }
