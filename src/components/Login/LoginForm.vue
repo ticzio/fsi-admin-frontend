@@ -42,7 +42,7 @@ const emailRules = [
 const passwordRules = [(v: string) => !!v || 'La contraseña es requerida']
 
 // --- Cloudflare Turnstile ---
-const TURNSTILE_SITE_KEY = '0x4AAAAAADDd6CB55k-DJUNb'
+const TURNSTILE_SITE_KEY = (import.meta.env.VITE_TURNSTILE_SITE_KEY as string) || ''
 const turnstileContainer = ref<HTMLElement | null>(null)
 const turnstileToken = ref<string | null>(null)
 let widgetId: string | null = null
