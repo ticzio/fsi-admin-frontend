@@ -63,7 +63,7 @@ export function useHandleError() {
     }
 
     // FALLBACK FINAL: si es un error nativo u otro formato, mostramos el valor por defecto
-    swalToast.showError(defaultMessage)
+    //swalToast.showError(defaultMessage)
   }
 
   return {

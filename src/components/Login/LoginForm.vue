@@ -1,7 +1,16 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import { isValidEmail } from '@/utils/funcEmails'
+
+declare global {
+  interface Window {
+    turnstile: {
+      render: (container: string | HTMLElement, options: Record<string, unknown>) => string
+      reset: (widgetId: string) => void
+    }
+  }
+}
 
 defineProps({
   loading: {
@@ -32,8 +41,38 @@ const emailRules = [
 
 const passwordRules = [(v: string) => !!v || 'La contraseña es requerida']
 
+// --- Cloudflare Turnstile ---
+const TURNSTILE_SITE_KEY = '0x4AAAAAADDd6CB55k-DJUNb'
+const turnstileContainer = ref<HTMLElement | null>(null)
+const turnstileToken = ref<string | null>(null)
+let widgetId: string | null = null
+
+onMounted(() => {
+  if (window.turnstile && turnstileContainer.value) {
+    widgetId = window.turnstile.render(turnstileContainer.value, {
+      sitekey: TURNSTILE_SITE_KEY,
+      callback: (token: string) => {
+        turnstileToken.value = token
+      },
+      'expired-callback': () => {
+        turnstileToken.value = null
+      },
+      'error-callback': () => {
+        turnstileToken.value = null
+      },
+    })
+  }
+})
+
 const handleLogin = () => {
-  emit('submit', { email: credentials.email, password: credentials.password })
+  if (!turnstileToken.value) {
+    return
+  }
+  emit('submit', {
+    email: credentials.email,
+    password: credentials.password,
+    cfTurnstileResponse: turnstileToken.value,
+  })
 }
 </script>
 
@@ -75,8 +114,17 @@ const handleLogin = () => {
           class="mb-4"
         />
 
-        <div class="d-grid mt-4">
-          <button type="submit" :disabled="loading" class="btn btn-primary btn-lg custom-btn">
+        <!-- Cloudflare Turnstile widget -->
+        <div class="d-flex justify-content-center my-3">
+          <div ref="turnstileContainer"></div>
+        </div>
+
+        <div class="d-grid mt-2">
+          <button
+            type="submit"
+            :disabled="loading || !turnstileToken"
+            class="btn btn-primary btn-lg custom-btn"
+          >
             {{ loading ? 'Iniciando...' : 'Entrar' }}
           </button>
         </div>

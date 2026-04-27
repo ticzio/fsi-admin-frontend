@@ -22,6 +22,7 @@ const loading = ref(false)
 const handleLogin = async (credentialsPayload: any) => {
   const email = normalizeEmail(credentialsPayload.email)
   const password = credentialsPayload.password
+  const cfTurnstileResponse = credentialsPayload.cfTurnstileResponse
 
   if (!email || !password) {
     swalToast.showError('Por favor, completa todos los campos')
@@ -32,7 +33,7 @@ const handleLogin = async (credentialsPayload: any) => {
   try {
     const response = await store.dispatch('login', {
       url: '/auth/login',
-      credentials: { email, password },
+      credentials: { email, password, cf_turnstile_response: cfTurnstileResponse },
     })
 
     if (response.code == 200) {
