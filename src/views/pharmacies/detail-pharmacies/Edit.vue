@@ -144,6 +144,12 @@ onMounted(async () => {
 
 const handleSave = async () => {
   const success = await savePharmacy(form as any, true, route.params.id_pharmacy as string)
+  if (success && pharmacy.value) {
+    Object.assign(form, pharmacy.value)
+    if (pharmacy.value.type_city) {
+      form.id_type_city = pharmacy.value.type_city
+    }
+  }
 }
 
 const handleDelete = async () => {
@@ -162,6 +168,9 @@ const handleOpenModal = () => {
 const handleSaveSchedule = async () => {
   const success = await savePharmacySchedule(form, route.params.id_pharmacy as string)
   if (success) {
+    if (pharmacy.value) {
+      Object.assign(form, pharmacy.value)
+    }
     modalRef.value?.closeModal()
   }
 }

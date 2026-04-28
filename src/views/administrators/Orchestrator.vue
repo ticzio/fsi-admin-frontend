@@ -19,7 +19,18 @@ const route = useRoute()
 const router = useRouter()
 const store = useStore()
 const swal = useSwal()
-const { getUser, loading: isUserLoading } = useUsers()
+const { getUser, user, loading: isUserLoading } = useUsers()
+
+watch(
+  () => user.value,
+  (newData) => {
+    if (newData) {
+      localTitle.value = newData.first_name + ' ' + newData.last_name || ''
+      store.dispatch('utils/setIsItem', localTitle.value)
+    }
+  },
+  { deep: true },
+)
 
 const isLoading = computed(() => isUserLoading.value)
 const localTitle = ref('Titulo por defecto')

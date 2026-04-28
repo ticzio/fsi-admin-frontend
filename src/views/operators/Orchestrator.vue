@@ -151,6 +151,17 @@ const loadOperatorData = async () => {
 }
 
 watch(
+  () => userData.value,
+  (newData) => {
+    if (newData) {
+      localTitle.value = newData.first_name + ' ' + newData.last_name || ''
+      store.dispatch('utils/setIsItem', localTitle.value)
+    }
+  },
+  { deep: true },
+)
+
+watch(
   () => activeTab.value,
   (newTab, oldTab) => {
     if (oldTab !== null && oldTab !== -1) {

@@ -104,9 +104,9 @@ export function useUsers() {
    * Obtiene un usuario específico mediante el método del store getData.
    * Útil para buscar por ID o algún parámetro específico.
    */
-  const getUser = async (id: string | number) => {
-    // 1. Si ya tenemos el usuario (y coincide el ID), devolverlo directamente
-    if (user.value && String(user.value.id) === String(id)) {
+  const getUser = async (id: string | number, forceRefresh = false) => {
+    // 1. Si ya tenemos el usuario (y no se requiere refresco), devolverlo directamente
+    if (!forceRefresh && user.value && String(user.value.id) === String(id)) {
       return user.value
     }
 
@@ -217,6 +217,9 @@ export function useUsers() {
         swalToast.showSuccess(
           isEditing ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente',
         )
+        if (isEditing && id) {
+          await getUser(id, true)
+        }
         await getDataUsers(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       } else {

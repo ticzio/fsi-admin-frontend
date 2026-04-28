@@ -106,9 +106,9 @@ export function useClients() {
    * Obtiene un cliente específico mediante el método del store getData.
    * Útil para buscar por ID o algún parámetro específico.
    */
-  const getClient = async (id: string | number) => {
-    // 1. Si ya tenemos el cliente (y coincide el ID), devolverlo directamente
-    if (client.value && String(client.value.id) === String(id)) {
+  const getClient = async (id: string | number, forceRefresh = false) => {
+    // 1. Si ya tenemos el cliente (y no se requiere refresco), devolverlo directamente
+    if (!forceRefresh && client.value && String(client.value.id) === String(id)) {
       return client.value
     }
 
@@ -211,6 +211,9 @@ export function useClients() {
         swalToast.showSuccess(
           isEditing ? 'Cliente actualizado correctamente' : 'Cliente creado correctamente',
         )
+        if (isEditing && id) {
+          await getClient(id, true)
+        }
         await getDataClients(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true
       } else {

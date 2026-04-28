@@ -148,6 +148,17 @@ const loadPharmacyData = async () => {
 }
 
 watch(
+  () => pharmacy.value,
+  (newData) => {
+    if (newData) {
+      localTitle.value = newData.name || newData.trade_name || ''
+      store.dispatch('utils/setIsItem', localTitle.value)
+    }
+  },
+  { deep: true },
+)
+
+watch(
   () => activeTab.value,
   (newTab, oldTab) => {
     if (oldTab !== null && oldTab !== -1) {

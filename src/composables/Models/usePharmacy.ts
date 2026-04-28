@@ -264,6 +264,9 @@ export function usePharmacy() {
         swalToast.showSuccess(
           isEditing ? 'Farmacia actualizada correctamente' : 'Farmacia creada correctamente',
         )
+        if (isEditing && id) {
+          await getPharmacy(id, true)
+        }
         return true
       } else {
         handleErrorResponse(null, 'Error al guardar la farmacia')
