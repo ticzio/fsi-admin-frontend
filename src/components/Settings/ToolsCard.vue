@@ -1,3 +1,34 @@
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useStore } from 'vuex'
+import { useSwalToast } from '@/composables/useSwalToast'
+
+const store = useStore()
+const { showSuccess, showError } = useSwalToast()
+const isLoading = ref(false)
+
+const handleFlushCache = async () => {
+  isLoading.value = true
+  try {
+    const response: any = await store.dispatch('createData', {
+      url: 'utils/flush-cache',
+      data: {},
+    })
+
+    if (response.code === 200) {
+      showSuccess('Caché del sistema borrada correctamente')
+    } else {
+      showError(response.message || 'Error al borrar la caché')
+    }
+  } catch (error: any) {
+    console.error('Error flushing cache:', error)
+    showError('Error de conexión al intentar borrar la caché')
+  } finally {
+    isLoading.value = false
+  }
+}
+</script>
+
 <template>
   <div class="tools-card card border border-light shadow-sm rounded-4 p-4">
     <!-- ── Header ── -->
@@ -16,18 +47,20 @@
       <!-- Caché del Sistema -->
       <button
         class="btn tool-btn d-flex align-items-center gap-3 text-start w-100 px-3 py-3 rounded-3"
-        disabled
+        :disabled="isLoading"
+        @click="handleFlushCache"
       >
         <div class="tool-btn-icon" style="background: rgba(6, 182, 212, 0.1)">
-          <i class="bi bi-database-fill-gear" style="color: #06b6d4"></i>
+          <i v-if="!isLoading" class="bi bi-database-fill-gear" style="color: #06b6d4"></i>
+          <span v-else class="spinner-border spinner-border-sm text-info" role="status"></span>
         </div>
         <div>
           <p class="mb-0 fw-semibold" style="font-size: 0.88rem; color: #1a1a2e">
             Caché del Sistema
           </p>
-          <small class="text-muted" style="font-size: 0.75rem"
-            >Limpiar caché global (próximamente)</small
-          >
+          <small class="text-muted" style="font-size: 0.75rem">
+            {{ isLoading ? 'Limpiando...' : 'Limpiar caché global' }}
+          </small>
         </div>
         <i class="bi bi-chevron-right ms-auto text-muted"></i>
       </button>
