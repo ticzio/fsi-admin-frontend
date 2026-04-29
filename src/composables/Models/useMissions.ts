@@ -86,7 +86,10 @@ export function useMissions() {
       return false
     } catch (error: any) {
       logger.logRequest(URLS.mission.changeStatus, {}, error)
-      handleErrorResponse(error, `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`)
+      handleErrorResponse(
+        error,
+        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`,
+      )
       return false
     }
   }
@@ -123,6 +126,32 @@ export function useMissions() {
     }
   }
 
+  const updateMissionImage = async (id: number | string, imageFile: File) => {
+    loading.value = true
+    try {
+      const formData = new FormData()
+      formData.append('url_image', imageFile)
+
+      const response: any = await store.dispatch('updateData', {
+        url: URLS.mission.update,
+        id: id,
+        data: formData,
+      })
+
+      if (response.code === 200 || response.code === 201) {
+        swalToast.showSuccess('Imagen de misión actualizada exitosamente')
+        await getDataMissions(pagination.currentPage)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      handleErrorResponse(error, 'Error al actualizar la imagen de la misión')
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     missions,
@@ -131,5 +160,6 @@ export function useMissions() {
     getDataMissions,
     deactivateMission,
     deleteMission,
+    updateMissionImage,
   }
 }

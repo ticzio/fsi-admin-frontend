@@ -7,12 +7,19 @@ import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
+import AppImage from '@/components/common/AppImage.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
+import { useSwalToast } from '@/composables/useSwalToast'
 import { useTableActions } from '@/composables/useTableActions'
 import { useMissions } from '@/composables/Models/useMissions'
+
+//Components
+import Modal from '@/components/common/Modal.vue'
+import MissionForm from '@/components/Missions/MissionForm.vue'
 
 import { TITLE_SECTION_COMPONENT, TABLE_HEADERS } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
@@ -32,10 +39,34 @@ const {
 } = useMissions()
 
 const search = ref('')
+const missionModalRef = ref<any>(null)
+const missionFormRef = ref<any>(null)
+const selectedMission = ref<any>(null)
+
+const swalToast = useSwalToast()
+
+const handleUpdateMission = async () => {
+  if (loading.value) return
+
+  loading.value = true
+  try {
+    const success = await missionFormRef.value?.handleSubmit()
+    if (success) {
+      missionModalRef.value?.closeModal()
+      // Forzamos el refresco en la instancia local de useMissions
+      await getDataMissions(pagination.currentPage, search.value)
+    }
+  } catch (error) {
+    console.error('Error al actualizar la misión:', error)
+  } finally {
+    loading.value = false
+  }
+}
 
 const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
-    // router.push(`/settings/missions/edit/${item.id}`)
+    selectedMission.value = item
+    missionModalRef.value?.openModal()
   } else if (actionName === 'deactivate') {
     await deactivateMission(item)
   } else if (actionName === 'delete') {
@@ -128,6 +159,18 @@ onMounted(() => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
+          <template #cell(url_image)="{ item }">
+            <div class="d-flex justify-content-center py-1">
+              <AppImage
+                :src="item.url_image"
+                :alt="item.name"
+                type="entity"
+                width="120px"
+                height="100px"
+                rounded="rounded-3 shadow-sm border"
+              />
+            </div>
+          </template>
           <template #cell(active)="{ value }">
             <StatusBadge :value="value" />
           </template>
@@ -135,4 +178,20 @@ onMounted(() => {
       </div>
     </div>
   </DashboardLayout>
+
+  <Modal id="mission-modal" ref="missionModalRef" title="Detalles de la misión" size="lg">
+    <MissionForm v-if="selectedMission" ref="missionFormRef" :mission="selectedMission" />
+
+    <template #footer>
+      <button
+        type="button"
+        class="btn btn-primary fw-bold text-white"
+        @click="handleUpdateMission"
+        :disabled="loading"
+      >
+        <LoadingSpinner v-if="loading" class="me-1" />
+        Actualizar
+      </button>
+    </template>
+  </Modal>
 </template>

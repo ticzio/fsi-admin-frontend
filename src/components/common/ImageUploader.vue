@@ -71,8 +71,14 @@
       </div>
     </div>
 
-    <!-- Cuando está deshabilitado, mostramos solo la vista previa -->
-    <div v-else class="w-100 h-100 d-flex flex-column align-items-center justify-content-center">
+    <!-- Cuando está deshabilitado, mostramos solo la vista previa con las mismas dimensiones -->
+    <div
+      v-else
+      :class="[
+        'w-100 d-flex flex-column align-items-center justify-content-center',
+        { 'image-upload': props.round, 'rectangular-upload': !props.round },
+      ]"
+    >
       <div v-if="imageUrl" class="image-upload-preview w-100 h-100">
         <div v-if="props.round" class="w-100 h-100">
           <img
