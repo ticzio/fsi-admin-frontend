@@ -69,7 +69,7 @@ const handleUpdate = () => {
         <!-- Update Button -->
         <button
           @click="handleUpdate"
-          class="btn btn-success rounded-pill px-5 py-2 fw-bold shadow-sm transition-all"
+          class="btn btn-success rounded-3 px-5 py-2 fw-bold shadow-sm transition-all text-white"
           style="background-color: #28a745; border: none"
         >
           Actualizar Puntos

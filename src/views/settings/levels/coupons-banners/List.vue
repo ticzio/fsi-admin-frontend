@@ -124,7 +124,7 @@ onMounted(() => {
       >
         <FetchButton @fetch="clearFilters" />
         <RedirectButton
-          :tooltip-title="BUTTONS_TOOLTIPS.couponsBanners?.tooltipTitle || 'Nuevo banner de cupón'"
+          :tooltip-title="'Nuevo cupón'"
           @redirect="goToNew"
         />
       </div>

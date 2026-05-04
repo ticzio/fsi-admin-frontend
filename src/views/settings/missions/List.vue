@@ -125,6 +125,7 @@ onMounted(() => {
             placeholder="Nombre o descripción"
             :loading="loading"
             :infoTexts="['Puedes buscar por nombre de la misión', 'O por descripción']"
+            @search="fetchData"
           />
         </div>
 

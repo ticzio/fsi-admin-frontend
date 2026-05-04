@@ -45,7 +45,7 @@ onMounted(() => {
 <template>
   <div class="d-flex flex-column h-100 gap-4 bg-light-subtle p-3">
     <!-- Benefits Section -->
-    <BenefitGrid :benefits="benefits" :loading="loading" />
+    <BenefitGrid :id-level="idLevel" :benefits="benefits" :loading="loading" @refresh="fetchData" />
 
     <!-- Progress Section -->
     <LevelProgress :level="level" @update="handleUpdateLevelPoints" />
