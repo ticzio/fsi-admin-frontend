@@ -25,7 +25,7 @@ export function useCoupons() {
     limit: TABLE_PAGINATION.limit,
   })
 
-  const getDataCoupons = async (page = 1, search = '') => {
+  const getDataCoupons = async (page = 1, search = '', extraParams: any = {}) => {
     coupons.value = []
     loading.value = true
     try {
@@ -34,8 +34,9 @@ export function useCoupons() {
         params: {
           page: page,
           limit: pagination.limit,
-          active: null,
+          active: extraParams.active ?? null,
           query: search || null,
+          ...extraParams,
         },
       })
 

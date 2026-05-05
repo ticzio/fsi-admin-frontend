@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import CustomCardGrid from '@/components/common/CustomCardGrid.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
@@ -20,6 +21,7 @@ interface Item {
 }
 
 const store = useStore()
+const route = useRoute()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
@@ -69,7 +71,7 @@ const handleTablePagination = (page: number) => {
     key: paginationKey,
     currentPage: page,
   })
-  getDataCoupons(page, search.value)
+  getDataCoupons(page, search.value, { id_level: route.params.id_level })
 }
 
 const clearFilters = () => {
@@ -78,7 +80,7 @@ const clearFilters = () => {
 }
 
 const fetchData = () => {
-  getDataCoupons(1, search.value)
+  getDataCoupons(1, search.value, { id_level: route.params.id_level })
 }
 
 const goToNew = () => {
@@ -98,7 +100,7 @@ onMounted(() => {
   const savedPageGetter = store.getters['pagination/getPage']
   const savedPage = savedPageGetter(paginationKey)
   pagination.currentPage = savedPage || 1
-  getDataCoupons(pagination.currentPage, search.value)
+  getDataCoupons(pagination.currentPage, search.value, { id_level: route.params.id_level })
 })
 </script>
 

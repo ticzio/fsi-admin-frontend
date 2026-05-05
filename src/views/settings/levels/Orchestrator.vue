@@ -17,7 +17,7 @@ const route = useRoute()
 const router = useRouter()
 const store = useStore()
 
-const isLoading = ref(false)
+const isLoading = ref(true)
 const levelName = ref('')
 
 const prevTab = ref(0)
@@ -56,7 +56,6 @@ const determineVisibleTabs = async () => {
 }
 
 const getDataLevel = async () => {
-  isLoading.value = true
   try {
     const response: any = await store.dispatch('getData', {
       url: `${URLS.level.prefix}/${route.params.id_level}`,
@@ -67,8 +66,6 @@ const getDataLevel = async () => {
     }
   } catch (error) {
     console.error('Error fetching level details:', error)
-  } finally {
-    isLoading.value = false
   }
 }
 
@@ -107,9 +104,24 @@ watch(
   },
 )
 
+watch(
+  () => route.params.id_level,
+  async (newId) => {
+    if (newId) {
+      isLoading.value = true
+      await getDataLevel()
+      isLoading.value = false
+    }
+  },
+)
+
 onMounted(async () => {
-  await determineVisibleTabs()
-  await getDataLevel()
+  isLoading.value = true
+  try {
+    await Promise.all([determineVisibleTabs(), getDataLevel()])
+  } finally {
+    isLoading.value = false
+  }
 })
 </script>
 
