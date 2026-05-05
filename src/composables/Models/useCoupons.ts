@@ -36,6 +36,7 @@ export function useCoupons() {
           limit: pagination.limit,
           active: extraParams.active ?? null,
           query: search || null,
+          id_level: extraParams.id_level ?? null,
           ...extraParams,
         },
       })
@@ -91,7 +92,7 @@ export function useCoupons() {
         swalToast.showSuccess(
           isEditing ? 'Cupón actualizado correctamente' : 'Cupón creado correctamente',
         )
-        await getDataCoupons(pagination.currentPage)
+        await getDataCoupons(pagination.currentPage, '', { id_level: data.id_level })
         return true
       } else {
         handleErrorResponse(null, 'Recursos no encontrados')
@@ -128,7 +129,7 @@ export function useCoupons() {
       if (response.code === 200 || response.code === 201) {
         logger.logRequest(URLS.coupon.changeStatus, {}, response)
         swalToast.showSuccess('Cupón ' + (isActive ? 'desactivado' : 'activado') + ' exitosamente')
-        await getDataCoupons(pagination.currentPage)
+        await getDataCoupons(pagination.currentPage, '', { id_level: item.id_level })
         return true
       }
       return false
@@ -160,7 +161,7 @@ export function useCoupons() {
       if (response.code == 200 || response.code == 201) {
         logger.logRequest(URLS.coupon.changeStatus, {}, response)
         swalToast.showSuccess('Cupón eliminado exitosamente')
-        await getDataCoupons(pagination.currentPage)
+        await getDataCoupons(pagination.currentPage, '', { id_level: item.id_level })
         return true
       }
       return false
