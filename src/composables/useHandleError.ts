@@ -51,7 +51,7 @@ export function useHandleError() {
       }
 
       if (errData.code === 400) {
-        swalToast.showError('Error en los datos enviados.')
+        swalToast.showError(errData.alert || 'Error en los datos enviados.')
         return
       }
 

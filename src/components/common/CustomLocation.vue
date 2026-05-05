@@ -279,6 +279,15 @@ const inputValue = computed<string>({
       return
     }
 
+    // Validación de longitud máxima
+    if (cleaned.length > 500) {
+      errorMessage.value = 'La URL no puede ser mayor a 500 caracteres'
+      hasValidCoords.value = false
+      lastCoords.value = null
+      emit('coordinates-extracted', null)
+      return
+    }
+
     const coords = extractCoordinates(cleaned)
     if (coords) {
       errorMessage.value = null
@@ -368,6 +377,14 @@ watch(
     if (cleaned.includes('maps.app.goo.gl') || cleaned.includes('goo.gl/maps')) {
       errorMessage.value =
         'URL corta detectada. Abre el enlace y copia la URL completa del navegador.'
+      hasValidCoords.value = false
+      lastCoords.value = null
+      return
+    }
+
+    // Validación de longitud máxima
+    if (cleaned.length > 500) {
+      errorMessage.value = 'La URL no puede ser mayor a 500 caracteres'
       hasValidCoords.value = false
       lastCoords.value = null
       return

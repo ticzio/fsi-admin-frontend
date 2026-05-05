@@ -65,17 +65,17 @@ const onFormSubmit = async (data: BenefitInterface) => {
         No hay beneficios configurados para este nivel.
       </div>
       <div v-else class="d-flex flex-column gap-4">
-        <div v-for="benefit in benefits" :key="benefit.id" class="d-flex align-items-center justify-content-between gap-3">
-          <div class="d-flex align-items-center gap-3">
-            <div class="icon-wrapper d-flex align-items-center justify-content-center rounded-2" style="width: 32px; height: 32px; background-color: transparent;">
+        <div v-for="benefit in benefits" :key="benefit.id" class="d-flex align-items-start justify-content-between gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <div class="icon-wrapper d-flex align-items-start justify-content-center rounded-2" style="width: 32px; height: 32px; background-color: transparent;">
               <i class="bi bi-patch-check-fill text-success fs-4"></i>
             </div>
-            <div class="text-dark" v-html="benefit.body_only_text || benefit.body"></div>
+            <div class="text-dark" v-html="benefit.body"></div>
           </div>
           
           <div class="actions">
             <button 
-              class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center p-0" 
+              class="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-start justify-content-center p-0" 
               style="width: 32px; height: 32px;"
               @click="handleEdit(benefit)"
               title="Editar beneficio"
