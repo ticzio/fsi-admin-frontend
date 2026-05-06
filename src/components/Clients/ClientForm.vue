@@ -40,10 +40,7 @@ const selectedCity = computed({
 const passwordRules = [
   (v: string) => (props.isEdit ? true : !!v || 'La contraseña es obligatoria'),
   (v: string) => !v || hasMinLength(v) || 'Debe tener al menos 8 caracteres',
-  (v: string) => !v || hasUpperCase(v) || 'Debe contener al menos una letra mayúscula (A-Z)',
-  (v: string) => !v || hasLowerCase(v) || 'Debe contener al menos una letra minúscula (a-z)',
   (v: string) => !v || hasNumber(v) || 'Debe contener al menos un número (0-9)',
-  (v: string) => !v || hasSpecialChar(v) || 'Debe contener al menos un carácter especial (!@#$...)',
 ]
 
 const passwordConfirmationRules = [
