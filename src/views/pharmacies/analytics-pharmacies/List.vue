@@ -45,9 +45,8 @@
           @tab-change="handleTabChange"
         />
 
-        <!-- Tab Content Card -->
         <div
-          class="flex-grow-1 bg-white p-4 rounded-4 shadow-sm border overflow-hidden position-relative"
+          class="flex-grow-1 bg-white p-4 rounded-4 shadow-sm border overflow-hidden position-relative d-flex flex-column"
         >
           <transition :name="transitionName" mode="out-in">
             <!-- Content: Chats atendidos -->
@@ -59,8 +58,15 @@
             />
 
             <!-- Content: Top de operadores -->
-            <div v-else-if="currentTab === 'operators'" key="operators" class="h-100">
-              <OperatorsAnalytics v-if="topOperators.length > 0" :operators="topOperators" />
+            <div
+              v-else-if="currentTab === 'operators'"
+              key="operators"
+              class="flex-grow-1 d-flex flex-column"
+            >
+              <OperatorsAnalytics
+                v-if="topOperators.length > 0"
+                :operators="topOperators as any[]"
+              />
               <div
                 v-else
                 class="h-100 d-flex flex-column align-items-center justify-content-center text-muted py-5"
@@ -204,19 +210,16 @@ const chatsOptions = ref<ApexOptions>({
   grid: { borderColor: '#f8f9fa' },
 })
 
-// Mock Data para Top Operadores
+// Mock Data para Top Operadores (campos alineados con el API y la interfaz del componente)
 const topOperators = ref([
-  { name: 'Ana M.', rank: 1, chats: 145, image: 'https://i.pravatar.cc/150?u=ana' },
-  { name: 'Juan P.', rank: 2, chats: 132, image: 'https://i.pravatar.cc/150?u=juan' },
-  { name: 'Maria G.', rank: 3, chats: 118, image: 'https://i.pravatar.cc/150?u=maria' },
-  { name: 'Luis R.', rank: 4, chats: 95, image: 'https://i.pravatar.cc/150?u=luis' },
-  { name: 'Pedro S.', rank: 5, chats: 88, image: 'https://i.pravatar.cc/150?u=pedro' },
-  { name: 'Lucia F.', rank: 6, chats: 75, image: 'https://i.pravatar.cc/150?u=lucia' },
+  { name: 'Ana M.',    position: 1, chats_count: 145, url_image: 'https://i.pravatar.cc/150?u=ana' },
+  { name: 'Juan P.',   position: 2, chats_count: 132, url_image: 'https://i.pravatar.cc/150?u=juan' },
+  { name: 'Maria G.',  position: 3, chats_count: 118, url_image: 'https://i.pravatar.cc/150?u=maria' },
+  { name: 'Luis R.',   position: 4, chats_count: 95,  url_image: 'https://i.pravatar.cc/150?u=luis' },
+  { name: 'Pedro S.',  position: 5, chats_count: 88,  url_image: 'https://i.pravatar.cc/150?u=pedro' },
+  { name: 'Lucia F.',  position: 6, chats_count: 75,  url_image: 'https://i.pravatar.cc/150?u=lucia' },
 ])
 
-// Mock Data para Cupones (Ya no se usa)
-const couponsSeries = ref([])
-const couponsLabels = ref([])
 
 // Datos reactivos para Canjes por Farmacia
 const totalExchanges = ref(0)
