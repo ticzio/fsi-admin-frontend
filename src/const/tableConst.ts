@@ -201,7 +201,7 @@ export const TABLE_HEADERS = {
     ...maybeId('id'),
     { key: 'url_image', label: 'Imagen' },
     { key: 'title', label: 'Titulo' },
-    { key: 'id_creator.full_name', label: 'Nombre del creador' },
+    { key: 'creator.full_name', label: 'Nombre del creador' },
     { key: 'active', label: 'Estatus' },
   ],
   cities: [

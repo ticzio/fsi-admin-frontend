@@ -96,6 +96,9 @@ const items = [
   overflow: hidden;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
   transition: box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 .gc-card:hover {
   box-shadow: 0 6px 28px rgba(18, 62, 147, 0.09);
@@ -135,7 +138,6 @@ const items = [
 /* ── Rows ── */
 .gc-rows {
   padding: 0 24px;
-  max-height: 290px; /* Adjust to roughly 4 items */
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #cbd5e1 transparent;

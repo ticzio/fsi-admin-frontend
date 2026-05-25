@@ -11,14 +11,8 @@ const { getMoment } = useMoment()
 
 // Data extraction with safe navigation
 const operatorName = computed(() => props.exchange?.id_users?.full_name || 'N/A')
-const exchangeDate = computed(() => {
-  const date = props.exchange?.exchanged_at
-  return date ? getMoment(date).format('DD/MM/YYYY') : 'N/A'
-})
-const exchangeTime = computed(() => {
-  const date = props.exchange?.exchanged_at
-  return date ? getMoment(date).format('h:mm a') : 'N/A'
-})
+const exchangeDate = computed(() => props.exchange?.exchanged_at || '-')
+const exchangeTime = computed(() => props.exchange?.created_at || '-')
 const clientName = computed(() => props.exchange?.coupon_client?.client?.full_name || 'N/A')
 const clientDni = computed(() => props.exchange?.coupon_client?.client?.ci || 'N/A')
 const benefit = computed(() => props.exchange?.coupon_client?.coupon?.name || 'N/A')
@@ -111,8 +105,9 @@ const extraData = computed(() => {
                 Canjeado el
               </div>
               <div class="col-sm-8 text-dark fw-bold">
-                {{ exchangeDate }} <span class="text-secondary fw-normal mx-1">|</span>
-                {{ exchangeTime }}
+                <span v-format-date="exchangeDate"></span>
+                <span class="text-secondary fw-normal mx-1">|</span>
+                <span v-format-time="exchangeTime"></span>
               </div>
             </div>
 

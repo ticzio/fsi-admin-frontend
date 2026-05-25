@@ -3,6 +3,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
 import { QuillEditor } from '@vueup/vue-quill'
+import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 interface NewsData {
@@ -11,6 +12,8 @@ interface NewsData {
   url_image?: string
   content: string
   active: boolean
+  created_at?: string | null
+  updated_at?: string | null
 }
 
 const props = defineProps({
@@ -131,7 +134,7 @@ defineExpose({
 
     <div class="row g-4 h-100">
       <!-- Columna Izquierda: Formulario (7 columnas u 6 dependiendo de preferencia) -->
-      <div class="col-12 col-lg-6 d-flex flex-column pe-lg-4 form-section">
+      <div class="col-12 col-lg-6 d-flex flex-column form-section">
         <h6
           class="fw-bold text-primary mb-3 text-uppercase"
           style="font-size: 1rem; letter-spacing: 0.5px"
@@ -139,6 +142,9 @@ defineExpose({
           Configuración de la Noticia
         </h6>
 
+        <div v-if="props.isEditing" class="mb-4">
+          <DateTimeBadges :created-at="props.initialData?.created_at" :updated-at="props.initialData?.updated_at" :hide-icons="true"   />
+        </div>
         <div class="mb-4 d-flex flex-column">
           <label class="form-label fw-bold mb-2 fs-5">Imagen de Portada</label>
           <ImageUploader

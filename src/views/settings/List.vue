@@ -91,7 +91,7 @@ onMounted(() => {
           <!-- ═══════════════════════════════════════════ -->
           <div class="col-12 col-lg-8 d-flex flex-column gap-4">
             <!-- ── Configuración General ── -->
-            <GeneralConfigCard @navigate="handleGeneralNavigate" />
+            <GeneralConfigCard @navigate="handleGeneralNavigate" class="flex-grow-1" />
             <SystemVersionCard :chat-version="chatVersion" />
           </div>
           <!-- /col-lg-8 -->
