@@ -9,15 +9,15 @@
     </div>
     <div class="d-flex flex-column gap-1">
       <div class="d-flex justify-content-between">
-        <span class="text-white-50 small">Frontend Version</span>
+        <span class="text-white-50 small">Frontend Versión</span>
         <span class="text-white fw-bold small">v{{ APP_VERSION }}</span>
       </div>
       <div class="d-flex justify-content-between">
-        <span class="text-white-50 small">Backend Version</span>
+        <span class="text-white-50 small">Backend Versión</span>
         <span class="text-white fw-bold small">v{{ API_VERSION }}</span>
       </div>
       <div class="d-flex justify-content-between">
-        <span class="text-white-50 small">Backend Chat Version</span>
+        <span class="text-white-50 small">Backend Chat Versión</span>
         <span class="text-white fw-bold small">v{{ chatVersion || '...' }}</span>
       </div>
     </div>

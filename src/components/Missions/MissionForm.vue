@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
+import moment from 'moment'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseTextarea from '@/components/common/BaseTextarea.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
@@ -13,6 +14,15 @@ const { updateMissionImage, loading } = useMissions()
 
 const localMission = ref({ ...props.mission })
 const selectedFile = ref<File | null>(null)
+
+const formatDate = (dateTime: string | null | undefined): string => {
+  if (dateTime) {
+    return moment.utc(dateTime, ['YYYY-MM-DD HH:mm:ss', 'YYYY/MM/DD HH:mm:ss']).local().format('DD-MM-YYYY hh:mm a')
+  }
+  return ''
+}
+
+const formattedUpdatedAt = computed(() => formatDate(localMission.value.updated_at))
 
 watch(
   () => props.mission,
@@ -43,17 +53,7 @@ defineExpose({
   handleSubmit,
 })
 
-const formatDate = (dateString: string) => {
-  if (!dateString) return 'N/A'
-  const date = new Date(dateString)
-  return date.toLocaleString('es-ES', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+
 </script>
 
 <template>
@@ -94,7 +94,7 @@ const formatDate = (dateString: string) => {
 
       <div class="col-md-6">
         <BaseInput
-          :modelValue="formatDate(localMission.updated_at)"
+          :modelValue="formattedUpdatedAt"
           id="mission-updated"
           label="Última Actualización"
           disabled

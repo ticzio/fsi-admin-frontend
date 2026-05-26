@@ -86,6 +86,7 @@ onMounted(() => {
         :title="TITLE_SECTION_COMPONENT.banners.title"
         :description="TITLE_SECTION_COMPONENT.banners.description"
         :show-logo="true"
+        :show-back-button="true"
       />
       <!-- Fila de filtros -->
       <div class="row mb-4 align-items-end g-3">

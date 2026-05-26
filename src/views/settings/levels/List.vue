@@ -101,6 +101,7 @@ onMounted(() => {
         :title="TITLE_SECTION_COMPONENT.levels.title"
         :description="TITLE_SECTION_COMPONENT.levels.description"
         :show-logo="true"
+        :show-back-button="true"
       />
       <!-- Fila de filtros -->
       <div class="row mb-4 align-items-end g-3">

@@ -10,8 +10,9 @@ interface TitleSectionProps {
   alert?: string
   isLoading?: boolean
   showLogo?: boolean
+  showBackButton?: boolean
 }
-defineProps<TitleSectionProps>()
+const props = defineProps<TitleSectionProps>()
 
 const route = useRoute()
 const store = useStore()
@@ -19,6 +20,9 @@ const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 
 const showBackButton = computed(() => {
+  if (props.showBackButton === true) {
+    return true
+  }
   const pathSegments = route.path.toLowerCase().split('/')
   return pathSegments.includes('edit') || pathSegments.includes('new')
 })
