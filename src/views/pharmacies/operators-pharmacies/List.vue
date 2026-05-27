@@ -57,7 +57,10 @@ const handleTablePagination = async (page: number) => {
     key: paginationKey,
     currentPage: page,
   })
-  await getDataUsers(page, search.value, { id_pharmacy: route.params.id_pharmacy })
+  await getDataUsers(page, search.value, {
+    id_pharmacy: route.params.id_pharmacy,
+    id_type_rol_user: 3,
+  })
 }
 
 const goToNew = () => {
@@ -70,7 +73,10 @@ const clearFilters = () => {
 }
 
 const fetchData = async () => {
-  await getDataUsers(1, search.value, { id_pharmacy: route.params.id_pharmacy })
+  await getDataUsers(1, search.value, {
+    id_pharmacy: route.params.id_pharmacy,
+    id_type_rol_user: 3,
+  })
 }
 
 onMounted(async () => {
@@ -78,6 +84,7 @@ onMounted(async () => {
   pagination.currentPage = savedPageGetter(paginationKey)
   await getDataUsers(pagination.currentPage, search.value, {
     id_pharmacy: route.params.id_pharmacy,
+    id_type_rol_user: 3,
   })
 })
 </script>
