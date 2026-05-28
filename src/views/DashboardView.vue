@@ -68,7 +68,7 @@ const selectedRange = ref({ id: '6', name: '6 meses' })
 const rangeOptions = [
   { id: '3', name: '3 meses' },
   { id: '6', name: '6 meses' },
-  { id: '', name: '1 año' },
+  { id: '12', name: '1 año' },
 ]
 
 // ── Data loading ──────────────────────────────────────────────────────────────
@@ -219,7 +219,7 @@ const handleViewAllUsers = async () => {
                 <StackedBarChart :series="exchangesChartSeries" :options="exchangesChartOptions" />
               </div>
             </div>
-          </div>
+        </div>  
 
           <!-- Bottom Chart -->
           <div
