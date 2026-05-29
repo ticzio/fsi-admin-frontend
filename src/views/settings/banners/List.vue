@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, reactive } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import CustomTable from '@/components/common/CustomTable.vue'
@@ -32,6 +32,8 @@ const bannerFormRef = ref<any>(null)
 const selectedBanner = ref<any>(null)
 const isEditing = ref(false)
 
+const bannerFormKey = ref(0)
+
 const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
     selectedBanner.value = item
@@ -55,6 +57,7 @@ const handleTablePagination = (page: number) => {
 const goToNew = () => {
   selectedBanner.value = null
   isEditing.value = false
+  bannerFormKey.value++
   modalFormRef.value?.openModal()
 }
 
@@ -158,7 +161,7 @@ onMounted(() => {
       :title="isEditing ? 'Editar Banner' : 'Nuevo Banner'"
       size="xl"
     >
-      <BannerForm ref="bannerFormRef" :initial-data="selectedBanner" @submit="handleFormSubmit" />
+      <BannerForm :key="bannerFormKey" ref="bannerFormRef" :initial-data="selectedBanner" @submit="handleFormSubmit" />
       <template #footer>
         <button
           type="button"

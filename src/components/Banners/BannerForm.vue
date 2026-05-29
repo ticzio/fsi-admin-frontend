@@ -95,6 +95,11 @@ watch(
 
 const isCreationMode = computed(() => !props.initialData || !props.initialData.id)
 
+// Generate a key to force component remount when switching between create/edit modes
+const formKey = computed(() => {
+  return isCreationMode.value ? 'create' : `edit-${props.initialData?.id || 'unknown'}`
+})
+
 const emit = defineEmits(['submit'])
 
 const handleSubmit = () => {
@@ -110,7 +115,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="banner-form-container pb-2 fs-5">
+  <div :key="formKey" class="banner-form-container pb-2 fs-5">
     <div class="row g-4">
       <!-- Columna Izquierda: Imagen -->
       <div class="col-12 col-md-5 d-flex flex-column pe-md-3 border-md-end">
