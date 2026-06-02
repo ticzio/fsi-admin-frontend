@@ -1,6 +1,13 @@
 <template>
   <div ref="chartWrapper" class="chart-responsive-wrapper">
-    <apexchart :type="type" width="100%" height="100%" :series="series" :options="mergedOptions" />
+    <apexchart
+      ref="chartRef"
+      :type="type"
+      width="100%"
+      height="100%"
+      :series="series"
+      :options="mergedOptions"
+    />
   </div>
 </template>
 
@@ -11,6 +18,7 @@ import type { ApexOptions } from 'apexcharts'
 
 const apexchart = VueApexCharts
 const chartWrapper = ref<HTMLElement | null>(null)
+const chartRef = ref<any>(null)
 let observer: MutationObserver | null = null
 
 /**
@@ -24,7 +32,6 @@ const removeSvgTitle = () => {
 
 onMounted(() => {
   removeSvgTitle()
-  // Watch for re-renders that re-add the <title>
   if (chartWrapper.value) {
     observer = new MutationObserver(removeSvgTitle)
     observer.observe(chartWrapper.value, { childList: true, subtree: true })
@@ -33,6 +40,18 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   observer?.disconnect()
+})
+
+const resetZoom = () => {
+  const total = props.series[0]?.data?.length ?? 0
+  if (total > 0) {
+    chartRef.value?.chart?.zoomX(1, total)
+  }
+}
+
+defineExpose({
+  chartRef,
+  resetZoom,
 })
 
 type ChartType =

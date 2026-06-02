@@ -71,7 +71,7 @@ export function useCoupons() {
       formDataToSend.append('active', data.active ? '1' : '0')
 
       if (data.imageFile) {
-        formDataToSend.append('url_img', data.imageFile)
+        formDataToSend.append('url_image', data.imageFile)
       }
 
       let response: any

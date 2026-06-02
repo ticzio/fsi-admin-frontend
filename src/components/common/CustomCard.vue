@@ -12,7 +12,6 @@ const props = defineProps<{
   item: any
   titleKey?: string
   descriptionKey?: string
-  imageKey?: string
   startDateKey?: string
   finishDateKey?: string
   statusKey?: string
@@ -48,11 +47,7 @@ const description = computed(() => {
 })
 
 const imageUrl = computed(() => {
-  return (
-    getNestedValue(props.item, props.imageKey || 'url_img') ||
-    getNestedValue(props.item, 'url_image') ||
-    getNestedValue(props.item, 'image')
-  )
+  return getNestedValue(props.item, 'url_image')
 })
 
 const startDate = computed(() => {
@@ -78,32 +73,8 @@ const status = computed(() => {
   return val
 })
 
-const formatDate = (dateValue: any) => {
-  if (!dateValue || dateValue === '-') return ''
 
-  try {
-    const date = new Date(dateValue)
-    if (isNaN(date.getTime())) {
-      // If it's not a standard date format, try to return as is or handle common cases
-      // For example, if it's already DD/MM/YYYY
-      if (typeof dateValue === 'string' && /^\d{2}\/\d{2}\/\d{4}/.test(dateValue)) {
-        return dateValue.split(' ')[0] // Just the date part
-      }
-      return dateValue
-    }
 
-    return date.toLocaleDateString('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: '2-digit',
-    })
-  } catch (e) {
-    return dateValue
-  }
-}
-
-const formattedStartDate = computed(() => formatDate(startDate.value))
-const formattedFinishDate = computed(() => formatDate(finishDate.value))
 
 const statusLabel = computed(() => {
   if (status.value === 1 || status.value === true) return 'ACTIVO'
@@ -200,7 +171,7 @@ const statusClass = computed(() => {
       <slot name="footer">
         <div class="d-flex justify-content-between align-items-center mt-auto">
           <div class="date-range small text-muted fw-medium">
-            {{ formattedStartDate }} - {{ formattedFinishDate }}
+           <span v-format-date="startDate"></span> - <span v-format-date="finishDate"></span>
           </div>
           <div :class="['status-badge small fw-bold', statusClass]">
             {{ statusLabel }}

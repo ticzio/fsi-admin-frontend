@@ -6,16 +6,24 @@ import ImageUploader from '@/components/common/ImageUploader.vue'
 import { useRoute } from 'vue-router'
 import { useMoment } from '@/composables/useMoment'
 
+interface LevelData {
+  id?: number | string
+  name?: string
+  min_points?: number
+  max_points?: number
+}
+
 interface CouponData {
   id?: number | string
   code: string
   name: string
   description: string
   id_level: number | string
-  url_img?: string
+  url_image?: string
   start_date: string
   finish_date: string
   active: boolean
+  id_levels?: LevelData | null
 }
 
 const props = defineProps({
@@ -40,7 +48,8 @@ const formData = ref<CouponData>({
   start_date: '',
   finish_date: '',
   active: true,
-  url_img: '',
+  url_image: '',
+  id_levels: null,
 })
 
 const imageFile = ref<File | null>(null)
@@ -50,7 +59,7 @@ watch(imageFile, (newFile) => {
   if (newFile) {
     previewImageUrl.value = URL.createObjectURL(newFile)
   } else {
-    previewImageUrl.value = formData.value.url_img || ''
+    previewImageUrl.value = formData.value.url_image || ''
   }
 })
 
@@ -64,10 +73,11 @@ const initForm = () => {
       id_level: props.initialData.id_level || '',
       start_date: formatToSQL(props.initialData.start_date) || '',
       finish_date: formatToSQL(props.initialData.finish_date) || '',
-      active: props.initialData.active !== undefined ? props.initialData.active : true,
-      url_img: props.initialData.url_img || '',
+      active: props.initialData.active !== undefined ? !!props.initialData.active : true,
+      url_image: props.initialData.url_image || '',
+      id_levels: props.initialData.id_levels || null,
     }
-    previewImageUrl.value = formData.value.url_img || ''
+    previewImageUrl.value = formData.value.url_image || ''
   } else {
     formData.value = {
       code: '',
@@ -77,7 +87,8 @@ const initForm = () => {
       start_date: '',
       finish_date: '',
       active: true,
-      url_img: '',
+      url_image: '',
+      id_levels: null,
     }
     imageFile.value = null
     previewImageUrl.value = ''
@@ -101,8 +112,9 @@ const isCreationMode = computed(() => !props.initialData || !props.initialData.i
 const emit = defineEmits(['submit'])
 
 const handleSubmit = () => {
+  const { id_levels, ...couponPayload } = formData.value
   emit('submit', {
-    ...formData.value,
+    ...couponPayload,
     imageFile: imageFile.value,
   })
 }
@@ -124,6 +136,7 @@ defineExpose({
           Visualización
         </h6>
 
+
         <div class="mb-4 d-flex flex-column flex-grow-1">
           <label class="form-label fw-bold mb-2">Imagen del Cupón</label>
           <div
@@ -133,7 +146,7 @@ defineExpose({
             <ImageUploader
               v-model="imageFile"
               :round="false"
-              :initialImageUrl="formData.url_img"
+              :initialImageUrl="formData.url_image"
               class="w-100 h-100"
               placeholder="Sin imagen disponible"
               :inputDisabled="readOnly"
@@ -147,7 +160,7 @@ defineExpose({
         >
           <div>
             <span
-              class="d-block text-muted"
+              class="d-block text-muted" 
               style="
                 font-size: 0.75rem;
                 text-transform: uppercase;
@@ -223,7 +236,7 @@ defineExpose({
           </div>
         </div>
 
-        <div class="mt-1 flex-grow-1 d-flex flex-column">
+        <div class="mt-1 d-flex flex-column">
           <BaseTextarea
             id="couponDesc"
             v-model="formData.description"
@@ -233,6 +246,8 @@ defineExpose({
             :disabled="readOnly"
           />
         </div>
+
+
       </div>
     </div>
   </div>

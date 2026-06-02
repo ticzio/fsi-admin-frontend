@@ -10,14 +10,9 @@ interface Action {
   tooltip?: string
 }
 
-interface EntityItem {
-  id: string | number
-  [key: string]: any
-}
-
 const props = withDefaults(
   defineProps<{
-    data: EntityItem[]
+    data: any[]
     isLoading?: boolean
     currentPage?: number
     totalPages?: number
@@ -30,7 +25,7 @@ const props = withDefaults(
     startDateKey?: string
     finishDateKey?: string
     statusKey?: string
-    actions?: Action[] | ((item: EntityItem) => Action[]) | ((item: EntityItem) => Promise<Action[]>)
+    actions?: Action[] | ((item: any) => Action[]) | ((item: any) => Promise<Action[]>)
   }>(),
   {
     data: () => [],
@@ -44,11 +39,11 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (e: 'change-page', page: number): void
-  (e: 'action-click', payload: { actionName: string; item: EntityItem }): void
-  (e: 'card-click', item: EntityItem): void
+  (e: 'action-click', payload: { actionName: string; item: any; url_image: string | null }): void
+  (e: 'card-click', payload: { item: any; url_image: string | null }): void
 }>()
 
-const getActionsForItem = (item: EntityItem): Action[] => {
+const getActionsForItem = (item: any): Action[] => {
   if (typeof props.actions === 'function') {
     // For now, handling sync functions. Async handled in CustomTable is more complex
     // with local state. If needed, we can replicate that logic here.
@@ -56,6 +51,10 @@ const getActionsForItem = (item: EntityItem): Action[] => {
     return (result instanceof Promise ? [] : result) || []
   }
   return props.actions || []
+}
+
+const getImageUrl = (item: any): string | null => {
+  return item.url_image || null
 }
 
 const { currentPage, totalPages } = toRefs(props)
@@ -134,8 +133,8 @@ const handlePageChange = (page: number) => {
               :finish-date-key="finishDateKey"
               :status-key="statusKey"
               :actions="getActionsForItem(item)"
-              @action-click="(payload) => $emit('action-click', payload)"
-              @card-click="(item) => $emit('card-click', item)"
+              @action-click="(payload) => $emit('action-click', { ...payload, url_image: getImageUrl(item) })"
+              @card-click="(item) => $emit('card-click', { item, url_image: getImageUrl(item) })"
             />
           </slot>
         </div>

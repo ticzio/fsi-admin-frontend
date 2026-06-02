@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
+import LineChart from '@/components/common/Charts/LineChart.vue'
 import { useRouter } from 'vue-router'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import TitleSection from '@/components/common/titleSection.vue'
 import StatisticCards from '@/components/Home/StatisticCards.vue'
-import LineChart from '@/components/common/Charts/LineChart.vue'
 import AreaChart from '@/components/common/Charts/AreaChart.vue'
 import StackedBarChart from '@/components/common/Charts/StackedBarChart.vue'
 import LatestUsers from '@/components/Home/LatestUsers.vue'
@@ -15,6 +15,15 @@ import type { StatisticItem } from '@/components/Home/StatisticCards.vue'
 
 // ── Analytics composable ──────────────────────────────────────────────────────
 const { loading: loadingDashboard, getDashboardAnalytics } = useAnalytics()
+
+// ── Exchanges chart zoom ──────────────────────────────────────────────────────
+const exchangesLineChartRef = ref<InstanceType<typeof LineChart> | null>(null)
+const isExchangesZoomed = ref(false)
+
+const resetExchangesZoom = () => {
+  exchangesLineChartRef.value?.resetZoom()
+  isExchangesZoomed.value = false
+}
 
 // ── Statistic Cards ───────────────────────────────────────────────────────────
 const statisticItems = ref<StatisticItem[]>([
@@ -40,22 +49,117 @@ const tooltipValue = ref<number | string>('')
 // Chart options (static portions)
 import type { ApexOptions } from 'apexcharts'
 const exchangesChartOptions = ref<ApexOptions>({
-  chart: { type: 'area', height: 250, toolbar: { show: false }, parentHeightOffset: 0 },
+  chart: {
+    type: 'area',
+    height: 250,
+    toolbar: {
+      show: true,
+      tools: { zoom: true, zoomin: true, zoomout: true, pan: true, reset: true },
+      autoSelected: 'zoom',
+    },
+    parentHeightOffset: 0,
+    zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
+    events: {
+      dataPointMouseEnter: (_event: any, chartContext: any, config: any) => {
+        document.body.style.cursor = 'pointer'
+      },
+      dataPointMouseLeave: () => {
+        document.body.style.cursor = 'default'
+      },
+      dataPointSelection: (_event: any, chartContext: any, config: any) => {
+        const dataIndex: number = config.dataPointIndex
+        if (dataIndex < 0 || dataIndex === undefined) return
+        const total: number = config.w.globals.series[0]?.length ?? 0
+        if (total === 0) return
+        const min = Math.max(1, dataIndex)
+        const max = Math.min(total, dataIndex + 2)
+        chartContext.zoomX(min, max)
+        isExchangesZoomed.value = true
+      },
+    },
+  },
   colors: ['#1e3888'],
   dataLabels: { enabled: false },
-  stroke: { curve: 'smooth' },
-  xaxis: { categories: [] },
-  tooltip: { x: { format: 'dd/MM/yy HH:mm' } },
-  grid: { padding: { bottom: 0 } },
+  stroke: { curve: 'smooth', width: 3 },
+  fill: {
+    type: 'solid',
+    opacity: 1,
+  },
+  markers: {
+    size: 0,
+    hover: { size: 6 },
+    strokeWidth: 2,
+    colors: ['#1e3888'],
+    strokeColors: ['#ffffff'],
+  },
+  xaxis: {
+    categories: [],
+    tooltip: { enabled: true },
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+    crosshairs: {
+      show: true,
+      width: 1,
+      position: 'back',
+      stroke: { color: '#1e3888', width: 1, dashArray: 4 },
+    },
+  },
+  tooltip: {
+    intersect: false,
+    followCursor: true,
+    x: { format: 'dd/MM/yy HH:mm' },
+    y: { formatter: (val: number) => `${val} canjes` },
+    theme: 'light',
+    style: { fontSize: '13px' },
+    marker: { show: true },
+  },
+  grid: {
+    borderColor: '#e9ecef',
+    strokeDashArray: 4,
+    padding: { bottom: 0 },
+  },
+  states: { hover: { filter: { type: 'lighten' } } },
 })
 
 const registrationsChartOptions = ref<ApexOptions>({
   chart: { type: 'line', height: 250, toolbar: { show: false }, parentHeightOffset: 0 },
   colors: ['#4a148c'],
   dataLabels: { enabled: false },
-  stroke: { curve: 'smooth' },
-  xaxis: { categories: [] },
-  grid: { padding: { bottom: 0 } },
+  stroke: { curve: 'smooth', width: 3 },
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.4,
+      opacityTo: 0.05,
+      stops: [0, 100],
+    },
+  },
+  markers: {
+    size: 0,
+    hover: { size: 6 },
+    strokeWidth: 2,
+    colors: ['#4a148c'],
+    strokeColors: ['#ffffff'],
+  },
+  xaxis: {
+    categories: [],
+    tooltip: { enabled: true },
+    axisBorder: { show: false },
+    axisTicks: { show: false },
+  },
+  tooltip: {
+    x: { format: 'dd/MM/yy HH:mm' },
+    y: { formatter: (val: number) => `${val} clientes` },
+    theme: 'light',
+    style: { fontSize: '13px' },
+  },
+  grid: {
+    borderColor: '#e9ecef',
+    strokeDashArray: 4,
+    padding: { bottom: 0 },
+  },
+  states: { hover: { filter: { type: 'lighten' } } },
 })
 
 // ── Latest users ──────────────────────────────────────────────────────────────
@@ -211,8 +315,9 @@ const handleViewAllUsers = async () => {
             </div>
             <div class="flex-grow-1" style="overflow: hidden">
               <!-- Desktop Chart -->
-              <div class="d-none d-md-block">
-                <LineChart :series="exchangesChartSeries" :options="exchangesChartOptions" />
+              <div class="d-none d-md-block" >
+       <LineChart ref="exchangesLineChartRef" :series="exchangesChartSeries" :options="exchangesChartOptions" />
+         
               </div>
               <!-- Mobile Chart (Stacked Bar) -->
               <div class="d-block d-md-none">

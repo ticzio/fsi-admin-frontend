@@ -13,7 +13,6 @@ import { useStore } from 'vuex'
 import { useTableActions } from '@/composables/useTableActions'
 import { useCoupons } from '@/composables/Models/useCoupons'
 
-import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
 
 interface Item {
   id: string | number
@@ -42,11 +41,13 @@ const couponModalRef = ref<InstanceType<typeof Modal> | null>(null)
 const selectedCoupon = ref<Item | null>(null)
 const isReadOnly = ref(false)
 const couponFormRef = ref<InstanceType<typeof CouponForm> | null>(null)
+const couponFormKey = ref(0)
 
 const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit' || actionName === 'view') {
     selectedCoupon.value = item
     isReadOnly.value = actionName === 'view'
+    couponFormKey.value++
     couponModalRef.value?.openModal()
   } else if (actionName === 'deactivate') {
     await deactivateCoupon(item)
@@ -55,9 +56,10 @@ const handleTableAction = async ({ actionName, item }: { actionName: string; ite
   }
 }
 
-const handleCardClick = (item: any) => {
+const handleCardClick = ({ item }: { item: any }) => {
   selectedCoupon.value = item
   isReadOnly.value = false
+  couponFormKey.value++
   couponModalRef.value?.openModal()
 }
 
@@ -86,6 +88,7 @@ const fetchData = () => {
 const goToNew = () => {
   selectedCoupon.value = null
   isReadOnly.value = false
+  couponFormKey.value++
   couponModalRef.value?.openModal()
 }
 
@@ -164,6 +167,7 @@ onMounted(() => {
       size="xl"
     >
       <CouponForm
+        :key="couponFormKey"
         ref="couponFormRef"
         :initialData="selectedCoupon"
         :readOnly="isReadOnly"
