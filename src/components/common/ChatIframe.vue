@@ -9,10 +9,12 @@
   <div v-else class="text-danger d-flex align-items-center justify-content-center p-4">
     No se pudo cargar la sala de chat. Faltan parámetros de configuración.
   </div>
+  <ImageLightbox :url="lightbox_url" @close="lightbox_url = null" />
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import ImageLightbox from '@/components/common/ImageLightbox.vue'
 
 const props = defineProps<{
   userType: 'operator' | 'client'
@@ -22,6 +24,22 @@ const props = defineProps<{
   codeOperator?: string
   codeClient?: string
 }>()
+
+const lightbox_url = ref<string | null>(null)
+
+const handle_message = (event: MessageEvent) => {
+  if (event.data && event.data.event === 'FSI_CHAT_PREVIEW_IMAGE') {
+    lightbox_url.value = event.data.url
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('message', handle_message)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('message', handle_message)
+})
 
 const iframeUrl = computed(() => {
   const baseUrl = import.meta.env.VITE_CHAT_IFRAME_URL || ''
