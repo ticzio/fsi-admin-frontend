@@ -152,6 +152,29 @@ export function useMissions() {
     }
   }
 
+  const updateMission = async (id: number | string, data: any) => {
+    loading.value = true
+    try {
+      const response: any = await store.dispatch('updateData', {
+        url: URLS.mission.update,
+        id: id,
+        data: data,
+      })
+
+      if (response.code === 200 || response.code === 201) {
+        swalToast.showSuccess('Misión actualizada exitosamente')
+        await getDataMissions(pagination.currentPage)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      handleErrorResponse(error, 'Error al actualizar la misión')
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     missions,
@@ -161,5 +184,6 @@ export function useMissions() {
     deactivateMission,
     deleteMission,
     updateMissionImage,
+    updateMission,
   }
 }
