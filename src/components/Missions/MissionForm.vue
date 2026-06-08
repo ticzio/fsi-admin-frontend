@@ -49,8 +49,11 @@ const handleSubmit = async () => {
     // Luego actualizar los campos según el type
     const dataToUpdate: any = {}
 
+    // Siempre incluir title y description si fueron modificados
+    dataToUpdate.title = localMission.value.title
+    dataToUpdate.description = localMission.value.description
+
     if (localMission.value.type === 'quantity_date') {
-      dataToUpdate.title = localMission.value.title
       dataToUpdate.invoice_quantity = localMission.value.invoice_quantity
       dataToUpdate.start_date = localMission.value.start_date
       dataToUpdate.end_date = localMission.value.end_date
@@ -129,7 +132,6 @@ defineExpose({
             v-model="localMission.description"
             id="mission-description"
             label="Descripción"
-            disabled
             rows="3"
           />
         </div>
@@ -138,7 +140,7 @@ defineExpose({
       <!-- CASO 2: quantity -->
       <template v-else-if="localMission.type === 'quantity'">
         <div class="col-md-6">
-          <BaseInput v-model="localMission.title" id="mission-title" label="Título" disabled />
+          <BaseInput v-model="localMission.title" id="mission-title" label="Título" />
         </div>
 
         <div class="col-md-6">
@@ -155,7 +157,6 @@ defineExpose({
             v-model="localMission.description"
             id="mission-description"
             label="Descripción"
-            disabled
             rows="3"
           />
         </div>
@@ -164,7 +165,7 @@ defineExpose({
       <!-- CASO 3: mount -->
       <template v-else-if="localMission.type === 'mount'">
         <div class="col-md-6">
-          <BaseInput v-model="localMission.title" id="mission-title" label="Título" disabled />
+          <BaseInput v-model="localMission.title" id="mission-title" label="Título" />
         </div>
 
         <div class="col-md-6">
@@ -190,7 +191,7 @@ defineExpose({
       <!-- CASO 4: type vacío o null -->
       <template v-else>
         <div class="col-md-6">
-          <BaseInput v-model="localMission.title" id="mission-title" label="Título" disabled />
+          <BaseInput v-model="localMission.title" id="mission-title" label="Título" />
         </div>
 
         <div class="col-12">
@@ -198,7 +199,6 @@ defineExpose({
             v-model="localMission.description"
             id="mission-description"
             label="Descripción"
-            disabled
             rows="3"
           />
         </div>
