@@ -13,10 +13,10 @@ const props = defineProps<{
   form: any
 }>()
 
-const { cities, loading: loadingCities, getDataCities } = useCities()
+const { cities, loading: loadingCities, getAllCitiesWithoutPagination } = useCities()
 
 onMounted(() => {
-  getDataCities()
+  getAllCitiesWithoutPagination()
 })
 
 const handleCoordinates = (coords: { latitude: string; longitude: string } | null) => {

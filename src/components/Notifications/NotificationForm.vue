@@ -99,6 +99,14 @@ const handleSubmit = async () => {
   setTimeout(() => {
     isSubmitting.value = false
     emit('submit', payload)
+
+    // Limpiar campos del formulario
+    form.value.title = ''
+    form.value.description = ''
+    form.value.message = ''
+    form.value.audience = null
+    selectedDynamicOption.value = null
+    dynamicOptions.value = []
   }, 800)
 }
 

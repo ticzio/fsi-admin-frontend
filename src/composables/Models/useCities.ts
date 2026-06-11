@@ -64,6 +64,34 @@ export function useCities() {
     }
   }
 
+  const getAllCitiesWithoutPagination = async (search = '') => {
+    cities.value = []
+    loading.value = true
+    try {
+      const response: any = await store.dispatch('getData', {
+        url: URLS.city.getAll,
+        params: {
+          order_value: 'asc',
+          order_key: 'name',
+          query: search || null,
+          active: null,
+        },
+      })
+
+      if (response.code === 200) {
+        cities.value = response.data
+      } else {
+        handleErrorResponse(null, 'Recursos no encontrados')
+        cities.value = []
+      }
+    } catch (error: any) {
+      handleErrorResponse(error, 'Recursos no encontrados')
+      cities.value = []
+    } finally {
+      loading.value = false
+    }
+  }
+
   const getCities = async (id_state?: string | number) => {
     // 1. Si ya tenemos las ciudades y no se pide un estado específico, devolverlas
     if (cities.value.length > 0 && !id_state) {
@@ -221,6 +249,7 @@ export function useCities() {
     cities,
     pagination,
     getDataCities,
+    getAllCitiesWithoutPagination,
     getCities,
     saveCity,
     deactivateCity,
