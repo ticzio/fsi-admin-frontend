@@ -414,6 +414,68 @@ export function usePharmacy() {
     }
   }
 
+  /**
+   * Actualiza únicamente las redes sociales de una farmacia.
+   */
+  const savePharmacySocialMedia = async (data: any, id: string | number) => {
+    loading.value = true
+    try {
+      const cityId =
+        data.id_type_city && typeof data.id_type_city === 'object'
+          ? (data.id_type_city as any).id
+          : data.id_type_city
+
+      // Preparamos el payload como objeto JSON
+      // Incluimos los campos obligatorios para asegurar que pase las validaciones del backend,
+      // pero actualizando solo url_instagram y url_whatsapp
+      const payload = {
+        name: data.name,
+        code: data.code,
+        phone: data.phone,
+        id_type_cities: cityId,
+        description: data.description || '',
+        ubication: data.ubication || '',
+        url_google_map: data.url_google_map || '',
+        url_instagram: data.url_instagram || '',
+        url_whatsapp: data.url_whatsapp || '',
+        opening_week: data.opening_week,
+        close_week: data.close_week,
+        opening_saturday: data.opening_saturday,
+        close_saturday: data.close_saturday,
+        opening_sunday: data.opening_sunday,
+        close_sunday: data.close_sunday,
+        lat: data.lat || '',
+        lon: data.lon || '',
+      }
+
+      // Aplicamos la Ley de Doherty: asegurar un tiempo mínimo de carga para feedback visual
+      const minDelay = new Promise((resolve) => setTimeout(resolve, 400))
+
+      const [response]: any = await Promise.all([
+        store.dispatch('updateData', {
+          url: URLS.pharmacy.update,
+          id: id,
+          data: payload,
+        }),
+        minDelay,
+      ])
+
+      if (response.code === 200 || response.code === 201) {
+        swalToast.showSuccess('Redes sociales actualizadas correctamente')
+        await getPharmacy(id, true)
+        return true
+      } else {
+        handleErrorResponse(null, 'Error al guardar las redes sociales')
+        return false
+      }
+    } catch (error: any) {
+      handleErrorResponse(error, 'Error al guardar las redes sociales')
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     pharmacies,
@@ -424,6 +486,7 @@ export function usePharmacy() {
     getPharmacy,
     savePharmacy,
     savePharmacySchedule,
+    savePharmacySocialMedia,
     deactivatePharmacy,
     deletePharmacy,
   }

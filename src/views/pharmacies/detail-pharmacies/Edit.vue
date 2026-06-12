@@ -8,6 +8,16 @@
         <div class="d-flex gap-2">
           <button
             type="button"
+            class="btn btn-outline-primary rounded-3"
+            :disabled="loading"
+            @click="handleOpenSocialMediaModal"
+          >
+            <i class="bi bi-share me-2"></i>
+            <span class="d-none d-md-inline">Agregar Redes Sociales</span>
+            <span class="d-md-none">Redes</span>
+          </button>
+          <button
+            type="button"
             class="btn btn-outline-primary rounded-3 position-relative"
             :disabled="loading"
             @click="handleOpenModal"
@@ -71,6 +81,27 @@
         </button>
       </template>
     </Modal>
+
+    <!-- Modal para gestionar redes sociales -->
+    <Modal id="socialMediaModal" ref="socialMediaModalRef" title="Gestionar Redes Sociales" size="lg">
+      <SocialMediaForm :form="form" />
+      <template #footer>
+        <button type="button" class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-dark rounded-3"
+          :disabled="loading || !isFormValid"
+          @click="handleSaveSocialMedia"
+        >
+          <LoadingSpinner v-if="loading" class="me-2" />
+
+          <i v-else class="bi bi-save me-2"></i>
+          Guardar Redes
+        </button>
+      </template>
+    </Modal>
   </div>
 </template>
 
@@ -81,6 +112,7 @@ import { usePharmacy } from '@/composables/Models/usePharmacy'
 import { BUTTONS } from '@/const/buttonConst'
 import GeneralInfoStep from '@/components/Pharmacies/GeneralInfoStep.vue'
 import ScheduleStep from '@/components/Pharmacies/ScheduleStep.vue'
+import SocialMediaForm from '@/components/Pharmacies/SocialMediaForm.vue'
 import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import Modal from '@/components/common/Modal.vue'
 import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
@@ -91,11 +123,12 @@ const route = useRoute()
 const router = useRouter()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
-const { getPharmacy, savePharmacy, savePharmacySchedule, deletePharmacy, pharmacy, loading } =
+const { getPharmacy, savePharmacy, savePharmacySchedule, savePharmacySocialMedia, deletePharmacy, pharmacy, loading } =
   usePharmacy()
 const { isFormValid } = provideFormValidation()
 
 const modalRef = ref<any>(null)
+const socialMediaModalRef = ref<any>(null)
 
 // Minimal state to satisfy the component props
 const form = reactive({
@@ -165,6 +198,10 @@ const handleOpenModal = () => {
   modalRef.value?.openModal()
 }
 
+const handleOpenSocialMediaModal = () => {
+  socialMediaModalRef.value?.openModal()
+}
+
 const handleSaveSchedule = async () => {
   const success = await savePharmacySchedule(form, route.params.id_pharmacy as string)
   if (success) {
@@ -172,6 +209,16 @@ const handleSaveSchedule = async () => {
       Object.assign(form, pharmacy.value)
     }
     modalRef.value?.closeModal()
+  }
+}
+
+const handleSaveSocialMedia = async () => {
+  const success = await savePharmacySocialMedia(form, route.params.id_pharmacy as string)
+  if (success) {
+    if (pharmacy.value) {
+      Object.assign(form, pharmacy.value)
+    }
+    socialMediaModalRef.value?.closeModal()
   }
 }
 </script>
