@@ -1,9 +1,24 @@
 <script setup lang="ts">
 import BaseInput from '@/components/common/BaseInput.vue'
+import { requiredIfPairFilled, closeMustBeAfterOpen } from '@/utils/funcSchedule'
 
 const props = defineProps<{
   form: any
 }>()
+
+/**
+ * Dispara la validación en un input hermano emitiendo un evento nativo 'blur'.
+ * Se usa setTimeout para asegurar que el DOM ya tenga el valor actualizado.
+ * @param id El ID del input objetivo
+ */
+const triggerValidation = (id: string) => {
+  setTimeout(() => {
+    const el = document.getElementById(id)
+    if (el) {
+      el.dispatchEvent(new Event('blur', { bubbles: true }))
+    }
+  }, 0)
+}
 
 const scheduleSections = [
   {
@@ -66,6 +81,8 @@ const scheduleSections = [
             type="time"
             v-model="form[section.openModel]"
             label="Hora de Apertura"
+            :rules="[requiredIfPairFilled(form[section.closeModel])]"
+            @update:model-value="() => triggerValidation(`close_${section.id}`)"
           />
         </div>
         <div class="col-6 col-md-4">
@@ -74,6 +91,11 @@ const scheduleSections = [
             type="time"
             v-model="form[section.closeModel]"
             label="Hora de Cierre"
+            :rules="[
+              requiredIfPairFilled(form[section.openModel]),
+              closeMustBeAfterOpen(form[section.openModel]),
+            ]"
+            @update:model-value="() => triggerValidation(`opening_${section.id}`)"
           />
         </div>
       </div>
@@ -87,6 +109,10 @@ const scheduleSections = [
   margin-bottom: 1rem;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border-color: #f3f4f6 !important;
+}
+
+.schedule-card.is-valid {
+  border-color: #198754 !important;
 }
 
 .schedule-card:last-child {

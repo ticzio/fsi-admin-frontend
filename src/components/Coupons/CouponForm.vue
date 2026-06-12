@@ -3,7 +3,15 @@ import { ref, watch, onMounted, computed } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseTextarea from '@/components/common/BaseTextarea.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
-import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
+import { useRoute } from 'vue-router'
+import { useMoment } from '@/composables/useMoment'
+
+interface LevelData {
+  id?: number | string
+  name?: string
+  min_points?: number
+  max_points?: number
+}
 
 interface CouponData {
   id?: number | string
@@ -11,10 +19,11 @@ interface CouponData {
   name: string
   description: string
   id_level: number | string
-  url_img?: string
+  url_image?: string
   start_date: string
   finish_date: string
   active: boolean
+  id_levels?: LevelData | null
 }
 
 const props = defineProps({
@@ -28,6 +37,9 @@ const props = defineProps({
   },
 })
 
+const route = useRoute()
+const { formatToSQL } = useMoment()
+
 const formData = ref<CouponData>({
   code: '',
   name: '',
@@ -36,7 +48,8 @@ const formData = ref<CouponData>({
   start_date: '',
   finish_date: '',
   active: true,
-  url_img: '',
+  url_image: '',
+  id_levels: null,
 })
 
 const imageFile = ref<File | null>(null)
@@ -46,7 +59,7 @@ watch(imageFile, (newFile) => {
   if (newFile) {
     previewImageUrl.value = URL.createObjectURL(newFile)
   } else {
-    previewImageUrl.value = formData.value.url_img || ''
+    previewImageUrl.value = formData.value.url_image || ''
   }
 })
 
@@ -58,23 +71,24 @@ const initForm = () => {
       name: props.initialData.name || '',
       description: props.initialData.description || '',
       id_level: props.initialData.id_level || '',
-      start_date: props.initialData.start_date ? props.initialData.start_date.split('T')[0] : '',
-      finish_date: props.initialData.finish_date ? props.initialData.finish_date.split('T')[0] : '',
-      active: props.initialData.active !== undefined ? props.initialData.active : true,
-      url_img: props.initialData.url_img || '',
+      start_date: formatToSQL(props.initialData.start_date) || '',
+      finish_date: formatToSQL(props.initialData.finish_date) || '',
+      active: props.initialData.active !== undefined ? !!props.initialData.active : true,
+      url_image: props.initialData.url_image || '',
+      id_levels: props.initialData.id_levels || null,
     }
-    previewImageUrl.value = formData.value.url_img || ''
+    previewImageUrl.value = formData.value.url_image || ''
   } else {
-    // Reset form
     formData.value = {
       code: '',
       name: '',
       description: '',
-      id_level: '',
+      id_level: route.params.id_level?.toString() || '',
       start_date: '',
       finish_date: '',
       active: true,
-      url_img: '',
+      url_image: '',
+      id_levels: null,
     }
     imageFile.value = null
     previewImageUrl.value = ''
@@ -92,30 +106,22 @@ watch(
   },
 )
 
-// Niveles disponibles para el Multiselect (Ejemplo de opciones)
-const levelOptions = [
-  { id: 1, name: 'Nivel 1' },
-  { id: 2, name: 'Nivel 2' },
-  { id: 3, name: 'Nivel 3' },
-  { id: 4, name: 'Nivel 4' },
-  { id: 5, name: 'Nivel 5' },
-]
-
-// Computed para manejar el valor del Multiselect (que espera un objeto) basado en id_level
-const selectedLevel = computed({
-  get: () => {
-    return formData.value.id_level
-      ? levelOptions.find((lvl) => lvl.id === Number(formData.value.id_level)) || null
-      : null
-  },
-  set: (val: any) => {
-    formData.value.id_level = val ? val.id : ''
-  },
-})
-
 const isCreationMode = computed(() => !props.initialData || !props.initialData.id)
 
 // Helper methods validación en caso de ser no readOnly
+const emit = defineEmits(['submit'])
+
+const handleSubmit = () => {
+  const { id_levels, ...couponPayload } = formData.value
+  emit('submit', {
+    ...couponPayload,
+    imageFile: imageFile.value,
+  })
+}
+
+defineExpose({
+  handleSubmit,
+})
 </script>
 
 <template>
@@ -130,6 +136,7 @@ const isCreationMode = computed(() => !props.initialData || !props.initialData.i
           Visualización
         </h6>
 
+
         <div class="mb-4 d-flex flex-column flex-grow-1">
           <label class="form-label fw-bold mb-2">Imagen del Cupón</label>
           <div
@@ -139,7 +146,7 @@ const isCreationMode = computed(() => !props.initialData || !props.initialData.i
             <ImageUploader
               v-model="imageFile"
               :round="false"
-              :initialImageUrl="formData.url_img"
+              :initialImageUrl="formData.url_image"
               class="w-100 h-100"
               placeholder="Sin imagen disponible"
               :inputDisabled="readOnly"
@@ -153,7 +160,7 @@ const isCreationMode = computed(() => !props.initialData || !props.initialData.i
         >
           <div>
             <span
-              class="d-block text-muted"
+              class="d-block text-muted" 
               style="
                 font-size: 0.75rem;
                 text-transform: uppercase;
@@ -209,21 +216,7 @@ const isCreationMode = computed(() => !props.initialData || !props.initialData.i
         </div>
 
         <div class="row g-3 mb-1">
-          <div class="col-12 col-sm-4">
-            <MultiselectCustom
-              v-model="selectedLevel"
-              :options="levelOptions"
-              label="Nivel Requerido"
-              placeholder="Seleccione un nivel"
-              labelKey="name"
-              iconKey="id"
-              helperType="custom"
-              :showIcons="false"
-              :clearable="true"
-              :disabled="readOnly"
-            />
-          </div>
-          <div class="col-12 col-sm-4">
+          <div class="col-12 col-sm-6">
             <BaseInput
               id="couponStart"
               type="date"
@@ -232,7 +225,7 @@ const isCreationMode = computed(() => !props.initialData || !props.initialData.i
               :disabled="readOnly"
             />
           </div>
-          <div class="col-12 col-sm-4">
+          <div class="col-12 col-sm-6">
             <BaseInput
               id="couponFinish"
               type="date"
@@ -243,7 +236,7 @@ const isCreationMode = computed(() => !props.initialData || !props.initialData.i
           </div>
         </div>
 
-        <div class="mt-1 flex-grow-1 d-flex flex-column">
+        <div class="mt-1 d-flex flex-column">
           <BaseTextarea
             id="couponDesc"
             v-model="formData.description"
@@ -253,6 +246,8 @@ const isCreationMode = computed(() => !props.initialData || !props.initialData.i
             :disabled="readOnly"
           />
         </div>
+
+
       </div>
     </div>
   </div>

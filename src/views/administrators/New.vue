@@ -1,22 +1,29 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSwalToast } from '@/composables/useSwalToast'
+import { useUsers } from '@/composables/Models/useUsers'
 
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import AdministratorForm from '@/components/Administrators/AdministratorForm.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
+import { BUTTONS } from '@/const/buttonConst'
+import { provideFormValidation } from '@/composables/useFormValidation'
 
 const router = useRouter()
 const swalToast = useSwalToast()
+const { loading, roles, getRoles, saveUser } = useUsers()
+const { isFormValid } = provideFormValidation()
 
-const loading = ref(false)
+onMounted(async () => {
+  await getRoles()
+})
 
-const roleOptions = ref([
-  { id: 1, name: 'Administrador' },
-  { id: 2, name: 'Moderador' },
-])
+const filteredRoles = computed(() => {
+  return roles.value.filter((role: any) => role.id !== 3)
+})
 
 const form = reactive({
   url_image: null as File | null,
@@ -24,38 +31,15 @@ const form = reactive({
   last_name: '',
   email: '',
   phone: '',
-  role_id: null as any,
+  id_type_rol_user: null as any,
   password: '',
   password_confirmation: '',
 })
 
 const saveAdministrator = async () => {
-  if (!form.first_name || !form.last_name || !form.email || !form.role_id) {
-    swalToast.showError('Por favor, completa los campos obligatorios.')
-    return
-  }
-
-  if (form.password && form.password !== form.password_confirmation) {
-    swalToast.showError('Las contraseñas no coinciden.')
-    return
-  }
-
-  if (!form.password) {
-    swalToast.showError('La contraseña es obligatoria para nuevos administradores.')
-    return
-  }
-
-  loading.value = true
-  try {
-    console.log('Guardando administrador:', form)
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    swalToast.showSuccess('Administrador creado exitosamente')
+  const success = await saveUser(form as any, false)
+  if (success) {
     router.push('/administrators')
-  } catch (error) {
-    console.error('Error al guardar:', error)
-    swalToast.showError('Ocurrió un error al intentar guardar el administrador.')
-  } finally {
-    loading.value = false
   }
 }
 </script>
@@ -69,19 +53,11 @@ const saveAdministrator = async () => {
           :description="TITLE_SECTION_COMPONENT.administrators.newDescription"
           :show-logo="true"
         />
-
-        <button
-          @click="router.back()"
-          class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-2 rounded-pill px-3"
-        >
-          <i class="bi bi-arrow-left"></i>
-          Volver
-        </button>
       </div>
 
       <div class="flex-grow-1">
-        <form id="adminForm" @submit.prevent="saveAdministrator">
-          <AdministratorForm :form="form" :roleOptions="roleOptions" :is-edit="false" />
+        <form id="adminForm">
+          <AdministratorForm :form="form" :roleOptions="filteredRoles" :is-edit="false" />
         </form>
       </div>
 
@@ -90,26 +66,13 @@ const saveAdministrator = async () => {
         <div class="d-flex justify-content-end gap-2">
           <button
             type="button"
-            class="btn btn-sm btn-light px-4 fw-medium rounded-pill"
-            @click="router.push('/administrators')"
-            :disabled="loading"
+            @click="saveAdministrator"
+            :class="BUTTONS.save.class"
+            :disabled="loading || !isFormValid"
           >
-            Cancelar
-          </button>
-          <button
-            type="submit"
-            form="adminForm"
-            class="btn btn-sm btn-primary px-4 fw-medium d-flex align-items-center gap-2 rounded-pill shadow-sm"
-            :disabled="loading"
-          >
-            <span
-              v-if="loading"
-              class="spinner-border spinner-border-sm"
-              role="status"
-              aria-hidden="true"
-            ></span>
-            <i v-else class="bi bi-person-plus-fill"></i>
-            Crear Administrador
+            <LoadingSpinner v-if="loading" />
+            <i v-else :class="BUTTONS.save.icon"></i>
+            {{ BUTTONS.save.title }}
           </button>
         </div>
       </div>
@@ -117,10 +80,4 @@ const saveAdministrator = async () => {
   </DashboardLayout>
 </template>
 
-<style scoped>
-.sticky-bottom {
-  position: sticky;
-  bottom: 0.5rem;
-  z-index: 10;
-}
-</style>
+<style scoped></style>

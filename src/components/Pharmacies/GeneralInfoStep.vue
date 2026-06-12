@@ -1,14 +1,23 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseTextarea from '@/components/common/BaseTextarea.vue'
 import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import CustomLocation from '@/components/common/CustomLocation.vue'
+import { useCities } from '@/composables/Models/useCities'
+import { ICONS_MULTISELECT } from '@/const/multiselectConst'
+import { isValidPhone } from '@/utils/funcPhones'
 
 const props = defineProps<{
   form: any
-  cityOptions: any[]
 }>()
+
+const { cities, loading: loadingCities, getAllCitiesWithoutPagination } = useCities()
+
+onMounted(() => {
+  getAllCitiesWithoutPagination()
+})
 
 const handleCoordinates = (coords: { latitude: string; longitude: string } | null) => {
   if (coords) {
@@ -32,6 +41,7 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
           :round="false"
           placeholder="Haz click o arrastra una imagen"
           accepted-formats="image/png, image/jpeg, image/jpg"
+          :rules="[(v) => !!v || 'La imagen es obligatoria']"
         />
       </div>
 
@@ -42,8 +52,8 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
             <BaseInput
               id="name"
               v-model="form.name"
-              label="Nombre de la Farmacia *"
-              placeholder="Ej. Farmatodo Los Leones"
+              label="Nombre de la Farmacia"
+              placeholder="Ej. Farmacia San Rafael"
               :rules="[(v) => !!v || 'El nombre es obligatorio']"
             />
           </div>
@@ -53,20 +63,26 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
               v-model="form.phone"
               label="Teléfono Principal"
               placeholder="Ej. 04141234567"
+              :rules="[
+                (v) => !!v || 'El teléfono es obligatorio',
+                (v) => !v || isValidPhone(v) || 'El formato del teléfono es inválido',
+              ]"
             />
           </div>
           <div class="col-12 col-md-4">
             <MultiselectCustom
               v-model="form.id_type_city"
-              :options="cityOptions"
+              :options="cities"
+              :loading="loadingCities"
               label="Ciudad"
-              placeholder="Selecciona la ciudad de operación"
+              placeholder="Selecciona la ciudad"
               labelKey="name"
               trackBy="id"
               :showIcons="true"
               helperType="custom"
-              customDefaultIcon="bi bi-building"
+              :custom-default-icon="ICONS_MULTISELECT.city"
               :clearable="true"
+              :rules="[(v) => !!v || 'La ciudad es obligatoria']"
             />
           </div>
           <div class="col-12 col-md-6 mb-0">
@@ -77,6 +93,7 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
               rows="3"
               resize="none"
               placeholder="Breve descripción de los servicios u orientaciones principales de la farmacia..."
+              :rules="[(v) => !!v || 'La descripción es obligatoria']"
             />
           </div>
           <div class="col-12 col-md-6 mb-0">
@@ -87,6 +104,7 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
               rows="3"
               resize="none"
               placeholder="Ej. Av. Los Leones, cruce con calle 1, Edificio Plaza, Local 3."
+              :rules="[(v) => !!v || 'La dirección es obligatoria']"
             />
           </div>
           <div class="col-12 mt-0">
@@ -94,6 +112,7 @@ const handleCoordinates = (coords: { latitude: string; longitude: string } | nul
               v-model="form.url_google_map"
               label="Enlace de Google Maps"
               placeholder="Pega el link corto o largo de la ubicación"
+              :rules="[(v) => !!v || 'El enlace de Google Maps es obligatorio']"
               @coordinates-extracted="handleCoordinates"
             />
           </div>

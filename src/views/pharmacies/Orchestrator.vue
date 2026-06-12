@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, watch, computed, onMounted, onBeforeUnmount, provide } from 'vue'
 import DashboardLayout from '@/components/DashboardLayout.vue'
 import titleSection from '@/components/common/titleSection.vue'
 import ScrollableTabs from '@/components/common/ScrollableTabs.vue'
@@ -10,6 +10,7 @@ import { useStore } from 'vuex'
 import { useLogger } from '@/composables/useLogger'
 import { useCookies } from '@/composables/useCookies'
 import { decodeRole } from '@/composables/useAccessControl'
+import { usePharmacy } from '@/composables/Models/usePharmacy'
 
 import { TITLE_SECTION_COMPONENT } from '@/const/tableConst'
 import { URLS } from '@/const/api'
@@ -19,7 +20,6 @@ const router = useRouter()
 const store = useStore()
 const logger = useLogger()
 
-const isLoading = ref(false)
 const localTitle = ref('Titulo por defecto')
 
 const title = computed(() => localTitle.value || store.getters['utils/isItem'] || '')
@@ -131,34 +131,32 @@ const clearLoadingTimeout = () => {
   }
 }
 
-// Cargar datos de la farmacia directamente si es necesario (ej: recarga de página)
-/*
+// Cargar datos de la farmacia usando el composable
+const { getPharmacy, pharmacy, loading: isLoading } = usePharmacy()
+
+// Proveer la farmacia a los componentes hijos (sub-vistas)
+provide('pharmacyData', pharmacy)
+
 const loadPharmacyData = async () => {
-  try {
-    const response = await store.dispatch('getData', {
-      url: `${URLS.pharmacy?.prefix || 'pharmacy'}/${route.params.id_pharmacy}`,
-    })
-    if (response.code === 200) {
-      const data = response.data
-      logger.logRequest(
-        (URLS.pharmacy?.prefix || 'pharmacy') + '/' + route.params.id_pharmacy,
-        {},
-        data,
-      )
-      localTitle.value = data.name || data.trade_name || ''
-      store.dispatch('utils/setIsItem', localTitle.value)
-    }
-  } catch (error) {
-    logger.logRequest(
-      (URLS.pharmacy?.prefix || 'pharmacy') + '/' + route.params.id_pharmacy,
-      {},
-      error,
-    )
-  } finally {
-    isLoading.value = false
+  const data = await getPharmacy(route.params.id_pharmacy as string)
+  if (data) {
+    localTitle.value = data.name || data.trade_name || ''
+    store.dispatch('utils/setIsItem', localTitle.value)
+  } else {
+    router.replace('/pharmacy')
   }
 }
-*/
+
+watch(
+  () => pharmacy.value,
+  (newData) => {
+    if (newData) {
+      localTitle.value = newData.name || newData.trade_name || ''
+      store.dispatch('utils/setIsItem', localTitle.value)
+    }
+  },
+  { deep: true },
+)
 
 watch(
   () => activeTab.value,
@@ -186,7 +184,7 @@ onMounted(async () => {
     startLoadingTimeout()
   } else {
     // Si no está cargando, cargamos los datos inmediatamente
-    //loadPharmacyData()
+    loadPharmacyData()
   }
 })
 

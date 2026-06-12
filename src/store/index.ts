@@ -47,10 +47,12 @@ const store = createStore({
      *   // Retorna una promesa con los datos
      */
     getData({ commit }: { commit: Function }, form: { url: string; params?: Record<string, any> }) {
+      const isAbsolute = form.url.startsWith('http')
+      const finalUrl = isAbsolute ? form.url : '/' + form.url
       return new Promise((resolve, reject) => {
         apiClient
-          .get('/' + form.url, {
-            params: { active: 1, ...(form.params || {}) },
+          .get(finalUrl, {
+            params: { active: 1, order_value: 'desc', ...(form.params || {}) },
           })
           .then((response) => resolve(response.data))
           .catch((error) => reject(error?.response?.data || error))
@@ -125,10 +127,13 @@ const store = createStore({
           .then((response) => {
             if (response.data.code === 200) {
               const userData = response.data.data
-              setCookie('fsi_admin_token', userData.token)
+              setCookie('fsi_admin_token', userData.auth.token)
               setCookie('fsi_admin_full_name', userData.full_name)
+              setCookie('fsi_admin_id_user', userData.id)
+              setCookie('fsi_admin_code_user', userData.code)
               const id_role_hashing = btoa(userData.id_type_rol_user.toString())
               setCookie('fsi_admin_id_role', id_role_hashing)
+
               //setCookie('fsi_admin_id_admin', userData.id_admin)
               if (userData.url_image) {
                 setCookie('fsi_admin_url_image', userData.url_image)
@@ -137,7 +142,7 @@ const store = createStore({
               resetAuthRole()
               resolve(response.data)
             } else {
-              reject(new Error(response.data.message || 'Error al iniciar sesión'))
+              reject(response.data)
             }
           })
           .catch((error) => {
@@ -155,6 +160,8 @@ const store = createStore({
       removeCookie('fsi_admin_id_role')
       removeCookie('fsi_admin_id_admin')
       removeCookie('fsi_admin_url_image')
+      removeCookie('fsi_admin_code_user')
+      removeCookie('fsi_admin_id_user')
 
       resetAuthRole()
 

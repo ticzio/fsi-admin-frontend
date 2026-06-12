@@ -6,80 +6,68 @@ import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
+import StatusBadge from '@/components/common/StatusBadge.vue'
 import Modal from '@/components/common/Modal.vue'
 import NewsForm from '@/components/News/NewsForm.vue'
+import AppImage from '@/components/common/AppImage.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { useSwalToast } from '@/composables/useSwalToast'
 import { useTableActions } from '@/composables/useTableActions'
+import { useNewsModel } from '@/composables/Models/useNewsModel'
 
-import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
+import { TITLE_SECTION_COMPONENT, TABLE_HEADERS } from '@/const/tableConst'
 import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
 
-interface Item {
-  id: string | number
-  [key: string]: any
-}
-
 const router = useRouter()
-const swalToast = useSwalToast()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
 
-const loading = ref(false)
-const items = ref<Item[]>([
-  {
-    id: 1,
-    url_image: '',
-    title: 'Noticia de ejemplo 1',
-    body_only_text: 'Descripción breve de la noticia',
-    'creator.full_name': 'Admin Principal',
-    active: true,
-  },
-  {
-    id: 2,
-    url_image: '',
-    title: 'Noticia de ejemplo 2',
-    body_only_text: 'Descripción breve de la segunda noticia',
-    'creator.full_name': 'Admin Principal',
-    active: false,
-  },
-])
-const search = ref('')
+const {
+  loading,
+  news,
+  pagination,
+  paginationKey,
+  getDataNews,
+  saveNews,
+  deactivateNews,
+  deleteNews,
+} = useNewsModel()
 
-const paginationKey = 'news-list'
-const pagination = reactive({
-  currentPage: TABLE_PAGINATION.currentPage,
-  totalPages: TABLE_PAGINATION.totalPages,
-  limit: TABLE_PAGINATION.limit,
-})
+const search = ref('')
 
 // === Modal & Form Logic ===
 const formModal = ref<InstanceType<typeof Modal> | null>(null)
 const isEditingForm = ref(false)
 const formData = ref<any>(null)
+const newsFormRef = ref<InstanceType<typeof NewsForm> | null>(null)
+const formKey = ref(0)
 
 const openModal = (isEdit = false, data = null) => {
   isEditingForm.value = isEdit
   formData.value = data
+  formKey.value++
   formModal.value?.openModal()
 }
 
-const handleFormSubmit = (data: any) => {
-  console.log('Form data to submit:', data)
-  // TODO: Agregar lógica real para POST/PUT cuando esté disponible
-  swalToast.showSuccess(
-    isEditingForm.value ? 'Noticia actualizada correctamente' : 'Noticia creada correctamente',
-  )
-  formModal.value?.closeModal()
+const handleFormSubmit = async (data: any) => {
+  const success = await saveNews(data, isEditingForm.value, formData.value?.id)
+  if (success) {
+    formModal.value?.closeModal()
+  }
 }
 
 const handleTableAction = ({ actionName, item }: { actionName: string; item: any }) => {
   if (actionName === 'edit') {
     openModal(true, item)
+  }
+  if (actionName === 'delete') {
+    deleteNews(item)
+  }
+  if (actionName === 'deactivate') {
+    deactivateNews(item)
   }
 }
 
@@ -93,20 +81,27 @@ const handleTablePagination = (page: number) => {
     key: paginationKey,
     currentPage: page,
   })
+  getDataNews(page, search.value)
 }
 
 const goToNew = () => {
   openModal(false, null)
 }
 
-const fetchData = () => {
-  // TODO: Lógica para hacer la petición GET
+const clearFilters = () => {
   search.value = ''
+  fetchData()
+}
+
+const fetchData = () => {
+  getDataNews(1, search.value)
 }
 
 onMounted(() => {
   const savedPageGetter = store.getters['pagination/getPage']
-  pagination.currentPage = savedPageGetter(paginationKey)
+  const savedPage = savedPageGetter(paginationKey)
+  pagination.currentPage = savedPage || 1
+  getDataNews(pagination.currentPage, search.value)
 })
 </script>
 
@@ -128,13 +123,15 @@ onMounted(() => {
             placeholder="Título de la noticia"
             :loading="loading"
             :infoTexts="['Puedes buscar por título', 'O por descripción de la noticia']"
+            @search="fetchData"
+            only-on-enter
           />
         </div>
 
         <div
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
-          <FetchButton @fetch="fetchData" />
+          <FetchButton @fetch="clearFilters" />
           <RedirectButton :tooltip-title="BUTTONS_TOOLTIPS.news.tooltipTitle" @redirect="goToNew" />
         </div>
       </div>
@@ -146,7 +143,7 @@ onMounted(() => {
         }"
       >
         <CustomTable
-          :data="items"
+          :data="news"
           :headers="TABLE_HEADERS.news"
           :actions="getTableActions"
           :is-loading="loading"
@@ -156,7 +153,14 @@ onMounted(() => {
           :change-page="handleTablePagination"
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
-        />
+        >
+          <template #cell(url_image)="{ value }">
+            <AppImage :src="value" type="entity" />
+          </template>
+          <template #cell(active)="{ value }">
+            <StatusBadge :value="value" />
+          </template>
+        </CustomTable>
       </div>
 
       <!-- Componente Modal para el Formulario de Noticia -->
@@ -169,11 +173,32 @@ onMounted(() => {
       >
         <NewsForm
           v-if="formModal"
+          :key="formKey"
+          ref="newsFormRef"
           :is-editing="isEditingForm"
           :initial-data="formData"
           @submit="handleFormSubmit"
           @cancel="formModal?.closeModal()"
         />
+        <template #footer>
+          <div class="d-flex justify-content-end gap-3 w-100">
+            <button
+              type="button"
+              class="btn btn-outline-secondary px-4 rounded-3 shadow-sm fw-medium fs-5"
+              @click="formModal?.closeModal()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary px-4 rounded-3 text-white fw-bold shadow-sm d-flex align-items-center fs-5"
+              @click="newsFormRef?.handleSubmit()"
+            >
+              <i class="bi bi-save me-2"></i>
+              {{ isEditingForm ? 'Guardar Cambios' : 'Crear Noticia' }}
+            </button>
+          </div>
+        </template>
       </Modal>
     </div>
   </DashboardLayout>

@@ -7,12 +7,12 @@ import { RouterLink, RouterView } from 'vue-router'
 </template>
 
 <style lang="scss" is:global>
-$primary: #103560;
+$primary: #044692;
 $secondary: #527387;
-$info: #84b0c0;
+$info: #006be8;
 $dark: #2c363e;
-$success: #16855f;
-$danger: #b25672;
+$success: #00b100;
+$danger: #ce000c;
 $warning: #ffba43;
 $light: #d6dde6;
 
@@ -38,8 +38,7 @@ $input-border-width: 2px;
   ),
 
   // AQUÍ fuerzas cómo se generan los *-bg-subtle
-  $theme-colors-bg-subtle:
-    (
+  $theme-colors-bg-subtle: (
       'primary': rgba($primary, 0.7),
       'secondary': rgba($secondary, 0.7),
       'info': rgba($info, 0.7),
@@ -51,8 +50,39 @@ $input-border-width: 2px;
     )
 );
 
-html {
+:root {
+  --app-zoom: 1;
+  --app-vh: 100vh;
+}
+
+@media screen and (min-width: 1025px) {
+  :root {
+    --app-zoom: 0.75;
+    --app-vh: calc(100vh / 0.75);
+  }
+}
+
+html, body {
   overflow: hidden;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* El zoom se aplica al contenedor de Vue, NO al html/body.
+   Así Bootstrap puede posicionar modales (fixed) correctamente. */
+#app {
+  zoom: var(--app-zoom);
+}
+
+/* Compensa el zoom dinámico para que los utilitarios de bootstrap ocupen toda la pantalla */
+.min-vh-100 {
+  min-height: var(--app-vh) !important;
+}
+
+.vh-100 {
+  height: var(--app-vh) !important;
 }
 
 body {
@@ -67,7 +97,7 @@ body {
 [data-title]:after {
   content: attr(data-title);
   /* Glass efecto tomado del nav-link.active del sidebar */
-  background: rgba(15, 32, 92, 0.55);
+  background: rgba(4, 70, 146, 0.55);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(3px);
   white-space: nowrap;
@@ -80,11 +110,14 @@ body {
   padding: 5px 20px;
   border: 1px solid rgba(251, 253, 255, 0.7);
   opacity: 0;
-  z-index: 99999;
+  z-index: 1040;
   visibility: hidden;
   border-radius: var(--bs-border-radius-xl);
-  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(151, 187, 255, 0.55),
-    inset 0 -1px 0 rgba(5, 18, 64, 0.6), inset 0 0 18px 11px rgba(48, 92, 210, 0.35);
+  box-shadow:
+    0 8px 40px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(151, 187, 255, 0.55),
+    inset 0 -1px 0 rgba(5, 18, 64, 0.6),
+    inset 0 0 18px 11px rgba(48, 92, 210, 0.35);
 
   // Default: show above
   top: -30px;
@@ -136,7 +169,9 @@ body {
 /* Izquierda a derecha */
 .slide-left-enter-active,
 .slide-left-leave-active {
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 .slide-left-enter-from {
   opacity: 0;
@@ -150,7 +185,9 @@ body {
 /* Derecha a izquierda */
 .slide-right-enter-active,
 .slide-right-leave-active {
-  transition: opacity 0.2s, transform 0.2s;
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
 }
 .slide-right-enter-from {
   opacity: 0;
@@ -190,5 +227,29 @@ body {
 .border-radius-left {
   border-top-left-radius: 10px;
   border-bottom-left-radius: 10px;
+}
+
+//Para los botones de accion
+.sticky-bottom {
+  position: sticky;
+  bottom: 0.5rem;
+  z-index: 10;
+}
+
+// Ocultar tooltips cuando hay un modal abierto
+body.modal-open [data-title]:after {
+  display: none !important;
+}
+
+.modal-backdrop {
+  zoom: 1 !important;
+}
+
+.modal {
+  zoom: 1 !important;
+}
+
+.modal-dialog {
+  zoom: var(--app-zoom);
 }
 </style>

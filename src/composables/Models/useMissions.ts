@@ -1,0 +1,189 @@
+import { ref, reactive } from 'vue'
+import { useStore } from 'vuex'
+import { useSwalToast } from '@/composables/useSwalToast'
+import { useSwal } from '@/composables/useSwal'
+import { useHandleError } from '@/composables/useHandleError'
+import { useLogger } from '@/composables/useLogger'
+import { URLS } from '@/const/api'
+import { ERROR } from '@/const/errorConst'
+import { TABLE_PAGINATION } from '@/const/tableConst'
+
+export function useMissions() {
+  const store = useStore()
+  const swalToast = useSwalToast()
+  const swal = useSwal()
+  const { handleErrorResponse } = useHandleError()
+  const logger = useLogger()
+
+  const loading = ref(false)
+  const missions = ref<any[]>([])
+
+  const paginationKey = 'missions-list'
+  const pagination = reactive({
+    currentPage: TABLE_PAGINATION.currentPage,
+    totalPages: TABLE_PAGINATION.totalPages,
+    limit: TABLE_PAGINATION.limit,
+  })
+
+  const getDataMissions = async (page = 1, search = '') => {
+    missions.value = []
+    loading.value = true
+    try {
+      const response: any = await store.dispatch('getData', {
+        url: URLS.mission.getAll,
+        params: {
+          page: page,
+          limit: pagination.limit,
+          active: null,
+          query: search || null,
+        },
+      })
+
+      if (response.code === 200) {
+        missions.value = response.data
+        pagination.totalPages = response.meta.last_page
+        pagination.currentPage = response.meta.current_page
+      } else {
+        handleErrorResponse(null, 'Recursos no encontrados')
+        missions.value = []
+        pagination.totalPages = 1
+      }
+    } catch (error: any) {
+      handleErrorResponse(error, 'Recursos no encontrados')
+      missions.value = []
+      pagination.totalPages = 1
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const deactivateMission = async (item: any) => {
+    const isActive = Boolean(item?.active)
+
+    const result = await swal.showConfirm(
+      `¿Estás seguro ${isActive ? 'desactivar' : 'activar'} misión?`,
+      `Esta acción ${isActive ? 'desactivará' : 'activará'} ${item.name}.`,
+      {
+        confirmButtonText: `${isActive ? 'Desactivar' : 'Activar'}`,
+        cancelButtonText: 'Cancelar',
+      },
+    )
+
+    if (!result) return false
+
+    try {
+      const response = await store.dispatch('changeStatus', {
+        url: URLS.mission.changeStatus,
+        id: item.id,
+        status: !isActive ? 1 : 0,
+      })
+      if (response.code === 200 || response.code === 201) {
+        logger.logRequest(URLS.mission.changeStatus, {}, response)
+        swalToast.showSuccess('Misión ' + (isActive ? 'desactivada' : 'activada') + ' exitosamente')
+        await getDataMissions(pagination.currentPage)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      logger.logRequest(URLS.mission.changeStatus, {}, error)
+      handleErrorResponse(
+        error,
+        `${isActive ? ERROR.errorDeactive : ERROR.errorActive} ${item.name}`,
+      )
+      return false
+    }
+  }
+
+  const deleteMission = async (item: any) => {
+    const result = await swal.showConfirm(
+      `¿Estás seguro de eliminar la misión ${item.name}?`,
+      `Esta acción eliminará la misión ${item.name}.`,
+      {
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar',
+      },
+    )
+
+    if (!result) return false
+
+    try {
+      const response = await store.dispatch('changeStatus', {
+        url: URLS.mission.changeStatus,
+        id: item.id,
+        status: 2,
+      })
+      if (response.code == 200 || response.code == 201) {
+        logger.logRequest(URLS.mission.changeStatus, {}, response)
+        swalToast.showSuccess('Misión eliminada exitosamente')
+        await getDataMissions(pagination.currentPage)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      logger.logRequest(URLS.mission.changeStatus, {}, error)
+      handleErrorResponse(error, `${ERROR.errorDelete} ${item.name}`)
+      return false
+    }
+  }
+
+  const updateMissionImage = async (id: number | string, imageFile: File) => {
+    loading.value = true
+    try {
+      const formData = new FormData()
+      formData.append('url_image', imageFile)
+
+      const response: any = await store.dispatch('updateData', {
+        url: URLS.mission.update,
+        id: id,
+        data: formData,
+      })
+
+      if (response.code === 200 || response.code === 201) {
+        swalToast.showSuccess('Imagen de misión actualizada exitosamente')
+        await getDataMissions(pagination.currentPage)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      handleErrorResponse(error, 'Error al actualizar la imagen de la misión')
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const updateMission = async (id: number | string, data: any) => {
+    loading.value = true
+    try {
+      const response: any = await store.dispatch('updateData', {
+        url: URLS.mission.update,
+        id: id,
+        data: data,
+      })
+
+      if (response.code === 200 || response.code === 201) {
+        swalToast.showSuccess('Misión actualizada exitosamente')
+        await getDataMissions(pagination.currentPage)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      handleErrorResponse(error, 'Error al actualizar la misión')
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    loading,
+    missions,
+    pagination,
+    paginationKey,
+    getDataMissions,
+    deactivateMission,
+    deleteMission,
+    updateMissionImage,
+    updateMission,
+  }
+}

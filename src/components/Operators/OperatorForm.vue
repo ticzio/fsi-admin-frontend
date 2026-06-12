@@ -1,12 +1,32 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
-import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
+import {
+  hasMinLength,
+  hasUpperCase,
+  hasLowerCase,
+  hasNumber,
+  hasSpecialChar,
+} from '@/utils/funcPassword'
+import { isValidPhone } from '@/utils/funcPhones'
 
 const props = defineProps<{
   form: any
   roleOptions: any[]
 }>()
+
+const isEdit = computed(() => !!props.form.id)
+
+const passwordRules = [
+  (v: string) => (isEdit.value ? true : !!v || 'La contraseña es obligatoria'),
+  (v: string) => !v || hasMinLength(v) || 'Debe tener al menos 8 caracteres',
+]
+
+const passwordConfirmationRules = [
+  (v: string) => (props.form.password ? !!v || 'Debes confirmar la contraseña' : true),
+  (v: string) => v === props.form.password || 'Las contraseñas no coinciden',
+]
 </script>
 
 <template>
@@ -29,7 +49,7 @@ const props = defineProps<{
           <BaseInput
             id="first_name"
             v-model="form.first_name"
-            label="Nombres *"
+            label="Nombres"
             placeholder="Ej. Juan Carlos"
             :rules="[(v) => !!v || 'El nombre es obligatorio']"
           />
@@ -38,7 +58,7 @@ const props = defineProps<{
           <BaseInput
             id="last_name"
             v-model="form.last_name"
-            label="Apellidos *"
+            label="Apellidos "
             placeholder="Ej. Pérez"
             :rules="[(v) => !!v || 'El apellido es obligatorio']"
           />
@@ -48,7 +68,7 @@ const props = defineProps<{
             id="email"
             v-model="form.email"
             type="email"
-            label="Correo Electrónico *"
+            label="Correo Electrónico "
             placeholder="Ej. juan.perez@ejemplo.com"
             :rules="[(v) => !!v || 'El correo es obligatorio']"
           />
@@ -59,20 +79,10 @@ const props = defineProps<{
             v-model="form.phone"
             label="Teléfono"
             placeholder="Ej. 04141234567"
-          />
-        </div>
-        <div class="col-12 col-md-12">
-          <MultiselectCustom
-            v-model="form.role_id"
-            :options="roleOptions"
-            label="Rol del Operador *"
-            placeholder="Selecciona el rol"
-            labelKey="name"
-            trackBy="id"
-            :showIcons="true"
-            helperType="custom"
-            customDefaultIcon="bi bi-person-badge"
-            :clearable="true"
+            :rules="[
+              (v) => !!v || 'El teléfono es obligatorio',
+              (v) => !v || isValidPhone(v) || 'El formato del teléfono es inválido',
+            ]"
           />
         </div>
         <!-- Contraseñas: Usamos autoComplete 'new-password' recomendado en las conversaciones previas para prevenir autocompletado en esta app -->
@@ -84,6 +94,7 @@ const props = defineProps<{
             label="Contraseña"
             placeholder="••••••••"
             autocomplete="new-password"
+            :rules="passwordRules"
           />
         </div>
         <div class="col-12 col-md-6">
@@ -94,6 +105,7 @@ const props = defineProps<{
             label="Confirmar Contraseña"
             placeholder="••••••••"
             autocomplete="new-password"
+            :rules="passwordConfirmationRules"
           />
         </div>
       </div>

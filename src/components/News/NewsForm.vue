@@ -3,6 +3,7 @@ import { ref, onMounted, computed, watch } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import ImageUploader from '@/components/common/ImageUploader.vue'
 import { QuillEditor } from '@vueup/vue-quill'
+import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
 interface NewsData {
@@ -11,6 +12,8 @@ interface NewsData {
   url_image?: string
   content: string
   active: boolean
+  created_at?: string | null
+  updated_at?: string | null
 }
 
 const props = defineProps({
@@ -111,6 +114,10 @@ const displayContent = computed(() => {
   }
   return formData.value.content
 })
+
+defineExpose({
+  handleSubmit,
+})
 </script>
 
 <template>
@@ -127,33 +134,37 @@ const displayContent = computed(() => {
 
     <div class="row g-4 h-100">
       <!-- Columna Izquierda: Formulario (7 columnas u 6 dependiendo de preferencia) -->
-      <div class="col-12 col-lg-6 d-flex flex-column pe-lg-4 form-section">
+      <div class="col-12 col-lg-6 d-flex flex-column form-section">
         <h6
           class="fw-bold text-primary mb-3 text-uppercase"
-          style="font-size: 0.85rem; letter-spacing: 0.5px"
+          style="font-size: 1rem; letter-spacing: 0.5px"
         >
           Configuración de la Noticia
         </h6>
 
+        <div v-if="props.isEditing" class="mb-4">
+          <DateTimeBadges :created-at="props.initialData?.created_at" :updated-at="props.initialData?.updated_at" :hide-icons="true"   />
+        </div>
         <div class="mb-4 d-flex flex-column">
-          <label class="form-label fw-bold mb-2">Imagen de Portada</label>
+          <label class="form-label fw-bold mb-2 fs-5">Imagen de Portada</label>
           <ImageUploader
             v-model="imageFile"
             :round="false"
             :initialImageUrl="formData.url_image"
             class="w-100"
             placeholder="Buscar o arrastrar imagen"
+            :rules="[(v) => !!v || 'La imagen es obligatoria']"
           />
         </div>
 
         <div class="row g-3 mb-1">
-          <div class="col-12 col-md-8">
+          <div class="col-12 col-md-10">
             <BaseInput
               id="title"
               v-model="formData.title"
               label="Título de la Noticia"
               placeholder="Ej: Nueva Actualización del Sistema"
-              :rules="[(v) => !!v || 'El título es requerido']"
+              :rules="[(v) => !!v || 'El título es obligatorio']"
             />
           </div>
           <div
@@ -179,7 +190,7 @@ const displayContent = computed(() => {
         </div>
 
         <div class="mt-1 flex-grow-1 d-flex flex-column">
-          <label class="form-label fw-bold mb-2">Contenido de la Noticia</label>
+          <label class="form-label fw-bold mb-2 fs-5">Contenido de la Noticia</label>
           <div
             class="quill-wrapper bg-white rounded-3 shadow-sm border transition-all flex-grow-1 d-flex flex-column"
             :class="{ 'border-danger': !isFormValid && !formData.content.trim() }"
@@ -200,10 +211,12 @@ const displayContent = computed(() => {
       </div>
 
       <!-- Columna Derecha: Vista Previa (Simulación de Mobile/Tarjeta) -->
-      <div class="col-12 col-lg-6 border-start ps-lg-4 preview-section d-none d-lg-block">
+      <div
+        class="col-12 col-lg-6 border-start ps-lg-4 preview-section d-none d-lg-block d-flex flex-column"
+      >
         <h6
           class="fw-bold text-secondary mb-3 text-uppercase d-flex align-items-center justify-content-between"
-          style="font-size: 0.85rem; letter-spacing: 0.5px"
+          style="font-size: 1rem; letter-spacing: 0.5px"
         >
           <span>Vista Previa en Tiempo Real</span>
           <span
@@ -215,7 +228,7 @@ const displayContent = computed(() => {
         </h6>
 
         <div
-          class="preview-container bg-light rounded-4 border p-4 h-100 overflow-auto position-relative custom-scrollbar"
+          class="preview-container bg-light rounded-4 border p-4 flex-grow-1 overflow-auto position-relative custom-scrollbar"
         >
           <!-- Mockup Tarjeta Noticia -->
           <div
@@ -240,11 +253,8 @@ const displayContent = computed(() => {
             </div>
 
             <div class="p-4">
-              <div
-                class="d-flex align-items-center gap-2 mb-3 text-muted"
-                style="font-size: 0.85rem"
-              >
-                <i class="bi bi-calendar3"></i>
+              <div class="d-flex align-items-center gap-2 mb-3 text-muted" style="font-size: 1rem">
+                <i class="bi bi-calendar3 fs-5"></i>
                 <span>{{
                   new Date().toLocaleDateString('es-ES', {
                     day: 'numeric',
@@ -253,7 +263,7 @@ const displayContent = computed(() => {
                   })
                 }}</span>
               </div>
-              <h3 class="fw-bold mb-3" style="font-size: 1.4rem; color: #1a1a1a; line-height: 1.3">
+              <h3 class="fw-bold mb-3" style="font-size: 1.8rem; color: #1a1a1a; line-height: 1.2">
                 {{ displayTitle }}
               </h3>
 
@@ -265,24 +275,6 @@ const displayContent = computed(() => {
         </div>
       </div>
     </div>
-
-    <!-- Botones de Acción -->
-    <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
-      <button
-        type="button"
-        class="btn btn-outline-secondary px-4 rounded-3 shadow-sm fw-medium"
-        @click="$emit('cancel')"
-      >
-        Cancelar
-      </button>
-      <button
-        type="submit"
-        class="btn btn-primary px-4 rounded-3 text-white fw-bold shadow-sm d-flex align-items-center"
-      >
-        <i class="bi bi-save me-2"></i>
-        {{ isEditing ? 'Guardar Cambios' : 'Crear Noticia' }}
-      </button>
-    </div>
   </form>
 </template>
 
@@ -291,6 +283,8 @@ const displayContent = computed(() => {
   font-family: inherit;
   display: flex;
   flex-direction: column;
+  flex-grow: 1;
+  height: 100%;
 }
 
 /* Scrollbar personalizada para la vista previa */
@@ -306,7 +300,7 @@ const displayContent = computed(() => {
 }
 
 .preview-container {
-  max-height: 600px;
+  min-height: 400px;
 }
 
 .preview-image-wrapper {
@@ -332,7 +326,7 @@ const displayContent = computed(() => {
 }
 :deep(.ql-container.ql-snow) {
   border: none;
-  font-size: 0.95rem;
+  font-size: 1.1rem;
   font-family: inherit;
   border-radius: 0 0 0.5rem 0.5rem;
   flex-grow: 1;

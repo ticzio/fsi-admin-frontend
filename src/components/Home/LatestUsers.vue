@@ -2,7 +2,12 @@
 import defaultProfileImage from '@/assets/images/default-profile.png'
 
 defineProps<{
-  users: Array<{ id: number; name: string; email: string }>
+  users: Array<{ id: number; name: string; email: string; url_image?: string | null }>
+}>()
+
+defineEmits<{
+  (e: 'click-user', user: { id: number; name: string; email: string }): void
+  (e: 'click-view-all'): void
 }>()
 </script>
 
@@ -18,6 +23,7 @@ defineProps<{
         </div>
         <a
           href="#"
+          @click.prevent="$emit('click-view-all')"
           class="text-dark text-decoration-none fw-bold"
           style="font-size: 0.75rem; white-space: nowrap"
         >
@@ -29,9 +35,9 @@ defineProps<{
         class="d-flex flex-column gap-3 overflow-auto custom-scrollbar pe-2 flex-grow-1"
         style="max-height: 520px"
       >
-        <div v-for="user in users" :key="user.id" class="d-flex align-items-center gap-3 user-card">
+        <div v-for="user in users" :key="user.id" class="d-flex align-items-center gap-3 user-card" @click="$emit('click-user', user)">
           <img
-            :src="defaultProfileImage"
+            :src="user.url_image || defaultProfileImage"
             :alt="user.name"
             class="rounded-circle shadow-sm user-avatar"
             style="width: 44px; height: 44px; object-fit: cover"
