@@ -9,6 +9,7 @@ import type { MenuItem } from '@/const/menuItems'
 import { useCookies } from '@/composables/useCookies'
 import defaultAvatar from '@/assets/images/default-profile.png'
 import fsiLogo from '@/assets/images/login/login_logo_FSI.png'
+import ticzLogo from '@/assets/images/ticz.png'
 
 const store = useStore()
 const route = useRoute()
@@ -127,12 +128,17 @@ const handleLogout = async () => {
 
         <!-- Footer Logo / Text -->
         <div class="mt-auto px-4 py-4 text-start">
-          <div class="d-flex align-items-center justify-content-start gap-2">
-            <div class="ticz-icon"></div>
+          <a
+            href="https://ticz.io/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="d-flex align-items-center justify-content-start gap-2 text-decoration-none"
+          >
+            <img :src="ticzLogo" alt="Ticz Logo" style="width: 22px; height: 22px; object-fit: contain;" />
             <span class="text-white fw-medium" style="font-size: 0.75rem"
               >Desarrollado por Ticz</span
             >
-          </div>
+          </a>
         </div>
       </div>
     </aside>
