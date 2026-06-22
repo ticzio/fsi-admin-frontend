@@ -13,13 +13,24 @@ import { provideFormValidation } from '@/composables/useFormValidation'
 
 const route = useRoute()
 const store = useStore()
-const { getClient, saveClient } = useClients()
+const { getClient, saveClient, unlockClient } = useClients()
 const swalToast = useSwalToast()
 const { isFormValid } = provideFormValidation()
 const isLoading = ref(false)
 
 const targetClient = inject<Ref<ClientInterface | null>>('targetClient')
 const isMobile = computed(() => store.getters.isMobile)
+const isBlocked = computed(() => {
+  const attempts = targetClient?.value?.failed_attempts ?? (targetClient?.value as any)?.failed_attemps
+  return Number(attempts) >= 5
+})
+
+const handleUnlock = async () => {
+  if (!targetClient?.value) return
+  isLoading.value = true
+  await unlockClient(targetClient.value)
+  isLoading.value = false
+}
 const form = reactive({
   url_image: '',
   first_name: '',
@@ -119,7 +130,18 @@ onMounted(() => {
           </div>
         </div>
 
-        <DateTimeBadges :createdAt="form.created_at" :updatedAt="form.updated_at" />
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+          <button
+            type="button"
+            :class="isBlocked ? BUTTONS.unlock.class : 'btn btn-outline-secondary rounded-3'"
+            :disabled="isLoading || !isBlocked"
+            @click="handleUnlock"
+          >
+            <i :class="isBlocked ? BUTTONS.unlock.icon : 'bi bi-lock-fill'" class="me-1"></i>
+            Desbloquear
+          </button>
+          <DateTimeBadges :createdAt="form.created_at" :updatedAt="form.updated_at" />
+        </div>
       </div>
 
       <ClientForm :form="form" :is-edit="true" />

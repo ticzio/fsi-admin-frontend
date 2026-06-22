@@ -8,6 +8,7 @@ import { URLS } from '@/const/api'
 import { ERROR } from '@/const/errorConst'
 import { TABLE_PAGINATION } from '@/const/tableConst'
 import { useRoles } from '@/composables/Models/useRoles'
+import { useCookies } from '@/composables/useCookies'
 
 export interface UserInterface {
   id: number | string
@@ -218,7 +219,27 @@ export function useUsers() {
           isEditing ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente',
         )
         if (isEditing && id) {
-          await getUser(id, true)
+          const updatedUser = await getUser(id, true)
+          const { getCookie, setCookie } = useCookies()
+          const loggedInUserId = getCookie('fsi_admin_id_user')
+          if (updatedUser && String(id) === String(loggedInUserId)) {
+            const fullName = `${updatedUser.first_name} ${updatedUser.last_name}`
+            setCookie('fsi_admin_full_name', fullName)
+            if (updatedUser.url_image && typeof updatedUser.url_image === 'string') {
+              setCookie('fsi_admin_url_image', updatedUser.url_image)
+            }
+            if (store.state.user) {
+              const updatedUserStore = {
+                ...store.state.user,
+                first_name: updatedUser.first_name,
+                last_name: updatedUser.last_name,
+                full_name: fullName,
+                url_image: updatedUser.url_image || store.state.user.url_image,
+                email: updatedUser.email || store.state.user.email,
+              }
+              store.commit('SET_USER', updatedUserStore)
+            }
+          }
         }
         await getDataUsers(pagination.currentPage, currentSearch.value, currentExtraParams.value)
         return true

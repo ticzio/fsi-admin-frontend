@@ -49,7 +49,7 @@ const {
 const search = ref('')
 
 const getTableActions = async (_item: any) => {
-  return [TABLE_ACTIONS.edit, TABLE_ACTIONS.delete]
+  return [TABLE_ACTIONS.edit]
 }
 
 const handleTableAction = async ({ actionName, item }: { actionName: string; item: any }) => {

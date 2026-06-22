@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter, useRoute } from 'vue-router'
 import { useSwal } from '@/composables/useSwal'
@@ -17,9 +17,15 @@ const router = useRouter()
 const swal = useSwal()
 
 const { getCookie } = useCookies()
-const CookiesFullName = getCookie('fsi_admin_full_name') || 'Usuario'
-const CookiesEmail = getCookie('fsi_admin_email') || 'Administrador'
-const CookiesUrlImage = getCookie('fsi_admin_url_image')
+const CookiesFullName = computed(() => {
+  return store.state.user?.full_name || (store.state.user?.first_name ? `${store.state.user.first_name} ${store.state.user.last_name}` : '') || getCookie('fsi_admin_full_name') || 'Usuario'
+})
+const CookiesEmail = computed(() => {
+  return store.state.user?.email || getCookie('fsi_admin_email') || 'Administrador'
+})
+const CookiesUrlImage = computed(() => {
+  return store.state.user?.url_image || getCookie('fsi_admin_url_image')
+})
 
 // Helper para verificar si un item está activo
 const isItemActive = (item: MenuItem): boolean => {
