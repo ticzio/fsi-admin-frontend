@@ -300,6 +300,47 @@ export function useClients() {
     }
   }
 
+  /**
+   * Desbloquea un cliente.
+   */
+  const unlockClient = async (item: ClientInterface) => {
+    const result = await swal.showConfirm(
+      `¿Estás seguro de desbloquear al cliente ${item.first_name} ${item.last_name}?`,
+      `Esta acción permitirá al cliente volver a acceder a su cuenta.`,
+      {
+        confirmButtonText: 'Desbloquear',
+        cancelButtonText: 'Cancelar',
+      },
+    )
+
+    if (!result) return false
+
+    loading.value = true
+    try {
+      const response = await store.dispatch('updateData', {
+        url: 'client/unlock',
+        id: item.id!,
+        data: {},
+      })
+      if (response.code === 200 || response.code === 201) {
+        logger.logRequest('client/unlock', {}, response)
+        swal.showSuccess('Cliente desbloqueado exitosamente')
+        if (client.value && String(client.value.id) === String(item.id)) {
+          await getClient(item.id!, true)
+        }
+        await getDataClients(pagination.currentPage, currentSearch.value, currentExtraParams.value)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      logger.logRequest('client/unlock', {}, error)
+      handleErrorResponse(error, `Error al desbloquear a ${item.first_name}`)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     clients,
@@ -313,5 +354,6 @@ export function useClients() {
     saveClient,
     deactivateClient,
     deleteClient,
+    unlockClient,
   }
 }

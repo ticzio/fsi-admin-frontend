@@ -5,27 +5,19 @@ import titleSection from '@/components/common/titleSection.vue'
 import CustomTable from '@/components/common/CustomTable.vue'
 import SearchInput from '@/components/common/SearchInput.vue'
 import FetchButton from '@/components/common/FetchButton.vue'
-import RedirectButton from '@/components/common/RedirectButton.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import AppImage from '@/components/common/AppImage.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
-import { useSwalToast } from '@/composables/useSwalToast'
 import { useTableActions } from '@/composables/useTableActions'
 
 import { TITLE_SECTION_COMPONENT, TABLE_HEADERS, TABLE_PAGINATION } from '@/const/tableConst'
-import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
 import { useClients } from '@/composables/Models/useClients'
 
-interface Item {
-  id: string | number
-  [key: string]: any
-}
 
 const router = useRouter()
-const swalToast = useSwalToast()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultActions } = useTableActions()
@@ -149,8 +141,13 @@ onMounted(() => {
               <AppImage :src="value" type="user" />
             </div>
           </template>
-          <template #cell(active)="{ value }">
-            <StatusBadge :value="value" />
+          <template #cell(active)="{ value, item }">
+            <StatusBadge
+              v-if="Number(item.failed_attempts ?? item.failed_attemps) >= 5"
+              label="Bloqueado"
+              variant="badge bg-secondary-subtle text-white fw-medium border border-secondary"
+            />
+            <StatusBadge v-else :value="value" />
           </template>
         </CustomTable>
       </div>

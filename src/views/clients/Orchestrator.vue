@@ -39,7 +39,7 @@ const allTabRoutes = [
     path: 'detail-clients',
     allowedRoles: [1, 2, 3, 4, 5],
   },
-  { label: 'Cupones', path: 'coupons-clients', allowedRoles: [1, 2, 3, 4, 5] },
+  { label: 'Cupones canjeados', path: 'coupons-clients', allowedRoles: [1, 2, 3, 4, 5] },
   { label: 'Chats', path: 'chats-clients', allowedRoles: [1, 2, 3, 4, 5] },
 ]
 

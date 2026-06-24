@@ -88,6 +88,7 @@ const emit = defineEmits(['submit'])
 const handleSubmit = () => {
   emit('submit', {
     ...formData.value,
+    id_type_state: formData.value.type_state,
   })
 }
 
