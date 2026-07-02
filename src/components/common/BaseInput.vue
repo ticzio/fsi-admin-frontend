@@ -100,7 +100,10 @@ const togglePasswordVisibility = () => {
 
 <template>
   <div class="mb-3 form-group-custom">
-    <label v-if="label" :for="id" class="form-label mb-1 fw-bold">{{ label }}</label>
+    <label v-if="label" :for="id" class="form-label mb-1 fw-bold">
+      {{ label }}
+      <slot name="label-icon"></slot>
+    </label>
 
     <div :class="{ 'input-group': type === 'password' }">
       <input
@@ -159,6 +162,20 @@ const togglePasswordVisibility = () => {
 <style scoped>
 .form-group-custom label {
   font-size: 1rem;
+}
+
+:deep(.label-icon) {
+  cursor: pointer;
+  color: #9ca3af;
+  transition: color 0.2s ease;
+  font-size: 0.9em;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+:deep(.label-icon:hover) {
+  color: #3b82f6;
 }
 
 .custom-input {

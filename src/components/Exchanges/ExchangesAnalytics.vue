@@ -5,19 +5,6 @@
       <h5 class="fw-bold mb-0">Estadísticas de Canjes</h5>
     </div>
 
-    <!-- Tarjeta Total de Canjes -->
-    <div class="total-card d-flex align-items-center gap-4 p-4 rounded-4 shadow-sm border mb-4">
-      <div class="total-icon-container">
-        <i class="bi bi-arrow-left-right"></i>
-      </div>
-      <div>
-        <p class="text-muted small mb-0 fw-medium text-uppercase letter-spacing-1">
-          Total General de Canjes
-        </p>
-        <h2 class="display-4 mb-0 fw-bold total-value">{{ totalExchanges }}</h2>
-      </div>
-    </div>
-
     <!-- Desglose por Nivel -->
     <div class="flex-grow-1 overflow-y-auto custom-scrollbar pe-2">
       <p class="text-secondary small text-uppercase fw-bold mb-3 letter-spacing-1">
@@ -93,33 +80,6 @@ const getLevelIcon = (label: string) => {
 </script>
 
 <style scoped>
-.total-card {
-  background: linear-gradient(135deg, #0d6efd08 0%, #6610f208 100%);
-  border-color: #0d6efd20 !important;
-}
-
-.total-icon-container {
-  width: 72px;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 22px;
-  background-color: #0d6efd15;
-  flex-shrink: 0;
-}
-
-.total-icon-container i {
-  font-size: 2rem;
-  color: #0d6efd;
-}
-
-.total-value {
-  color: #0d6efd;
-  line-height: 1;
-  letter-spacing: -1px;
-}
-
 .level-card {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

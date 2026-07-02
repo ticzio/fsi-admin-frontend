@@ -15,6 +15,8 @@ export function useAnalytics() {
     code_pharmacy: string,
     code_user: string,
     id_operator?: any,
+    startDate?: string,
+    endDate?: string,
   ) => {
     loading.value = true
     try {
@@ -27,6 +29,14 @@ export function useAnalytics() {
 
       if (id_operator !== undefined && id_operator !== null && id_operator !== '') {
         requestParams.id_operator = id_operator
+      }
+
+      if (startDate !== undefined && startDate !== null && startDate !== '') {
+        requestParams.start_date = startDate
+      }
+
+      if (endDate !== undefined && endDate !== null && endDate !== '') {
+        requestParams.end_date = endDate
       }
 
       const response: any = await store.dispatch('getData', {
@@ -52,11 +62,24 @@ export function useAnalytics() {
    * Obtiene las estadísticas de canjes de una farmacia específica.
    * Apunta al endpoint interno analytics/pharmacy/:id_pharmacy.
    */
-  const getPharmacyExchangesAnalytics = async (id_pharmacy: number | string) => {
+  const getPharmacyExchangesAnalytics = async (
+    id_pharmacy: number | string,
+    startDate?: string,
+    endDate?: string,
+  ) => {
     loading.value = true
     try {
+      const params: Record<string, any> = {}
+      if (startDate !== undefined && startDate !== null && startDate !== '') {
+        params.start_date = startDate
+      }
+      if (endDate !== undefined && endDate !== null && endDate !== '') {
+        params.end_date = endDate
+      }
+
       const response: any = await store.dispatch('getData', {
         url: `analytics/pharmacy/${id_pharmacy}`,
+        params,
       })
 
       if (response.code === 200) {
