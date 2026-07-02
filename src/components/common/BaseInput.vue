@@ -129,6 +129,7 @@ const togglePasswordVisibility = () => {
         :class="{
           'border-start-0': internalErrors.length === 0,
           'border-danger': internalErrors.length > 0,
+          'disabled-icon': disabled,
         }"
       >
         <button
@@ -188,6 +189,12 @@ const togglePasswordVisibility = () => {
   box-shadow: none;
 }
 
+.custom-input:disabled {
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+}
+
 .custom-input::placeholder {
   color: #6b7280;
   font-size: 1.1rem;
@@ -208,6 +215,11 @@ const togglePasswordVisibility = () => {
   background-color: #ffffff;
 }
 
+.custom-input-icon.disabled-icon {
+  cursor: not-allowed;
+  background-color: #f3f4f6 !important;
+}
+
 .custom-input.border-end-0 {
   border-right: none;
   border-top-right-radius: 0;
@@ -226,6 +238,10 @@ const togglePasswordVisibility = () => {
   color: #4b5563;
   outline: none;
   box-shadow: none;
+}
+
+.input-group .btn-link:disabled {
+  cursor: not-allowed;
 }
 
 .invalid-feedback {

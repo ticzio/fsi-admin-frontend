@@ -258,8 +258,10 @@ export const TABLE_HEADERS = {
   ],
   template_pharmacies: [
     ...maybeId('id'),
+    { key: 'category', label: 'Categoría' },
     { key: 'name', label: 'Título' },
     { key: 'description', label: 'Descripción' },
+    { key: 'command', label: 'Atajo de teclado' },
     { key: 'active', label: 'Estatus' },
   ],
 }
