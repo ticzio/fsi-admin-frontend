@@ -208,6 +208,7 @@ export const TABLE_HEADERS = {
   ],
   cities: [
     ...maybeId('id'),
+    { key: 'url_image', label: 'Imagen' },
     { key: 'type_state.name', label: 'Estado' },
     { key: 'name', label: 'Nombre de la ciudad' },
     { key: 'active', label: 'Estatus' },

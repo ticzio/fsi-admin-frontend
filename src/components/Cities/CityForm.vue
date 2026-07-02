@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, computed } from 'vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
+import ImageUploader from '@/components/common/ImageUploader.vue'
 import { useCities } from '@/composables/Models/useCities'
 import { useStates } from '@/composables/Models/useStates'
 import { ICONS_MULTISELECT } from '@/const/multiselectConst'
@@ -9,6 +10,7 @@ import { ICONS_MULTISELECT } from '@/const/multiselectConst'
 interface CityData {
   id?: number | string
   name: string
+  url_image: any
   type_state: any
   active: boolean
 }
@@ -28,9 +30,12 @@ const { states, loading: loadingStates, getStates } = useStates()
 
 const formData = ref<CityData>({
   name: '',
+  url_image: null,
   type_state: null,
   active: true,
 })
+
+const initialImageUrl = ref<string | null>(null)
 
 const initForm = () => {
   if (props.initialData) {
@@ -50,15 +55,19 @@ const initForm = () => {
     formData.value = {
       id: props.initialData.id,
       name: props.initialData.name || '',
+      url_image: null,
       type_state: mappedState || null,
       active: props.initialData.active !== undefined ? props.initialData.active : true,
     }
+    initialImageUrl.value = props.initialData.url_image || null
   } else {
     formData.value = {
       name: '',
+      url_image: null,
       type_state: null,
       active: true,
     }
+    initialImageUrl.value = null
   }
 }
 
@@ -102,6 +111,17 @@ defineExpose({
     <div class="row g-3">
       <div class="col-12">
         <h6 class="fw-bold text-primary mb-3 text-uppercase small-title">Detalles de la Ciudad</h6>
+
+        <div class="mb-4 text-center">
+          <label class="form-label text-muted fw-bold mb-2 d-block">Imagen (Opcional)</label>
+          <ImageUploader
+            v-model="formData.url_image"
+            :round="false"
+            :initial-image-url="initialImageUrl"
+            :input-disabled="readOnly"
+            placeholder="Subir imagen de la ciudad"
+          />
+        </div>
 
         <div class="mb-3">
           <BaseInput
