@@ -139,6 +139,12 @@ const handleBlur = (event: Event) => {
   box-shadow: none;
 }
 
+.custom-textarea:disabled {
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+}
+
 .custom-textarea::placeholder {
   color: #6b7280;
   font-size: 1.1rem;

@@ -100,7 +100,10 @@ const togglePasswordVisibility = () => {
 
 <template>
   <div class="mb-3 form-group-custom">
-    <label v-if="label" :for="id" class="form-label mb-1 fw-bold">{{ label }}</label>
+    <label v-if="label" :for="id" class="form-label mb-1 fw-bold">
+      {{ label }}
+      <slot name="label-icon"></slot>
+    </label>
 
     <div :class="{ 'input-group': type === 'password' }">
       <input
@@ -126,6 +129,7 @@ const togglePasswordVisibility = () => {
         :class="{
           'border-start-0': internalErrors.length === 0,
           'border-danger': internalErrors.length > 0,
+          'disabled-icon': disabled,
         }"
       >
         <button
@@ -161,6 +165,20 @@ const togglePasswordVisibility = () => {
   font-size: 1rem;
 }
 
+:deep(.label-icon) {
+  cursor: pointer;
+  color: #9ca3af;
+  transition: color 0.2s ease;
+  font-size: 0.9em;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+}
+
+:deep(.label-icon:hover) {
+  color: #3b82f6;
+}
+
 .custom-input {
   font-size: 1.1rem;
   padding: 0.8rem 1.2rem;
@@ -169,6 +187,12 @@ const togglePasswordVisibility = () => {
   background-color: #ffffff;
   color: #111827;
   box-shadow: none;
+}
+
+.custom-input:disabled {
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+  color: #9ca3af;
 }
 
 .custom-input::placeholder {
@@ -191,6 +215,11 @@ const togglePasswordVisibility = () => {
   background-color: #ffffff;
 }
 
+.custom-input-icon.disabled-icon {
+  cursor: not-allowed;
+  background-color: #f3f4f6 !important;
+}
+
 .custom-input.border-end-0 {
   border-right: none;
   border-top-right-radius: 0;
@@ -209,6 +238,10 @@ const togglePasswordVisibility = () => {
   color: #4b5563;
   outline: none;
   box-shadow: none;
+}
+
+.input-group .btn-link:disabled {
+  cursor: not-allowed;
 }
 
 .invalid-feedback {

@@ -51,11 +51,13 @@
   color: #cdd4df !important; /* matches SearchInput focused placeholder */
 }
 
-/* ── Selected / single value ─────────────────────────────────────────────── */
-.multiselect-custom .multiselect__single {
+/* ── Selected / single value / input ─────────────────────────────────────── */
+.multiselect-custom .multiselect__single,
+.multiselect-custom .multiselect__input {
   color: #111827 !important; /* matches SearchInput text color */
   margin-bottom: 0 !important;
   padding-top: 0 !important;
+  padding-bottom: 0 !important;
   font-size: 0.95rem !important; /* matches SearchInput font size */
   background: transparent !important;
 }

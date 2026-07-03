@@ -10,6 +10,7 @@ import RedirectButton from '@/components/common/RedirectButton.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import Modal from '@/components/common/Modal.vue'
 import CityForm from '@/components/Cities/CityForm.vue'
+import AppImage from '@/components/common/AppImage.vue'
 
 //Composables
 import { useStore } from 'vuex'
@@ -131,6 +132,18 @@ onMounted(() => {
           @change-page="handleTablePagination"
           @action-click="handleTableAction"
         >
+           <template #cell(url_image)="{ value, item }">
+            <div class="d-flex justify-content-center py-1">
+              <AppImage
+                :src="value"
+                :alt="item.name"
+                type="entity"
+                width="80px"
+                height="50px"
+                rounded="rounded-3 shadow-sm border"
+              />
+            </div>
+          </template>
           <template #cell(active)="{ value }">
             <StatusBadge :value="value" />
           </template>
@@ -143,7 +156,7 @@ onMounted(() => {
       ref="modalFormRef"
       id="modalCityForm"
       :title="isEditing ? 'Editar Ciudad' : 'Nueva Ciudad'"
-      size="md"
+      size="lg"
     >
       <CityForm ref="cityFormRef" :initial-data="selectedCity" @submit="handleFormSubmit" />
       <template #footer>

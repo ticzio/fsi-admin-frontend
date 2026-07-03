@@ -137,10 +137,13 @@ export function useCities() {
   const saveCity = async (data: any, isEditing: boolean, id?: string | number) => {
     loading.value = true
     try {
-      const payload = {
-        name: data.name,
-        id_state: data.id_type_state?.id || data.id_type_state,
-        active: data.active ? 1 : 0,
+      const payload = new FormData()
+      payload.append('name', data.name)
+      payload.append('id_state', data.id_type_state?.id || data.id_type_state)
+      payload.append('active', data.active ? '1' : '0')
+
+      if (data.url_image instanceof File) {
+        payload.append('url_image', data.url_image)
       }
 
       let response: any

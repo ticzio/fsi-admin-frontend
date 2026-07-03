@@ -170,6 +170,9 @@ onMounted(() => {
         @change-page="handleTablePagination"
         @action-click="handleTableAction"
       >
+      <template #cell(category)="{ value }">
+        <span>{{ value === 'Welcome' ? 'Bienvenida' : value === 'Inactivity' ? 'Inactividad' : value === 'Other' ? 'Otros' : value }}</span>
+      </template>
         <template #cell(active)="{ value }">
           <StatusBadge :value="value" />
         </template>

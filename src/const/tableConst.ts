@@ -208,6 +208,7 @@ export const TABLE_HEADERS = {
   ],
   cities: [
     ...maybeId('id'),
+    { key: 'url_image', label: 'Imagen' },
     { key: 'type_state.name', label: 'Estado' },
     { key: 'name', label: 'Nombre de la ciudad' },
     { key: 'active', label: 'Estatus' },
@@ -258,8 +259,10 @@ export const TABLE_HEADERS = {
   ],
   template_pharmacies: [
     ...maybeId('id'),
+    { key: 'category', label: 'Categoría' },
     { key: 'name', label: 'Título' },
     { key: 'description', label: 'Descripción' },
+    { key: 'command', label: 'Atajo de teclado' },
     { key: 'active', label: 'Estatus' },
   ],
 }
