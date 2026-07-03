@@ -11,10 +11,19 @@ import LatestUsers from '@/components/Home/LatestUsers.vue'
 import LoadingOverlay from '@/components/common/LoadingOverlay.vue'
 import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import { useAnalytics } from '@/composables/Models/useAnalytics'
+import { useMoment } from '@/composables/useMoment'
 import type { StatisticItem } from '@/components/Home/StatisticCards.vue'
 
 // ── Analytics composable ──────────────────────────────────────────────────────
 const { loading: loadingDashboard, getDashboardAnalytics } = useAnalytics()
+
+// ── Moment (locale es) ────────────────────────────────────────────────────────
+// Establece moment.locale('es') globalmente para nombres de meses en español
+useMoment()
+
+// ── Full labels para tooltips de gráficas ("Marzo 2026", etc.) ────────────────
+const exchangesFullLabels = ref<string[]>([])
+const registrationsFullLabels = ref<string[]>([])
 
 // ── Exchanges chart zoom ──────────────────────────────────────────────────────
 const exchangesLineChartRef = ref<InstanceType<typeof LineChart> | null>(null)
@@ -34,6 +43,7 @@ const statisticItems = ref<StatisticItem[]>([
 ])
 
 // ── Charts (reactive state driven by backend) ─────────────────────────────────
+const chartKey = ref(0)
 const totalExchange = ref<number | string>('—')
 
 const exchangesChartSeries = ref([{ name: 'Canjeados', data: [] as number[] }])
@@ -42,9 +52,6 @@ const exchangesChartCategories = ref<string[]>([])
 const registrationsChartSeries = ref([{ name: 'Clientes registrados', data: [] as number[] }])
 const registrationsChartCategories = ref<string[]>([])
 
-// Last tooltip data (most recent month with registrations)
-const tooltipMonth = ref('')
-const tooltipValue = ref<number | string>('')
 
 // Chart options (static portions)
 import type { ApexOptions } from 'apexcharts'
@@ -60,7 +67,7 @@ const exchangesChartOptions = ref<ApexOptions>({
     parentHeightOffset: 0,
     zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
     events: {
-      dataPointMouseEnter: (_event: any, chartContext: any, config: any) => {
+      dataPointMouseEnter: (_event: any, _chartContext: any, _config: any) => {
         document.body.style.cursor = 'pointer'
       },
       dataPointMouseLeave: () => {
@@ -71,8 +78,9 @@ const exchangesChartOptions = ref<ApexOptions>({
         if (dataIndex < 0 || dataIndex === undefined) return
         const total: number = config.w.globals.series[0]?.length ?? 0
         if (total === 0) return
-        const min = Math.max(1, dataIndex)
-        const max = Math.min(total, dataIndex + 2)
+        // zoomX is 1-indexed in ApexCharts
+        const min = dataIndex + 1
+        const max = Math.min(total, dataIndex + 3)
         chartContext.zoomX(min, max)
         isExchangesZoomed.value = true
       },
@@ -86,15 +94,16 @@ const exchangesChartOptions = ref<ApexOptions>({
     opacity: 1,
   },
   markers: {
-    size: 0,
-    hover: { size: 6 },
-    strokeWidth: 2,
+    size: 6,
+    hover: { size: 9 },
+    strokeWidth: 3,
     colors: ['#1e3888'],
     strokeColors: ['#ffffff'],
   },
   xaxis: {
     categories: [],
-    tooltip: { enabled: true },
+    tickPlacement: 'on',
+    tooltip: { enabled: false },
     axisBorder: { show: false },
     axisTicks: { show: false },
     crosshairs: {
@@ -104,14 +113,24 @@ const exchangesChartOptions = ref<ApexOptions>({
       stroke: { color: '#1e3888', width: 1, dashArray: 4 },
     },
   },
+  yaxis: {
+    max: (val: number) => val + 10,
+  },
   tooltip: {
-    intersect: false,
-    followCursor: true,
-    x: { format: 'dd/MM/yy HH:mm' },
-    y: { formatter: (val: number) => `${val} canjes` },
-    theme: 'light',
-    style: { fontSize: '13px' },
-    marker: { show: true },
+    enabled: true,
+    intersect: true,
+    shared: false,
+    followCursor: false,
+    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+      const val = series[seriesIndex][dataPointIndex]
+      const label = exchangesFullLabels.value[dataPointIndex] ?? ''
+      return `
+        <div style="position: relative; z-index: 9999; background: #1e3888; color: #ffffff; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(30, 56, 136, 0.2); border: 1px solid rgba(255,255,255,0.2);">
+          <div style="font-size: 11px; opacity: 0.8; margin-bottom: 2px;">${label}</div>
+          <div>${val} canjes</div>
+        </div>
+      `
+    }
   },
   grid: {
     borderColor: '#e9ecef',
@@ -122,7 +141,17 @@ const exchangesChartOptions = ref<ApexOptions>({
 })
 
 const registrationsChartOptions = ref<ApexOptions>({
-  chart: { type: 'line', height: 250, toolbar: { show: false }, parentHeightOffset: 0 },
+  chart: {
+    type: 'line',
+    height: 250,
+    toolbar: {
+      show: true,
+      tools: { zoom: true, zoomin: true, zoomout: true, pan: true, reset: true },
+      autoSelected: 'zoom',
+    },
+    parentHeightOffset: 0,
+    zoom: { enabled: true, type: 'x', autoScaleYaxis: true },
+  },
   colors: ['#4a148c'],
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 3 },
@@ -136,23 +165,43 @@ const registrationsChartOptions = ref<ApexOptions>({
     },
   },
   markers: {
-    size: 0,
-    hover: { size: 6 },
-    strokeWidth: 2,
+    size: 6,
+    hover: { size: 9 },
+    strokeWidth: 3,
     colors: ['#4a148c'],
     strokeColors: ['#ffffff'],
   },
   xaxis: {
     categories: [],
-    tooltip: { enabled: true },
+    tickPlacement: 'on',
+    tooltip: { enabled: false },
     axisBorder: { show: false },
     axisTicks: { show: false },
+    crosshairs: {
+      show: true,
+      width: 1,
+      position: 'back',
+      stroke: { color: '#4a148c', width: 1, dashArray: 4 },
+    },
+  },
+  yaxis: {
+    max: (val: number) => val + 10,
   },
   tooltip: {
-    x: { format: 'dd/MM/yy HH:mm' },
-    y: { formatter: (val: number) => `${val} clientes` },
-    theme: 'light',
-    style: { fontSize: '13px' },
+    enabled: true,
+    intersect: true,
+    shared: false,
+    followCursor: false,
+    custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+      const val = series[seriesIndex][dataPointIndex]
+      const label = registrationsFullLabels.value[dataPointIndex] ?? ''
+      return `
+        <div style="position: relative; z-index: 9999; background: #4a148c; color: #ffffff; padding: 8px 12px; border-radius: 8px; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(74, 20, 140, 0.2); border: 1px solid rgba(255,255,255,0.2);">
+          <div style="font-size: 11px; opacity: 0.8; margin-bottom: 2px;">${label}</div>
+          <div>${val} clientes</div>
+        </div>
+      `
+    }
   },
   grid: {
     borderColor: '#e9ecef',
@@ -202,32 +251,49 @@ const loadDashboardData = async () => {
 
   // Registrations chart (chart2 / bottom chart)
   const regMonths = data.registrations_by_month ?? []
-  registrationsChartCategories.value = regMonths.map((m: { label: string }) => m.label)
+  registrationsChartCategories.value = regMonths.map((m: any) => m.label)
   registrationsChartSeries.value = [
-    { name: 'Clientes registrados', data: regMonths.map((m: { value: number }) => m.value) },
+    { name: 'Clientes registrados', data: regMonths.map((m: any) => m.value as number) },
   ]
+
+  // Full labels para tooltip (él backend devuelve full_label: "Marzo 2026")
+  // formatToMonthYear garantiza el locale 'es' y el formato consistente
+  registrationsFullLabels.value = regMonths.map((m: any) => {
+    if (m.full_label) return m.full_label as string
+    return m.label ?? ''
+  })
+
   registrationsChartOptions.value = {
     ...registrationsChartOptions.value,
-    xaxis: { categories: registrationsChartCategories.value },
+    xaxis: {
+      ...registrationsChartOptions.value.xaxis,
+      categories: registrationsChartCategories.value,
+    },
   }
 
-  // Tooltip: last month that has data
-  const lastWithData = [...regMonths].reverse().find((m: { value: number }) => m.value > 0)
-  if (lastWithData) {
-    tooltipMonth.value = (lastWithData as { full_label: string }).full_label
-    tooltipValue.value = (lastWithData as { value: number }).value
-  }
-
-  // Exchanges chart (chart1 / top chart) — single series for now (exchanges_by_month)
+  // Exchanges chart (chart1 / top chart)
   const exchMonths = data.exchanges_by_month ?? []
-  exchangesChartCategories.value = exchMonths.map((m: { label: string }) => m.label)
+  exchangesChartCategories.value = exchMonths.map((m: any) => m.label)
   exchangesChartSeries.value = [
-    { name: 'Canjeados', data: exchMonths.map((m: { value: number }) => m.value) },
+    { name: 'Canjeados', data: exchMonths.map((m: any) => m.value as number) },
   ]
+
+  // Full labels para tooltip (él backend devuelve full_label: "Marzo 2026")
+  exchangesFullLabels.value = exchMonths.map((m: any) => {
+    if (m.full_label) return m.full_label as string
+    return m.label ?? ''
+  })
+
   exchangesChartOptions.value = {
     ...exchangesChartOptions.value,
-    xaxis: { categories: exchangesChartCategories.value },
+    xaxis: {
+      ...exchangesChartOptions.value.xaxis,
+      categories: exchangesChartCategories.value,
+    },
   }
+
+  // Force chart components to re-render to prevent tooltip detaching bugs
+  chartKey.value += 1
 }
 
 watch(selectedRange, () => {
@@ -300,6 +366,14 @@ const handleViewAllUsers = async () => {
                 <p class="text-dark fw-bold mb-0" style="font-size: 0.9rem">Cupones canjeados</p>
               </div>
               <div class="d-flex flex-wrap gap-3 align-items-center">
+                <button
+                  v-if="isExchangesZoomed"
+                  class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                  style="font-size: 0.8rem; border-radius: 8px"
+                  @click="resetExchangesZoom"
+                >
+                  <span>↺</span> Restablecer zoom
+                </button>
                 <div style="min-width: 140px">
                   <MultiselectCustom
                     v-model="selectedRange"
@@ -313,15 +387,15 @@ const handleViewAllUsers = async () => {
                 </div>
               </div>
             </div>
-            <div class="flex-grow-1" style="overflow: hidden">
+            <div class="flex-grow-1" style="min-width: 0; min-height: 0; position: relative; z-index: 10;">
               <!-- Desktop Chart -->
-              <div class="d-none d-md-block" >
-       <LineChart ref="exchangesLineChartRef" :series="exchangesChartSeries" :options="exchangesChartOptions" />
-         
+              <div class="d-none d-lg-block" >
+        <LineChart :key="`chart1-${chartKey}`" ref="exchangesLineChartRef" :series="exchangesChartSeries" :options="exchangesChartOptions" />
+          
               </div>
               <!-- Mobile Chart (Stacked Bar) -->
-              <div class="d-block d-md-none">
-                <StackedBarChart :series="exchangesChartSeries" :options="exchangesChartOptions" />
+              <div class="d-block d-lg-none">
+                <StackedBarChart :key="`chart1-mobile-${chartKey}`" :series="exchangesChartSeries" :options="exchangesChartOptions" />
               </div>
             </div>
         </div>  
@@ -333,30 +407,20 @@ const handleViewAllUsers = async () => {
             <h6 class="fw-bold text-dark mb-4 text-center text-md-start" style="font-size: 1rem">
               Clientes registrados
             </h6>
-            <div class="flex-grow-1 mt-2" style="overflow: hidden; position: relative">
-              <!-- Tooltip Mockup (Desktop only) -->
-              <div
-                v-if="tooltipMonth && tooltipValue !== ''"
-                class="position-absolute translate-middle-x bg-white border border-light shadow-sm rounded-2 d-none d-md-flex flex-column align-items-center justify-content-center p-2 z-2"
-                style="left: 45.4%; top: 5%; width: 80px"
-              >
-                <span class="text-muted" style="font-size: 0.65rem">{{ tooltipMonth }}</span>
-                <span class="fw-bold text-dark lh-1 mt-1" style="font-size: 0.9rem">{{
-                  tooltipValue
-                }}</span>
-              </div>
-
+            <div class="flex-grow-1 mt-2" style="min-width: 0; min-height: 0; position: relative; z-index: 10;">
               <!-- Desktop Chart -->
-              <div class="d-none d-md-block">
+              <div class="d-none d-lg-block">
                 <LineChart
+                  :key="`chart2-${chartKey}`"
                   type="area"
                   :series="registrationsChartSeries"
                   :options="registrationsChartOptions"
                 />
               </div>
               <!-- Mobile Chart (Intelligent Markers) -->
-              <div class="d-block d-md-none">
+              <div class="d-block d-lg-none">
                 <AreaChart
+                  :key="`chart2-mobile-${chartKey}`"
                   :series="registrationsChartSeries"
                   :options="registrationsChartOptions"
                 />
