@@ -38,6 +38,27 @@ const form = ref({
   category: '',
 })
 
+const descriptionError = ref('')
+
+const validateDescription = () => {
+  const content = form.value.description || ''
+  if (!content || content.trim() === '') {
+    descriptionError.value = 'La descripción es obligatoria'
+    return false
+  }
+  descriptionError.value = ''
+  return true
+}
+
+watch(
+  () => form.value.description,
+  () => {
+    if (descriptionError.value) {
+      validateDescription()
+    }
+  }
+)
+
 const shortcutOptions = ['SHIFT', 'ALT', 'CTRL']
 const shortcutModifiers = ref<any>(null)
 const shortcutKey = ref('')
@@ -77,6 +98,7 @@ watch(
       shortcutModifiers.value = null
       shortcutKey.value = ''
     }
+    descriptionError.value = ''
   },
   { immediate: true },
 )
@@ -109,7 +131,8 @@ onMounted(() => {
 })
 
 const handleSubmit = () => {
-  if (!form.value.name || !form.value.description) {
+  const isDescValid = validateDescription()
+  if (!form.value.name || !isDescValid) {
     return
   }
   if (!form.value.category) {
@@ -190,15 +213,17 @@ const handleSubmit = () => {
       v-model="form.name"
       placeholder="Ej. Plantilla de bienvenida"
       :disabled="!selectedCategory"
+      enable-emoji
       :rules="[(v) => !!v || 'El nombre es obligatorio']"
     />
     <BaseTextarea
       id="templateDescription"
-      label="Descripción *"
       v-model="form.description"
-      :rows="4"
+      label="Descripción *"
       placeholder="Mensaje de la plantilla..."
       :disabled="!selectedCategory"
+      enable-emoji
+      :error="descriptionError"
       :rules="[(v) => !!v || 'La descripción es obligatoria']"
     />
 

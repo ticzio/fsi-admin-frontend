@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useFormValidation } from '@/composables/useFormValidation'
+import EmojiPicker from './EmojiPicker.vue'
 
 interface Props {
   modelValue: string | number
@@ -11,6 +12,7 @@ interface Props {
   disabled?: boolean
   autocomplete?: string
   rules?: Array<(val: any) => string | boolean>
+  enableEmoji?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -20,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   disabled: false,
   autocomplete: 'off',
   rules: () => [],
+  enableEmoji: false,
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -28,12 +31,59 @@ const internalErrors = ref<string[]>([])
 const isPasswordVisible = ref(false)
 const validationContext = useFormValidation()
 
+// --- EMOJI PICKER LOGIC ---
+const showEmojiPicker = ref(false)
+const inputRef = ref<HTMLInputElement | null>(null)
+const emojiPickerRef = ref<any>(null)
+const emojiTriggerRef = ref<HTMLElement | null>(null)
+
+const toggleEmojiPicker = () => {
+  showEmojiPicker.value = !showEmojiPicker.value
+}
+
+// Insert emoji at the cursor position
+const insertEmoji = (emojiChar: string) => {
+  const input = inputRef.value
+  if (!input) return
+
+  const start = input.selectionStart ?? 0
+  const end = input.selectionEnd ?? 0
+  const text = props.modelValue ? String(props.modelValue) : ''
+
+  const newText = text.substring(0, start) + emojiChar + text.substring(end)
+  emit('update:modelValue', newText)
+  validate(newText)
+
+  // Restore focus and cursor position
+  setTimeout(() => {
+    input.focus()
+    const newPos = start + emojiChar.length
+    input.setSelectionRange(newPos, newPos)
+  }, 0)
+}
+
+// Click outside handler
+const handleClickOutside = (event: MouseEvent) => {
+  const pickerEl = emojiPickerRef.value?.$el
+  if (
+    showEmojiPicker.value &&
+    pickerEl &&
+    !pickerEl.contains(event.target as Node) &&
+    emojiTriggerRef.value &&
+    !emojiTriggerRef.value.contains(event.target as Node)
+  ) {
+    showEmojiPicker.value = false
+  }
+}
+
 onMounted(() => {
   validationContext?.registerField(props.id, internalErrors.value.length > 0)
+  document.addEventListener('click', handleClickOutside)
 })
 
 onUnmounted(() => {
   validationContext?.unregisterField(props.id)
+  document.removeEventListener('click', handleClickOutside)
 })
 
 watch(
@@ -105,43 +155,70 @@ const togglePasswordVisibility = () => {
       <slot name="label-icon"></slot>
     </label>
 
-    <div :class="{ 'input-group': type === 'password' }">
-      <input
-        :id="id"
-        :type="inputType"
-        class="form-control"
-        :class="{
-          'is-invalid': internalErrors.length > 0,
-          'border-end-0': type === 'password' && internalErrors.length === 0,
-          'custom-input': true,
-        }"
-        :value="modelValue"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :autocomplete="autocomplete"
-        @input="handleInput"
-        @blur="handleBlur"
-      />
-
-      <span
-        v-if="type === 'password'"
-        class="input-group-text bg-white custom-input-icon"
-        :class="{
-          'border-start-0': internalErrors.length === 0,
-          'border-danger': internalErrors.length > 0,
-          'disabled-icon': disabled,
-        }"
-      >
-        <button
-          class="btn btn-link p-0 text-muted text-decoration-none"
-          type="button"
-          @click="togglePasswordVisibility"
-          tabindex="-1"
+    <div class="input-wrapper">
+      <div :class="{ 'input-group': type === 'password' }">
+        <input
+          ref="inputRef"
+          :id="id"
+          :type="inputType"
+          class="form-control"
+          :class="{
+            'is-invalid': internalErrors.length > 0,
+            'border-end-0': type === 'password' && internalErrors.length === 0,
+            'custom-input': true,
+            'has-emoji': type === 'text' && enableEmoji,
+          }"
+          :value="modelValue"
+          :placeholder="placeholder"
           :disabled="disabled"
+          :autocomplete="autocomplete"
+          @input="handleInput"
+          @blur="handleBlur"
+        />
+
+        <span
+          v-if="type === 'password'"
+          class="input-group-text bg-white custom-input-icon"
+          :class="{
+            'border-start-0': internalErrors.length === 0,
+            'border-danger': internalErrors.length > 0,
+            'disabled-icon': disabled,
+          }"
         >
-          <i :class="isPasswordVisible ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
-        </button>
-      </span>
+          <button
+            class="btn btn-link p-0 text-muted text-decoration-none"
+            type="button"
+            @click="togglePasswordVisibility"
+            tabindex="-1"
+            :disabled="disabled"
+          >
+            <i :class="isPasswordVisible ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+          </button>
+        </span>
+      </div>
+
+      <!-- Emoji Trigger Button -->
+      <button
+        v-if="type === 'text' && enableEmoji"
+        ref="emojiTriggerRef"
+        type="button"
+        class="emoji-trigger-btn"
+        :disabled="disabled"
+        @click="toggleEmojiPicker"
+        @mousedown.prevent
+        title="Insertar emoji"
+      >
+        <i class="bi bi-emoji-smile"></i>
+      </button>
+
+      <!-- macOS Emoji Picker Popover -->
+      <transition name="popover-fade">
+        <EmojiPicker
+          v-if="type === 'text' && enableEmoji && showEmojiPicker"
+          ref="emojiPickerRef"
+          @select="insertEmoji"
+        />
+      </transition>
     </div>
 
     <transition name="fade">
@@ -345,5 +422,56 @@ const togglePasswordVisibility = () => {
   transform: translateX(-10px);
   max-height: 0;
   margin-bottom: 0;
+}
+
+/* Emoji Picker Integration */
+.input-wrapper {
+  position: relative;
+  display: block;
+}
+
+.custom-input.has-emoji {
+  padding-right: 2.75rem; /* Space for the emoji trigger button */
+}
+
+.emoji-trigger-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 1.25rem;
+  padding: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+  z-index: 5;
+}
+
+.emoji-trigger-btn:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.emoji-trigger-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  color: #9ca3af;
+}
+
+/* Popover animations */
+.popover-fade-enter-active,
+.popover-fade-leave-active {
+  transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.popover-fade-enter-from,
+.popover-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.95) translateY(5px);
 }
 </style>
