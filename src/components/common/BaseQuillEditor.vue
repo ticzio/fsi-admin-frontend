@@ -24,6 +24,10 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -39,7 +43,7 @@ const content = computed({
     <label v-if="label" class="form-label fw-bold mb-2 fs-6">{{ label }}</label>
     <div
       class="quill-wrapper bg-white rounded-3 shadow-sm border transition-all"
-      :class="{ 'border-danger': !!error }"
+      :class="{ 'border-danger': !!error, 'quill-disabled': disabled }"
     >
       <QuillEditor
         v-model:content="content"
@@ -47,6 +51,7 @@ const content = computed({
         theme="snow"
         :toolbar="toolbar"
         :placeholder="placeholder"
+        :readOnly="disabled"
       />
     </div>
     <div v-if="error" class="text-danger small mt-1">
@@ -99,5 +104,22 @@ const content = computed({
 
 .transition-all {
   transition: all 0.2s ease-in-out;
+}
+
+.quill-disabled {
+  cursor: not-allowed;
+  background-color: #f3f4f6 !important;
+}
+
+.quill-disabled :deep(.ql-editor) {
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+  color: #9ca3af;
+}
+
+.quill-disabled :deep(.ql-toolbar) {
+  pointer-events: none;
+  opacity: 0.6;
+  background-color: #f3f4f6;
 }
 </style>
