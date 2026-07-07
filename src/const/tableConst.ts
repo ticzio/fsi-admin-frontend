@@ -102,6 +102,10 @@ export const TITLE_SECTION_COMPONENT = {
     new: 'Nuevo estado',
     newDescription: 'Aquí puedes crear un nuevo estado con toda la información necesaria.',
   },
+  loyaltySettings: {
+    title: 'Configuración de Puntaje',
+    description: 'Gestione los parámetros del multiplicador de puntos y la vigencia de los mismos',
+  },
   template_pharmacies: {
     title: 'Plantillas de Farmacias',
     description: 'Lista de plantillas de farmacias',

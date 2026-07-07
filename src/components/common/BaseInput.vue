@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import { useFormValidation } from '@/composables/useFormValidation'
 import EmojiPicker from './EmojiPicker.vue'
 
@@ -13,6 +13,7 @@ interface Props {
   autocomplete?: string
   rules?: Array<(val: any) => string | boolean>
   enableEmoji?: boolean
+  isCurrency?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -23,6 +24,7 @@ const props = withDefaults(defineProps<Props>(), {
   autocomplete: 'off',
   rules: () => [],
   enableEmoji: false,
+  isCurrency: false,
 })
 
 const emit = defineEmits(['update:modelValue'])
@@ -36,6 +38,41 @@ const showEmojiPicker = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 const emojiPickerRef = ref<any>(null)
 const emojiTriggerRef = ref<HTMLElement | null>(null)
+
+// --- CURRENCY LOGIC ---
+const displayValue = ref('')
+const numericValue = ref<number | null>(null)
+const digitsOnly = ref('')
+const isInternalUpdate = ref(false)
+
+const formatCurrencyNumber = (num: number) => {
+  if (num === null || num === undefined || isNaN(num)) return ''
+  const [intPart, decPart] = num.toFixed(2).split('.')
+  return `${intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}.${decPart}`
+}
+
+const formatFromDigits = (digits: string) => {
+  const stripped = digits.replace(/^0+/, '')
+
+  if (stripped === '') {
+    return { formatted: '0.00', numeric: 0 }
+  }
+  
+  if (stripped.length === 1) {
+    const numeric = parseFloat(`0.0${stripped}`)
+    return { formatted: '0.0' + stripped, numeric }
+  } else if (stripped.length === 2) {
+    const numeric = parseFloat(`0.${stripped}`)
+    return { formatted: '0.' + stripped, numeric }
+  } else {
+    const intPart = stripped.slice(0, -2)
+    const decPart = stripped.slice(-2)
+    const formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    const formatted = `${formattedInt}.${decPart}`
+    const numeric = parseFloat(`${intPart}.${decPart}`)
+    return { formatted, numeric }
+  }
+}
 
 const toggleEmojiPicker = () => {
   showEmojiPicker.value = !showEmojiPicker.value
@@ -79,6 +116,21 @@ const handleClickOutside = (event: MouseEvent) => {
 onMounted(() => {
   validationContext?.registerField(props.id, internalErrors.value.length > 0)
   document.addEventListener('click', handleClickOutside)
+
+  if (props.isCurrency) {
+    const num = props.modelValue !== '' && props.modelValue !== null && props.modelValue !== undefined 
+      ? parseFloat(String(props.modelValue).replace(/,/g, '')) 
+      : 0
+    if (!isNaN(num)) {
+      displayValue.value = formatCurrencyNumber(num)
+      numericValue.value = num
+      digitsOnly.value = num === 0 ? '' : String(Math.round(num * 100))
+    } else {
+      displayValue.value = '0.00'
+      numericValue.value = 0
+      digitsOnly.value = ''
+    }
+  }
 })
 
 onUnmounted(() => {
@@ -92,7 +144,6 @@ watch(
     validationContext?.updateFieldStatus(props.id, newCount > 0)
   },
 )
-
 
 const inputType = computed(() => {
   if (props.type === 'password') {
@@ -124,8 +175,30 @@ const validate = (value: any) => {
 watch(
   () => props.modelValue,
   (newVal) => {
-    if (internalErrors.value.length > 0) {
-      validate(newVal)
+    if (props.isCurrency) {
+      if (isInternalUpdate.value) return
+      
+      const incoming = (newVal !== null && newVal !== undefined && newVal !== '') 
+        ? parseFloat(String(newVal).replace(/,/g, '')) 
+        : 0
+      if (incoming !== numericValue.value) {
+        if (!isNaN(incoming)) {
+          displayValue.value = formatCurrencyNumber(incoming)
+          numericValue.value = incoming
+          digitsOnly.value = incoming === 0 ? '' : String(Math.round(incoming * 100))
+        } else {
+          displayValue.value = '0.00'
+          numericValue.value = 0
+          digitsOnly.value = ''
+        }
+      }
+      if (internalErrors.value.length > 0) {
+        validate(incoming)
+      }
+    } else {
+      if (internalErrors.value.length > 0) {
+        validate(newVal)
+      }
     }
   },
 )
@@ -137,9 +210,63 @@ const handleInput = (event: Event) => {
   validate(value)
 }
 
+const handleCurrencyInput = (event: Event) => {
+  const inputEvent = event as InputEvent
+  const inputType = inputEvent.inputType
+  
+  isInternalUpdate.value = true
+  
+  if (inputType === 'deleteContentBackward' || inputType === 'deleteContentForward') {
+    digitsOnly.value = digitsOnly.value.slice(0, -1)
+  } else if (inputType === 'insertText' && inputEvent.data && /^[0-9]$/.test(inputEvent.data)) {
+    digitsOnly.value += inputEvent.data
+  } else {
+    const target = event.target as HTMLInputElement
+    const allDigits = target.value.replace(/[^0-9]/g, '')
+    if (allDigits !== digitsOnly.value) {
+      digitsOnly.value = allDigits
+    }
+  }
+  
+  const { formatted, numeric } = formatFromDigits(digitsOnly.value)
+  displayValue.value = formatted
+  numericValue.value = numeric
+  emit('update:modelValue', numeric)
+  validate(numeric)
+  
+  nextTick(() => {
+    if (inputRef.value) {
+      inputRef.value.setSelectionRange(formatted.length, formatted.length)
+    }
+    isInternalUpdate.value = false
+  })
+}
+
+const handleFocus = () => {
+  if (props.isCurrency && inputRef.value) {
+    nextTick(() => {
+      requestAnimationFrame(() => {
+        if (inputRef.value) {
+          const length = inputRef.value.value.length
+          inputRef.value.setSelectionRange(length, length)
+        }
+      })
+    })
+  }
+}
+
 const handleBlur = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  validate(target.value)
+  if (props.isCurrency) {
+    if (numericValue.value === null || numericValue.value === undefined) {
+      displayValue.value = '0.00'
+      numericValue.value = 0
+      emit('update:modelValue', 0)
+    }
+    validate(numericValue.value)
+  } else {
+    const target = event.target as HTMLInputElement
+    validate(target.value)
+  }
 }
 
 const togglePasswordVisibility = () => {
@@ -160,7 +287,8 @@ const togglePasswordVisibility = () => {
         <input
           ref="inputRef"
           :id="id"
-          :type="inputType"
+          :type="isCurrency ? 'text' : inputType"
+          :inputmode="isCurrency ? 'numeric' : undefined"
           class="form-control"
           :class="{
             'is-invalid': internalErrors.length > 0,
@@ -168,12 +296,14 @@ const togglePasswordVisibility = () => {
             'custom-input': true,
             'has-emoji': type === 'text' && enableEmoji,
           }"
-          :value="modelValue"
+          :value="isCurrency ? displayValue : modelValue"
           :placeholder="placeholder"
           :disabled="disabled"
           :autocomplete="autocomplete"
-          @input="handleInput"
+          :style="isCurrency ? 'text-align: right;' : undefined"
+          @input="isCurrency ? handleCurrencyInput($event) : handleInput($event)"
           @blur="handleBlur"
+          @focus="handleFocus"
         />
 
         <span

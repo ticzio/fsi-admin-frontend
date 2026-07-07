@@ -8,6 +8,12 @@ import GeneralConfigCard from '@/components/Settings/GeneralConfigCard.vue'
 import ToolsCard from '@/components/Settings/ToolsCard.vue'
 import SystemVersionCard from '@/components/Settings/SystemVersionCard.vue'
 import SystemStatusCard from '@/components/Settings/SystemStatusCard.vue'
+import Modal from '@/components/common/Modal.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
+import LoyaltySettingsForm from '@/components/LoyaltySettings/LoyaltySettingsForm.vue'
+import LoyaltySettingsSkeleton from '@/components/LoyaltySettings/LoyaltySettingsSkeleton.vue'
+import LoyaltySettingsDetail from '@/components/LoyaltySettings/LoyaltySettingsDetail.vue'
+import { useLoyaltySettings } from '@/composables/Models/useLoyaltySettings'
 
 const router = useRouter()
 const store = useStore()
@@ -36,8 +42,33 @@ const selectMobileTab = (tabId: string) => {
   document.body.style.overflow = ''
 }
 
+// Loyalty settings modal logic
+const modalLoyaltyRef = ref<any>(null)
+const loyaltyFormRef = ref<any>(null)
+const isEditingLoyalty = ref(false)
+const { loading: loadingLoyalty, settings: loyaltySettings, getLoyaltySettings, updateLoyaltySettings } = useLoyaltySettings()
+
+const openLoyaltyModal = async () => {
+  isEditingLoyalty.value = false
+  modalLoyaltyRef.value?.openModal()
+  await getLoyaltySettings()
+}
+
+const handleLoyaltySubmit = async (formData: any) => {
+  const response = await updateLoyaltySettings(formData)
+  if (response) {
+    isEditingLoyalty.value = false
+    await getLoyaltySettings()
+  }
+}
+
+
 // Navigate handler from GeneralConfigCard
 const handleGeneralNavigate = (key: string) => {
+  if (key === 'puntaje') {
+    openLoyaltyModal()
+    return
+  }
   router.push({ name: `settings.${key}` }).catch(() => {
     // Route not yet defined — silently ignore
     console.warn(`Route settings.${key} not found`)
@@ -189,6 +220,81 @@ onMounted(() => {
     <!-- /settings-page -->
 
     <!-- Modales -->
+    <Modal
+      ref="modalLoyaltyRef"
+      id="modalLoyaltySettings"
+      title="Reglas de Lealtad y Fidelización"
+      size="xl"
+    >
+      <!-- Skeleton Loader que imita el diseño del modal con datos -->
+      <LoyaltySettingsSkeleton v-if="loadingLoyalty && !loyaltySettings" />
+
+      <div v-else-if="loyaltySettings">
+        <!-- Vista de Lectura -->
+        <LoyaltySettingsDetail
+          v-if="!isEditingLoyalty"
+          :loyalty-settings="loyaltySettings"
+        />
+
+        <!-- Vista de Edición -->
+        <div v-else>
+          <div class="mb-4">
+            <h4 class="fw-bold mb-1 text-dark">Editar Parámetros</h4>
+            <span class="text-muted fs-6">Modifica las reglas de acumulación y vencimiento</span>
+          </div>
+          <LoyaltySettingsForm
+            ref="loyaltyFormRef"
+            :initial-data="loyaltySettings"
+            @submit="handleLoyaltySubmit"
+          />
+        </div>
+      </div>
+
+      <div v-else class="text-center py-5">
+        <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-3"></i>
+        <h5 class="fw-bold">No se encontró información de configuración</h5>
+        <p class="text-muted fs-6">Por favor, intente recargar o comuníquese con soporte.</p>
+      </div>
+
+      <template #footer>
+        <template v-if="!isEditingLoyalty">
+          <button
+            type="button"
+            class="btn btn-light border fw-bold px-4 py-2 fs-6"
+            data-bs-dismiss="modal"
+          >
+            Cerrar
+          </button>
+          <button
+            v-if="loyaltySettings"
+            type="button"
+            class="btn btn-primary fw-bold text-white px-4 py-2 fs-6"
+            @click="isEditingLoyalty = true"
+          >
+            Editar Parámetros
+          </button>
+        </template>
+        <template v-else>
+          <button
+            type="button"
+            class="btn btn-light border fw-bold px-4 py-2 fs-6"
+            @click="isEditingLoyalty = false"
+            :disabled="loadingLoyalty"
+          >
+            Cancelar
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary fw-bold text-white px-4 py-2 fs-6"
+            @click="loyaltyFormRef?.handleSubmit()"
+            :disabled="loadingLoyalty"
+          >
+            <LoadingSpinner v-if="loadingLoyalty" class="me-1" />
+            Guardar Cambios
+          </button>
+        </template>
+      </template>
+    </Modal>
   </DashboardLayout>
 </template>
 
@@ -472,5 +578,13 @@ onMounted(() => {
 }
 .inactive-menu-btn:hover {
   background: #f1f5f9;
+}
+
+/* ── Loyalty Modal Styles ── */
+.fs-7 {
+  font-size: 0.85rem;
+}
+.fw-extrabold {
+  font-weight: 800;
 }
 </style>
