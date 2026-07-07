@@ -41,6 +41,7 @@ const allTabRoutes = [
   },
   { label: 'Cupones canjeados', path: 'coupons-clients', allowedRoles: [1, 2, 3, 4, 5] },
   { label: 'Chats', path: 'chats-clients', allowedRoles: [1, 2, 3, 4, 5] },
+  { label: 'Auditoría de Puntos', path: 'audit-points', allowedRoles: [1] },
 ]
 
 // ----- INICIO DE LA CORRECCIÓN -----

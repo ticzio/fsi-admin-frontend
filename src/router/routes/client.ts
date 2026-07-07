@@ -36,6 +36,12 @@ export default [
         meta: { requiresAuth: true },
       },
       {
+        path: 'audit-points',
+        name: 'Auditoría de Puntos',
+        component: () => import('../../views/clients/audit-points/List.vue'),
+        meta: { requiresAuth: true },
+      },
+      {
         path: '',
         redirect: (to: any) => {
           return { name: 'Detalle Cliente', params: { id: to.params.id } }

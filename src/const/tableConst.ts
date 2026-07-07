@@ -170,6 +170,16 @@ export const TABLE_HEADERS = {
     { key: 'created_at', label: 'Fecha de Canje' },
   ],
 
+  pointsClient: [
+    ...maybeId('id'),
+    { key: 'code', label: 'Código de factura' },
+    { key: 'points', label: 'Puntos' },
+    { key: 'description', label: 'Descripción' },
+    { key: 'type', label: 'Tipo' },
+    { key: 'expires_at', label: 'Vence' },
+    { key: 'created_at', label: 'Fecha de creación' },
+  ],
+
   coupons: [
     ...maybeId('id'),
     { key: 'code', label: 'Código' },
@@ -183,7 +193,7 @@ export const TABLE_HEADERS = {
     { key: 'active', label: 'Estatus' },
   ],
   clients: [
-    ...maybeId('id_user'),
+    ...maybeId('id'),
     { key: 'code', label: 'Código' },
     { key: 'url_image_light', label: 'Foto' },
     { key: 'ci', label: 'Cédula' },
