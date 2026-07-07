@@ -11,6 +11,7 @@ interface Props {
   placeholderMultiselect?: string
   placeholderInput?: string
   disabled?: boolean
+  disableModifiers?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -18,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
   placeholderMultiselect: 'Seleccionar modificadores',
   placeholderInput: 'Tecla',
   disabled: false,
+  disableModifiers: false,
 })
 
 const emit = defineEmits<{
@@ -59,8 +61,8 @@ const handleInput = (event: Event) => {
           helper-type="custom"
           :show-icons="false"
           :show-descriptions="false"
-          clearable
-          :disabled="disabled"
+          :clearable="!disableModifiers"
+          :disabled="disabled || disableModifiers"
         />
       </div>
 
