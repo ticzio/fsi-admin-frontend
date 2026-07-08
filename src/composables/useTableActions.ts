@@ -237,6 +237,18 @@ export const useTableActions = () => {
     }
   }
 
+  /**
+   * Acciones para módulo Banners
+   */
+  const getBannerActions = (item: any): Action[] => {
+    const config: ActionPermissionConfig = {
+      edit: { permission: PERMISSIONS.banner.update },
+      deactivate: { permission: PERMISSIONS.banner.deactivate },
+      delete: { permission: PERMISSIONS.banner.delete },
+    }
+    return getActionsWithPermissions(item, undefined, config)
+  }
+
   return {
     // Función principal
     getActionsWithPermissions,
@@ -249,6 +261,7 @@ export const useTableActions = () => {
     getExhibitionActions,
     getNewsActions,
     getNotificationActions,
+    getBannerActions,
 
     // Utilidades
     getDefaultActions,

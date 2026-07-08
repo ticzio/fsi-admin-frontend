@@ -10,6 +10,7 @@ import StatusBadge from '@/components/common/StatusBadge.vue'
 import Modal from '@/components/common/Modal.vue'
 import NewsForm from '@/components/News/NewsForm.vue'
 import AppImage from '@/components/common/AppImage.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 //Composables
 import { useRouter } from 'vue-router'
@@ -23,7 +24,7 @@ import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
 const router = useRouter()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
-const { getDefaultActions } = useTableActions()
+const { getNewsActions } = useTableActions()
 
 const {
   loading,
@@ -72,7 +73,7 @@ const handleTableAction = ({ actionName, item }: { actionName: string; item: any
 }
 
 const getTableActions = async (item: any) => {
-  return getDefaultActions(item)
+  return getNewsActions(item)
 }
 
 const handleTablePagination = (page: number) => {
@@ -132,7 +133,7 @@ onMounted(() => {
           class="col-12 col-md d-flex flex-md-row gap-2 align-items-stretch align-items-md-end justify-content-md-end mt-1 mt-md-0"
         >
           <FetchButton @fetch="clearFilters" />
-          <RedirectButton :tooltip-title="BUTTONS_TOOLTIPS.news.tooltipTitle" @redirect="goToNew" />
+          <RedirectButton v-can="'news.create'" :tooltip-title="BUTTONS_TOOLTIPS.news.tooltipTitle" @redirect="goToNew" />
         </div>
       </div>
 
@@ -186,6 +187,7 @@ onMounted(() => {
               type="button"
               class="btn btn-outline-secondary px-4 rounded-3 shadow-sm fw-medium fs-5"
               @click="formModal?.closeModal()"
+              :disabled="loading"
             >
               Cancelar
             </button>
@@ -193,8 +195,10 @@ onMounted(() => {
               type="button"
               class="btn btn-primary px-4 rounded-3 text-white fw-bold shadow-sm d-flex align-items-center fs-5"
               @click="newsFormRef?.handleSubmit()"
+              :disabled="loading"
             >
-              <i class="bi bi-save me-2"></i>
+              <LoadingSpinner v-if="loading" class="me-2" />
+              <i v-else class="bi bi-save me-2"></i>
               {{ isEditingForm ? 'Guardar Cambios' : 'Crear Noticia' }}
             </button>
           </div>

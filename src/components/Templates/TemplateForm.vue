@@ -8,11 +8,16 @@ import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import BaseInput from '@/components/common/BaseInput.vue'
 import BaseTextarea from '@/components/common/BaseTextarea.vue'
 import ShortcutInput from '@/components/common/ShortcutInput.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 const props = defineProps({
   initialData: {
     type: Object as () => Record<string, any> | null,
     default: null,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -239,10 +244,11 @@ const handleSubmit = () => {
     
     
     <div class="d-flex justify-content-end gap-2 mt-4">
-      <button type="button" class="btn btn-light" @click="emit('close')">
+      <button type="button" class="btn btn-light" @click="emit('close')" :disabled="loading">
         Cancelar
       </button>
-      <button type="submit" class="btn btn-primary text-white px-4">
+      <button type="submit" class="btn btn-primary text-white px-4" :disabled="loading">
+        <LoadingSpinner v-if="loading" class="me-1" />
         Guardar
       </button>
     </div>

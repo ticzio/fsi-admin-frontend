@@ -4,6 +4,6 @@ export default [
     path: '/notifications',
     name: 'Notificaciones',
     component: () => import('../../views/notifications/List.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['notification.read'] },
   },
 ]

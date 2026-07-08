@@ -7,9 +7,15 @@ import ImageUploader from '@/components/common/ImageUploader.vue'
 import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import { useMissions } from '@/composables/Models/useMissions'
 
-const props = defineProps<{
-  mission: any
-}>()
+const props = withDefaults(
+  defineProps<{
+    mission: any
+    disabled?: boolean
+  }>(),
+  {
+    disabled: false,
+  }
+)
 
 const { updateMissionImage, updateMission, loading } = useMissions()
 
@@ -90,14 +96,14 @@ defineExpose({
         <ImageUploader
           :initialImageUrl="localMission.url_image"
           @update:modelValue="handleImageUpdate"
-          :inputDisabled="loading"
+          :inputDisabled="loading || disabled"
         />
       </div>
 
       <!-- CASO 1: quantity_date -->
       <template v-if="localMission.type === 'quantity_date'">
         <div class="col-md-6">
-          <BaseInput v-model="localMission.title" id="mission-title" label="Título" />
+          <BaseInput v-model="localMission.title" id="mission-title" label="Título" :disabled="disabled" />
         </div>
 
         <div class="col-md-6">
@@ -106,6 +112,7 @@ defineExpose({
             id="mission-invoice-quantity"
             label="Cantidad de Facturas"
             type="number"
+            :disabled="disabled"
           />
         </div>
 
@@ -115,6 +122,7 @@ defineExpose({
             id="mission-start-date"
             label="Fecha de Inicio"
             type="date"
+            :disabled="disabled"
           />
         </div>
 
@@ -124,6 +132,7 @@ defineExpose({
             id="mission-end-date"
             label="Fecha de Fin"
             type="date"
+            :disabled="disabled"
           />
         </div>
 
@@ -133,6 +142,7 @@ defineExpose({
             id="mission-description"
             label="Descripción"
             rows="3"
+            :disabled="disabled"
           />
         </div>
       </template>
@@ -140,7 +150,7 @@ defineExpose({
       <!-- CASO 2: quantity -->
       <template v-else-if="localMission.type === 'quantity'">
         <div class="col-md-6">
-          <BaseInput v-model="localMission.title" id="mission-title" label="Título" />
+          <BaseInput v-model="localMission.title" id="mission-title" label="Título" :disabled="disabled" />
         </div>
 
         <div class="col-md-6">
@@ -149,6 +159,7 @@ defineExpose({
             id="mission-invoice-quantity"
             label="Cantidad de Facturas"
             type="number"
+            :disabled="disabled"
           />
         </div>
 
@@ -158,6 +169,7 @@ defineExpose({
             id="mission-description"
             label="Descripción"
             rows="3"
+            :disabled="disabled"
           />
         </div>
       </template>
@@ -165,7 +177,7 @@ defineExpose({
       <!-- CASO 3: mount -->
       <template v-else-if="localMission.type === 'mount'">
         <div class="col-md-6">
-          <BaseInput v-model="localMission.title" id="mission-title" label="Título" />
+          <BaseInput v-model="localMission.title" id="mission-title" label="Título" :disabled="disabled" />
         </div>
 
         <div class="col-md-6">
@@ -174,6 +186,7 @@ defineExpose({
             id="mission-invoice-mount"
             label="Monto de Factura"
             type="number"
+            :disabled="disabled"
           />
         </div>
 
@@ -191,7 +204,7 @@ defineExpose({
       <!-- CASO 4: type vacío o null -->
       <template v-else>
         <div class="col-md-6">
-          <BaseInput v-model="localMission.title" id="mission-title" label="Título" />
+          <BaseInput v-model="localMission.title" id="mission-title" label="Título" :disabled="disabled" />
         </div>
 
         <div class="col-12">
@@ -200,6 +213,7 @@ defineExpose({
             id="mission-description"
             label="Descripción"
             rows="3"
+            :disabled="disabled"
           />
         </div>
       </template>

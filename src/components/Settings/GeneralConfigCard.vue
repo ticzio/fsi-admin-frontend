@@ -1,8 +1,13 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useAccessControl } from '@/composables/useAccessControl'
+
 // ── Emits ──────────────────────────────────────────────────────────────────
 const emit = defineEmits<{
   (e: 'navigate', key: string): void
 }>()
+
+const { can } = useAccessControl()
 
 // ── Navigation items ───────────────────────────────────────────────────────
 const items = [
@@ -55,6 +60,18 @@ const items = [
     bg: 'rgba(225, 29, 72, 0.12)',
   },
 ]
+
+const filteredItems = computed(() => {
+  return items.filter((item) => {
+    if (item.key === 'misiones') return can('mission.read')
+    if (item.key === 'banners') return can('banner.read')
+    if (item.key === 'puntaje') return can('loyalty.read')
+    if (item.key === 'niveles' || item.key === 'ciudades' || item.key === 'estados') {
+      return can('settings.update')
+    }
+    return true
+  })
+})
 </script>
 
 <template>
@@ -69,14 +86,14 @@ const items = [
         <small class="text-muted">Parámetros básicos del sistema</small>
       </div>
       <div class="gc-info-badge text-end">
-        <span class="gc-items-count">{{ items.length }} opciones</span>
+        <span class="gc-items-count">{{ filteredItems.length }} opciones</span>
         <span class="gc-scroll-text"><i class="bi bi-mouse-fill"></i> Haz scroll para ver más</span>
       </div>
     </div>
 
     <!-- ── Navigation rows ── -->
     <div class="gc-rows">
-      <template v-for="(item, index) in items" :key="item.key">
+      <template v-for="(item, index) in filteredItems" :key="item.key">
         <button class="gc-row" @click="emit('navigate', item.key)">
           <!-- Icon -->
           <div class="gc-icon-wrap" :style="{ background: item.bg, color: item.color }">
@@ -93,7 +110,7 @@ const items = [
           <i class="bi bi-chevron-right gc-chevron"></i>
         </button>
 
-        <div v-if="index < items.length - 1" class="gc-divider" />
+        <div v-if="index < filteredItems.length - 1" class="gc-divider" />
       </template>
     </div>
   </div>

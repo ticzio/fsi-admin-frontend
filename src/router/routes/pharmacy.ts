@@ -4,19 +4,19 @@ export default [
     path: '/pharmacy',
     name: 'Farmacia',
     component: () => import('../../views/pharmacies/List.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['concessionaire.read'] },
   },
   {
     path: '/pharmacy/new',
     name: 'Nueva Farmacia',
     component: () => import('../../views/pharmacies/New.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['concessionaire.read'] },
   },
   {
     path: '/pharmacy/edit/:id_pharmacy',
     name: 'Editar Farmacia',
     component: () => import('../../views/pharmacies/Orchestrator.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['concessionaire.read'] },
     children: [
       {
         path: 'detail-pharmacies',

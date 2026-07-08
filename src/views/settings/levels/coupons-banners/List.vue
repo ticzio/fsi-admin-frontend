@@ -7,6 +7,7 @@ import FetchButton from '@/components/common/FetchButton.vue'
 import RedirectButton from '@/components/common/RedirectButton.vue'
 import Modal from '@/components/common/Modal.vue'
 import CouponForm from '@/components/Coupons/CouponForm.vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 //Composables
 import { useStore } from 'vuex'
@@ -178,6 +179,7 @@ onMounted(() => {
           type="button"
           class="btn btn-secondary px-4 me-2"
           @click="couponModalRef?.closeModal()"
+          :disabled="loading"
         >
           Cerrar
         </button>
@@ -186,7 +188,9 @@ onMounted(() => {
           type="button"
           class="btn btn-primary px-4 fw-bold shadow-sm"
           @click="couponFormRef?.handleSubmit()"
+          :disabled="loading"
         >
+          <LoadingSpinner v-if="loading" class="me-1" />
           {{ selectedCoupon ? 'Actualizar' : 'Guardar' }}
         </button>
       </template>

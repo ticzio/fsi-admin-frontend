@@ -187,6 +187,7 @@ onMounted(() => {
       <TemplateForm
         :key="modalKey"
         :initial-data="modalMode === 'edit' ? selectedTemplate : null"
+        :loading="loading"
         @close="templateModalRef?.closeModal()"
         @submit="handleTemplateSubmit"
       />

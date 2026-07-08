@@ -89,6 +89,43 @@ export const PERMISSIONS = {
     read: 'activity.read',
     manage: 'activity.manage',
   },
+
+  // Canjes
+  exchange: {
+    read: 'exchange.read',
+    update: 'exchange.update',
+    delete: 'exchange.delete',
+  },
+
+  // Banners
+  banner: {
+    read: 'banner.read',
+    create: 'banner.create',
+    update: 'banner.update',
+    delete: 'banner.delete',
+    deactivate: 'banner.deactivate',
+  },
+
+  // Misiones
+  mission: {
+    read: 'mission.read',
+    update: 'mission.update',
+  },
+
+  // Algoritmo de puntos (Loyalty Settings)
+  loyalty: {
+    read: 'loyalty.read',
+    update: 'loyalty.update',
+  },
+
+  // Operadores
+  operator: {
+    read: 'operator.read',
+    create: 'operator.create',
+    update: 'operator.update',
+    delete: 'operator.delete',
+    deactivate: 'operator.deactivate',
+  },
 } as const
 
 // Tipo para autocompletado

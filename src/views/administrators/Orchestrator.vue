@@ -48,7 +48,7 @@ const allTabRoutes = [
   {
     label: 'Datos del Administrador',
     path: 'detail-administrators',
-    allowedRoles: [1, 2, 3, 4, 5],
+    allowedRoles: [1, 2],
   },
 ]
 

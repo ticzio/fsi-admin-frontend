@@ -37,10 +37,10 @@ const allTabRoutes = [
   {
     label: 'Datos del Operador',
     path: 'detail-operators',
-    allowedRoles: [1, 2, 3, 4, 5],
+    allowedRoles: [1, 2],
   },
-  { label: 'Cupones', path: 'coupons-operators', allowedRoles: [1, 2, 3, 4, 5] },
-  { label: 'Chats', path: 'chats-operators', allowedRoles: [1, 2, 3, 4, 5] },
+  { label: 'Cupones', path: 'coupons-operators', allowedRoles: [1, 2] },
+  { label: 'Chats', path: 'chats-operators', allowedRoles: [1, 2] },
 ]
 
 // ----- INICIO DE LA CORRECCIÓN -----

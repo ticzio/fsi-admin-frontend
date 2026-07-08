@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, computed } from 'vue'
 import LineChart from '@/components/common/Charts/LineChart.vue'
 import { useRouter } from 'vue-router'
 import DashboardLayout from '@/components/DashboardLayout.vue'
@@ -13,6 +13,9 @@ import MultiselectCustom from '@/components/common/MultiselectCustom.vue'
 import { useAnalytics } from '@/composables/Models/useAnalytics'
 import { useMoment } from '@/composables/useMoment'
 import type { StatisticItem } from '@/components/Home/StatisticCards.vue'
+import { useAccessControl } from '@/composables/useAccessControl'
+
+const { can } = useAccessControl()
 
 // ── Analytics composable ──────────────────────────────────────────────────────
 const { loading: loadingDashboard, getDashboardAnalytics } = useAnalytics()
@@ -35,12 +38,29 @@ const resetExchangesZoom = () => {
 }
 
 // ── Statistic Cards ───────────────────────────────────────────────────────────
-const statisticItems = ref<StatisticItem[]>([
-  { value: '—', label: 'Farmacias activas', to: 'Farmacia' },
-  { value: '—', label: 'Operadores activos', to: 'Operadores' },
-  { value: '—', label: 'Clientes registrados', highlighted: true, to: 'Clientes' },
-  { value: '—', label: 'Cupones canjeados', to: 'Canjes' },
-])
+const rawStats = ref({
+  total_pharmacies: '—',
+  total_operators: '—',
+  total_clients: '—',
+  total_exchange: '—',
+})
+
+const statisticItems = computed<StatisticItem[]>(() => {
+  const cards: StatisticItem[] = []
+  if (can('concessionaire.read')) {
+    cards.push({ value: rawStats.value.total_pharmacies, label: 'Farmacias activas', to: 'Farmacia' })
+  }
+  if (can('operator.read')) {
+    cards.push({ value: rawStats.value.total_operators, label: 'Operadores activos', to: 'Operadores' })
+  }
+  if (can('client.read')) {
+    cards.push({ value: rawStats.value.total_clients, label: 'Clientes registrados', highlighted: true, to: 'Clientes' })
+  }
+  if (can('exchange.read')) {
+    cards.push({ value: rawStats.value.total_exchange, label: 'Cupones canjeados', to: 'Canjes' })
+  }
+  return cards
+})
 
 // ── Charts (reactive state driven by backend) ─────────────────────────────────
 const chartKey = ref(0)
@@ -230,12 +250,12 @@ const loadDashboardData = async () => {
   if (!data) return
 
   // Statistic cards
-  statisticItems.value = [
-    { value: data.total_pharmacies, label: 'Farmacias activas', to: 'Farmacia' },
-    { value: data.total_operators, label: 'Operadores activos', to: 'Operadores' },
-    { value: data.total_clients, label: 'Clientes registrados', highlighted: true, to: 'Clientes' },
-    { value: data.total_exchange, label: 'Cupones canjeados', to: 'Canjes' },
-  ]
+  rawStats.value = {
+    total_pharmacies: data.total_pharmacies,
+    total_operators: data.total_operators,
+    total_clients: data.total_clients,
+    total_exchange: data.total_exchange,
+  }
 
   totalExchange.value = data.total_exchange
 
@@ -353,7 +373,7 @@ const handleViewAllUsers = async () => {
       <!-- MAIN CONTENT -->
       <div class="row g-4 flex-grow-1">
         <!-- LEFT COLUMN: Charts -->
-        <div class="col-12 col-lg-8 d-flex flex-column gap-3 gap-md-4">
+        <div :class="[can('client.read') ? 'col-12 col-lg-8' : 'col-12', 'd-flex flex-column gap-3 gap-md-4']">
           <!-- Top Chart -->
           <div class="card border border-light shadow-sm rounded-4 p-3 p-md-4 flex-grow-1">
             <div
@@ -402,6 +422,7 @@ const handleViewAllUsers = async () => {
 
           <!-- Bottom Chart -->
           <div
+            v-if="can('client.read')"
             class="card border border-light shadow-sm rounded-4 p-3 p-md-4 pb-5 pb-md-5 h-100 min-h-200"
           >
             <h6 class="fw-bold text-dark mb-4 text-center text-md-start" style="font-size: 1rem">
@@ -431,6 +452,7 @@ const handleViewAllUsers = async () => {
 
         <!-- RIGHT COLUMN: Users List -->
         <LatestUsers
+          v-if="can('client.read')"
           :users="latestUsers"
           @click-user="handleUserClick"
           @click-view-all="handleViewAllUsers"

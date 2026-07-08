@@ -22,7 +22,7 @@ import { BUTTONS_TOOLTIPS } from '@/const/buttonConst'
 
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
-const { getDefaultActions } = useTableActions()
+const { getBannerActions } = useTableActions()
 const { loading, banners, pagination, getDataBanners, saveBanner, deactivateBanner, deleteBanner } =
   useBanners()
 
@@ -47,7 +47,7 @@ const handleTableAction = async ({ actionName, item }: { actionName: string; ite
 }
 
 const getTableActions = async (item: any) => {
-  return getDefaultActions(item)
+  return getBannerActions(item)
 }
 
 const handleTablePagination = (page: number) => {
@@ -110,6 +110,7 @@ onMounted(() => {
         >
           <FetchButton @fetch="clearFilters" />
           <RedirectButton
+            v-can="'banner.create'"
             :tooltip-title="BUTTONS_TOOLTIPS.banners.tooltipTitle"
             @redirect="goToNew"
           />

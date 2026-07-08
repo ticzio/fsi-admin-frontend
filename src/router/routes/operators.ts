@@ -4,18 +4,18 @@ export default [
     path: '/operators',
     name: 'Operadores',
     component: () => import('../../views/operators/List.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['operator.read'] },
   },
   {
     path: '/operators/new',
     name: 'Nuevo Operador',
     component: () => import('../../views/operators/New.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['operator.read'] },
   },
   {
     path: '/operators/edit/:id',
     component: () => import('../../views/operators/Orchestrator.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['operator.read'] },
     children: [
       {
         path: 'detail-operators',

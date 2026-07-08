@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import AppImage from './AppImage.vue'
 
 interface Action {
   name: string
@@ -12,6 +13,7 @@ const props = defineProps<{
   item: any
   titleKey?: string
   descriptionKey?: string
+  imageKey?: string
   startDateKey?: string
   finishDateKey?: string
   statusKey?: string
@@ -47,7 +49,11 @@ const description = computed(() => {
 })
 
 const imageUrl = computed(() => {
-  return getNestedValue(props.item, 'url_image')
+  return (
+    getNestedValue(props.item, props.imageKey || 'url_image') ||
+    getNestedValue(props.item, 'url_image') ||
+    getNestedValue(props.item, 'url_img')
+  )
 })
 
 const startDate = computed(() => {
@@ -114,20 +120,14 @@ const statusClass = computed(() => {
             height: centeredContent ? '140px' : '80px',
           }"
         >
-          <template v-if="imageUrl">
-            <img :src="imageUrl" class="w-100 h-100 object-fit-cover rounded-4" alt="Coupon" />
-          </template>
-          <template v-else>
-            <div class="text-center">
-              <div class="fw-bold" :style="{ fontSize: centeredContent ? '1.2rem' : '0.8rem' }">
-                DCTO
-              </div>
-              <div :class="['fw-bold mb-0', centeredContent ? 'h1' : 'h4']">30%</div>
-              <div class="small" :style="{ fontSize: centeredContent ? '0.9rem' : '0.6rem' }">
-                OFF
-              </div>
-            </div>
-          </template>
+          <AppImage
+            :src="imageUrl"
+            :alt="title"
+            type="entity"
+            width="100%"
+            height="100%"
+            rounded="rounded-4"
+          />
         </div>
 
         <!-- Action Button -->

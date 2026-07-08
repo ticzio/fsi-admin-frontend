@@ -35,12 +35,12 @@ const allTabRoutes = [
   {
     label: 'Datos de la Farmacia',
     path: 'detail-pharmacies',
-    allowedRoles: [1, 2, 3, 4, 5],
+    allowedRoles: [1, 2],
   },
-  { label: 'Operadores', path: 'operators-pharmacies', allowedRoles: [1, 2, 3, 4, 5] },
-  { label: 'Plantillas', path: 'template-pharmacies', allowedRoles: [1, 2, 3, 4, 5] },
-  { label: 'Chats', path: 'chats-pharmacies', allowedRoles: [1, 2, 3, 4, 5] },
-  { label: 'Analíticas', path: 'analytics-pharmacies', allowedRoles: [1, 2, 3, 4, 5] },
+  { label: 'Operadores', path: 'operators-pharmacies', allowedRoles: [1, 2] },
+  { label: 'Plantillas', path: 'template-pharmacies', allowedRoles: [1, 2] },
+  { label: 'Chats', path: 'chats-pharmacies', allowedRoles: [1, 2] },
+  { label: 'Analíticas', path: 'analytics-pharmacies', allowedRoles: [1, 2] },
 ]
 
 // ----- INICIO DE LA CORRECCIÓN -----

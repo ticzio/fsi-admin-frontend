@@ -27,12 +27,12 @@ const allTabRoutes = [
   {
     label: 'Cupones',
     path: 'coupons',
-    allowedRoles: [1, 2, 3, 4, 5],
+    allowedRoles: [1, 2],
   },
   {
     label: 'Beneficios y progreso',
     path: 'benefits',
-    allowedRoles: [1, 2, 3, 4, 5],
+    allowedRoles: [1, 2],
   },
 ]
 

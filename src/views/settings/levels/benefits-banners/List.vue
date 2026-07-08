@@ -48,7 +48,7 @@ onMounted(() => {
     <BenefitGrid :id-level="idLevel" :benefits="benefits" :loading="loading" @refresh="fetchData" />
 
     <!-- Progress Section -->
-    <LevelProgress :level="level" @update="handleUpdateLevelPoints" />
+    <LevelProgress :level="level" :loading="loading" @update="handleUpdateLevelPoints" />
   </div>
 </template>
 

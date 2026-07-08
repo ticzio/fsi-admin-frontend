@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 
 const props = defineProps<{
   level?: any
+  loading?: boolean
 }>()
 
 const emit = defineEmits(['update'])
@@ -69,9 +71,11 @@ const handleUpdate = () => {
         <!-- Update Button -->
         <button
           @click="handleUpdate"
-          class="btn btn-success rounded-3 px-5 py-2 fw-bold shadow-sm transition-all text-white"
+          class="btn btn-success rounded-3 px-5 py-2 fw-bold shadow-sm transition-all text-white d-flex align-items-center gap-2"
           style="background-color: #28a745; border: none"
+          :disabled="loading"
         >
+          <LoadingSpinner v-if="loading" />
           Actualizar Puntos
         </button>
       </div>

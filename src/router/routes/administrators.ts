@@ -4,19 +4,19 @@ export default [
     path: '/administrators',
     name: 'Administradores',
     component: () => import('../../views/administrators/List.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['administrator.read'] },
   },
   {
     path: '/administrators/new',
     name: 'Nuevo Administrador',
     component: () => import('../../views/administrators/New.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['administrator.read'] },
   },
   {
     path: '/administrators/edit/:id',
     name: 'Editar Administrador',
     component: () => import('../../views/administrators/Orchestrator.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['administrator.read'] },
     redirect: {
       name: 'Detalle Administrador',
     },

@@ -4,18 +4,18 @@ export default [
     path: '/clients',
     name: 'Clientes',
     component: () => import('../../views/clients/List.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['client.read'] },
   },
   {
     path: '/clients/new',
     name: 'Nuevo Cliente',
     component: () => import('../../views/clients/New.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['client.read'] },
   },
   {
     path: '/clients/edit/:id',
     component: () => import('../../views/clients/Orchestrator.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['client.read'] },
     children: [
       {
         path: 'detail-clients',

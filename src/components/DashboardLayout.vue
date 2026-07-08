@@ -10,6 +10,17 @@ import { useCookies } from '@/composables/useCookies'
 import defaultAvatar from '@/assets/images/default-profile.png'
 import fsiLogo from '@/assets/images/login/login_logo_FSI.png'
 import ticzLogo from '@/assets/images/ticz.png'
+import { useAccessControl } from '@/composables/useAccessControl'
+
+const { can } = useAccessControl()
+const filteredMenuItems = computed(() => {
+  return MENU_ITEMS.filter((item) => {
+    if (item.permission) {
+      return can(item.permission)
+    }
+    return true
+  })
+})
 
 const store = useStore()
 const route = useRoute()
@@ -121,7 +132,7 @@ const handleLogout = async () => {
         <!-- Navigation Menu -->
         <nav class="sidebar-nav mt-3">
           <ul class="nav flex-column gap-1">
-            <li v-for="item in MENU_ITEMS" :key="item.to" class="nav-item">
+            <li v-for="item in filteredMenuItems" :key="item.to" class="nav-item">
               <router-link
                 :to="item.to"
                 :class="['nav-link custom-nav-link', { active: isItemActive(item) }]"

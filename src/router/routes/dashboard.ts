@@ -4,6 +4,6 @@ export default [
     path: '/dashboard',
     name: 'Dashboard',
     component: () => import('../../views/DashboardView.vue'),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, permissions: ['dashboard.read'] },
   },
 ]

@@ -37,10 +37,10 @@ const allTabRoutes = [
   {
     label: 'Datos del Cliente',
     path: 'detail-clients',
-    allowedRoles: [1, 2, 3, 4, 5],
+    allowedRoles: [1, 2],
   },
-  { label: 'Cupones canjeados', path: 'coupons-clients', allowedRoles: [1, 2, 3, 4, 5] },
-  { label: 'Chats', path: 'chats-clients', allowedRoles: [1, 2, 3, 4, 5] },
+  { label: 'Cupones canjeados', path: 'coupons-clients', allowedRoles: [1, 2] },
+  { label: 'Chats', path: 'chats-clients', allowedRoles: [1, 2] },
   { label: 'Auditoría de Puntos', path: 'audit-points', allowedRoles: [1] },
 ]
 

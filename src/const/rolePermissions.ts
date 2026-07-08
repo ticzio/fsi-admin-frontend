@@ -8,12 +8,8 @@
  * Roles conocidos:
  * 1 = Super Admin
  * 2 = Admin
- * 3 = Supervisor
- * 4 = Editor
- * 5 = Viewer
- * 6 = Marketing (solo Noticias y Notificaciones)
- * 7 = Concessionaire User
- * 8 = Concessionaire Admin
+ * 3 = Operator
+ * 4 = Marketing
  */
 
 import { PERMISSIONS, PERMISSION_WILDCARD } from './permissions'
@@ -21,12 +17,8 @@ import { PERMISSIONS, PERMISSION_WILDCARD } from './permissions'
 export const ROLE_IDS = {
   SUPER_ADMIN: 1,
   ADMIN: 2,
-  SUPERVISOR: 3,
-  EDITOR: 4,
-  VIEWER: 5,
-  MARKETING: 6,
-  CONCESSIONAIRE_USER: 7,
-  CONCESSIONAIRE_ADMIN: 8,
+  OPERATOR: 3,
+  MARKETING: 4,
 } as const
 
 export type RoleId = (typeof ROLE_IDS)[keyof typeof ROLE_IDS]
@@ -39,141 +31,107 @@ export const ROLE_PERMISSIONS: Record<number, string[]> = {
   // Super Admin: acceso total
   [ROLE_IDS.SUPER_ADMIN]: [PERMISSION_WILDCARD],
 
-  // Admin: casi todo excepto configuración crítica
+  // Admin: casi todo excepto configuración crítica y algoritmo de puntos
   [ROLE_IDS.ADMIN]: [
     // Dashboard
     PERMISSIONS.dashboard.read,
 
-    // Concesionarios
+    // Concesionarios (Farmacias)
     PERMISSIONS.concessionaire.read,
     PERMISSIONS.concessionaire.create,
     PERMISSIONS.concessionaire.update,
     PERMISSIONS.concessionaire.deactivate,
+    PERMISSIONS.concessionaire.delete,
 
     // Empresas
     PERMISSIONS.company.read,
     PERMISSIONS.company.create,
     PERMISSIONS.company.update,
     PERMISSIONS.company.deactivate,
+    PERMISSIONS.company.delete,
 
     // Administradores
     PERMISSIONS.administrator.read,
     PERMISSIONS.administrator.create,
     PERMISSIONS.administrator.update,
     PERMISSIONS.administrator.deactivate,
+    PERMISSIONS.administrator.delete,
 
     // Clientes
     PERMISSIONS.client.read,
     PERMISSIONS.client.create,
     PERMISSIONS.client.update,
     PERMISSIONS.client.deactivate,
+    PERMISSIONS.client.delete,
 
-    // Exhibiciones
-    PERMISSIONS.exhibition.read,
-    PERMISSIONS.exhibition.create,
-    PERMISSIONS.exhibition.update,
-    PERMISSIONS.exhibition.deactivate,
+    // Operadores
+    PERMISSIONS.operator.read,
+    PERMISSIONS.operator.create,
+    PERMISSIONS.operator.update,
+    PERMISSIONS.operator.deactivate,
+    PERMISSIONS.operator.delete,
 
-    // Noticias
+    // Noticias (CRUD)
     PERMISSIONS.news.read,
     PERMISSIONS.news.create,
     PERMISSIONS.news.update,
     PERMISSIONS.news.deactivate,
+    PERMISSIONS.news.delete,
 
-    // Notificaciones
+    // Notificaciones (CRUD)
     PERMISSIONS.notification.read,
     PERMISSIONS.notification.create,
     PERMISSIONS.notification.update,
+    PERMISSIONS.notification.delete,
 
-    // Configuración
+    // Canjes (CRUD)
+    PERMISSIONS.exchange.read,
+    PERMISSIONS.exchange.update,
+    PERMISSIONS.exchange.delete,
+
+    // Banners publicitarios (CRUD)
+    PERMISSIONS.banner.read,
+    PERMISSIONS.banner.create,
+    PERMISSIONS.banner.update,
+    PERMISSIONS.banner.delete,
+    PERMISSIONS.banner.deactivate,
+
+    // Configurar misiones (SOLO VER)
+    PERMISSIONS.mission.read,
+
+    // Configuración general
     PERMISSIONS.settings.read,
   ],
 
-  // Supervisor: lectura + algunas ediciones
-  [ROLE_IDS.SUPERVISOR]: [
-    PERMISSIONS.dashboard.read,
+  // Operador: tiene su propio dashboard, aquí se ignora/sin permisos
+  [ROLE_IDS.OPERATOR]: [],
 
-    PERMISSIONS.concessionaire.read,
-    PERMISSIONS.concessionaire.update,
-
-    PERMISSIONS.company.read,
-    PERMISSIONS.company.update,
-
-    PERMISSIONS.administrator.read,
-
-    PERMISSIONS.client.read,
-    PERMISSIONS.client.update,
-
-    PERMISSIONS.exhibition.read,
-    PERMISSIONS.exhibition.update,
-
-    PERMISSIONS.news.read,
-    PERMISSIONS.news.update,
-
-    PERMISSIONS.notification.read,
-
-    PERMISSIONS.settings.read,
-  ],
-
-  // Editor: lectura + crear/editar contenido
-  [ROLE_IDS.EDITOR]: [
-    PERMISSIONS.dashboard.read,
-
-    PERMISSIONS.concessionaire.read,
-
-    PERMISSIONS.company.read,
-
-    PERMISSIONS.client.read,
-
-    PERMISSIONS.exhibition.read,
-    PERMISSIONS.exhibition.create,
-    PERMISSIONS.exhibition.update,
-
-    PERMISSIONS.news.read,
-    PERMISSIONS.news.create,
-    PERMISSIONS.news.update,
-
-    PERMISSIONS.notification.read,
-    PERMISSIONS.notification.create,
-  ],
-
-  // Viewer: solo lectura
-  [ROLE_IDS.VIEWER]: [
-    PERMISSIONS.dashboard.read,
-    PERMISSIONS.concessionaire.read,
-    PERMISSIONS.company.read,
-    PERMISSIONS.client.read,
-    PERMISSIONS.exhibition.read,
-    PERMISSIONS.news.read,
-    PERMISSIONS.notification.read,
-  ],
-
-  // Marketing: acceso a Noticias, Notificaciones e Inicio
+  // Marketing: Noticias (CRUD), Notificaciones (VER), Canjes (VER), Banners (CRUD)
   [ROLE_IDS.MARKETING]: [
     PERMISSIONS.dashboard.read,
 
+    // Noticias (CRUD)
     PERMISSIONS.news.read,
     PERMISSIONS.news.create,
     PERMISSIONS.news.update,
     PERMISSIONS.news.deactivate,
+    PERMISSIONS.news.delete,
 
+    // Notificaciones (VER)
     PERMISSIONS.notification.read,
-    PERMISSIONS.notification.create,
-    PERMISSIONS.notification.update,
-  ],
 
-  // Concessionaire User: gestión de actividades
-  [ROLE_IDS.CONCESSIONAIRE_USER]: [
-    PERMISSIONS.dashboard.read,
-    PERMISSIONS.activity.read,
-    PERMISSIONS.activity.manage,
-  ],
+    // Canjes (VER)
+    PERMISSIONS.exchange.read,
 
-  // Concessionaire Admin: gestión de actividades
-  [ROLE_IDS.CONCESSIONAIRE_ADMIN]: [
-    PERMISSIONS.dashboard.read,
-    PERMISSIONS.activity.read,
-    PERMISSIONS.activity.manage,
+    // Banners publicitarios (CRUD)
+    PERMISSIONS.banner.read,
+    PERMISSIONS.banner.create,
+    PERMISSIONS.banner.update,
+    PERMISSIONS.banner.delete,
+    PERMISSIONS.banner.deactivate,
+
+    // Configuración general (necesario para ver banners)
+    PERMISSIONS.settings.read,
   ],
 }
 

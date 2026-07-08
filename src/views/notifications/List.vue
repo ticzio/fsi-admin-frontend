@@ -131,6 +131,7 @@ onMounted(async () => {
         >
           <FetchButton @fetch="clearFilters" />
           <RedirectButton
+            v-can="'notification.create'"
             :tooltip-title="BUTTONS_TOOLTIPS.notification.tooltipTitle"
             @redirect="goToNew"
           />

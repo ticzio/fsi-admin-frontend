@@ -15,6 +15,7 @@ import { useStore } from 'vuex'
 import { useSwalToast } from '@/composables/useSwalToast'
 import { useTableActions } from '@/composables/useTableActions'
 import { useMissions } from '@/composables/Models/useMissions'
+import { useAccessControl } from '@/composables/useAccessControl'
 
 //Components
 import Modal from '@/components/common/Modal.vue'
@@ -27,6 +28,7 @@ const router = useRouter()
 const store = useStore()
 const isMobile = computed(() => store.getters.isMobile)
 const { getDefaultSafeActions } = useTableActions()
+const { can } = useAccessControl()
 const {
   loading,
   missions,
@@ -181,9 +183,9 @@ onMounted(() => {
   </DashboardLayout>
 
   <Modal id="mission-modal" ref="missionModalRef" title="Detalles de la misión" size="lg">
-    <MissionForm v-if="selectedMission" ref="missionFormRef" :mission="selectedMission" />
+    <MissionForm v-if="selectedMission" ref="missionFormRef" :mission="selectedMission" :disabled="!can('mission.update')" />
 
-    <template #footer>
+    <template #footer v-if="can('mission.update')">
       <button
         type="button"
         class="btn btn-primary fw-bold text-white"

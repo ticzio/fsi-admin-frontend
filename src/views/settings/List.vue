@@ -14,6 +14,9 @@ import LoyaltySettingsForm from '@/components/LoyaltySettings/LoyaltySettingsFor
 import LoyaltySettingsSkeleton from '@/components/LoyaltySettings/LoyaltySettingsSkeleton.vue'
 import LoyaltySettingsDetail from '@/components/LoyaltySettings/LoyaltySettingsDetail.vue'
 import { useLoyaltySettings } from '@/composables/Models/useLoyaltySettings'
+import { useAccessControl } from '@/composables/useAccessControl'
+
+const { can } = useAccessControl()
 
 const router = useRouter()
 const store = useStore()
@@ -66,6 +69,7 @@ const handleLoyaltySubmit = async (formData: any) => {
 // Navigate handler from GeneralConfigCard
 const handleGeneralNavigate = (key: string) => {
   if (key === 'puntaje') {
+    if (!can('loyalty.read')) return
     openLoyaltyModal()
     return
   }
