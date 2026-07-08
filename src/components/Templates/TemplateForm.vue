@@ -59,8 +59,8 @@ watch(
   }
 )
 
-const shortcutOptions = ['SHIFT', 'ALT', 'CTRL']
-const shortcutModifiers = ref<any>(null)
+const shortcutOptions = ['CTRL']
+const shortcutModifiers = ref<any>({ id: 'CTRL', name: 'CTRL' })
 const shortcutKey = ref('')
 
 watch(
@@ -84,10 +84,10 @@ watch(
             key = part
           }
         })
-        shortcutModifiers.value = modifiers.length > 0 ? { id: modifiers[0], name: modifiers[0] } : null
+        shortcutModifiers.value = modifiers.length > 0 ? { id: modifiers[0], name: modifiers[0] } : { id: 'CTRL', name: 'CTRL' }
         shortcutKey.value = key
       } else {
-        shortcutModifiers.value = null
+        shortcutModifiers.value = { id: 'CTRL', name: 'CTRL' }
         shortcutKey.value = ''
       }
     } else {
@@ -95,7 +95,7 @@ watch(
       form.value.description = ''
       form.value.category = ''
       selectedCategory.value = null
-      shortcutModifiers.value = null
+      shortcutModifiers.value = { id: 'CTRL', name: 'CTRL' }
       shortcutKey.value = ''
     }
     descriptionError.value = ''
@@ -234,6 +234,7 @@ const handleSubmit = () => {
       v-model:selectedModifiers="shortcutModifiers"
       v-model:inputValue="shortcutKey"
       :disabled="!selectedCategory"
+      disable-modifiers
     />
     
     

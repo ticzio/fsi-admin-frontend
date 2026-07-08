@@ -46,6 +46,14 @@ const items = [
     color: '#06b6d4',
     bg: 'rgba(6, 182, 212, 0.12)',
   },
+  {
+    key: 'puntaje',
+    label: 'Configuración de puntaje',
+    desc: 'Configura el multiplicador de puntos para los usuarios',
+    icon: 'bi-award-fill',
+    color: '#e11d48',
+    bg: 'rgba(225, 29, 72, 0.12)',
+  },
 ]
 </script>
 
@@ -56,9 +64,13 @@ const items = [
       <div class="gc-icon-wrap" style="background: rgba(18, 62, 147, 0.1); color: #123e93">
         <i class="bi bi-sliders2"></i>
       </div>
-      <div>
+      <div class="flex-grow-1">
         <h5 class="fw-bold mb-0">Configuración General</h5>
         <small class="text-muted">Parámetros básicos del sistema</small>
+      </div>
+      <div class="gc-info-badge text-end">
+        <span class="gc-items-count">{{ items.length }} opciones</span>
+        <span class="gc-scroll-text"><i class="bi bi-mouse-fill"></i> Haz scroll para ver más</span>
       </div>
     </div>
 
@@ -99,6 +111,8 @@ const items = [
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-width: 320px;
+  max-width: 100%;
 }
 .gc-card:hover {
   box-shadow: 0 6px 28px rgba(18, 62, 147, 0.09);
@@ -122,6 +136,31 @@ const items = [
   font-size: 0.8rem;
   color: #94a3b8;
 }
+.gc-info-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+.gc-items-count {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #123e93;
+  background: rgba(18, 62, 147, 0.12);
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+.gc-scroll-text {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #475569;
+  white-space: nowrap;
+}
+.gc-scroll-text i {
+  color: #123e93;
+  margin-right: 2px;
+}
 
 /* ── Icon wraps ── */
 .gc-icon-wrap {
@@ -138,17 +177,30 @@ const items = [
 /* ── Rows ── */
 .gc-rows {
   padding: 0 24px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #cbd5e1 transparent;
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  .gc-rows {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f8fafc;
+  }
 }
 
 .gc-rows::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+}
+.gc-rows::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 10px;
 }
 .gc-rows::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 10px;
+}
+.gc-rows::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 
 
