@@ -117,8 +117,11 @@ export const ROLE_PERMISSIONS: Record<number, string[]> = {
     PERMISSIONS.news.deactivate,
     PERMISSIONS.news.delete,
 
-    // Notificaciones (VER)
+    // Notificaciones (CRUD)
     PERMISSIONS.notification.read,
+    PERMISSIONS.notification.create,
+    PERMISSIONS.notification.update,
+    PERMISSIONS.notification.delete,
 
     // Canjes (VER)
     PERMISSIONS.exchange.read,
