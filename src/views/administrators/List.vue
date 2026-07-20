@@ -133,9 +133,13 @@ onMounted(async () => {
               <AppImage :src="value" type="user" />
             </div>
           </template>
-
-          <template #cell(active)="{ value }">
-            <StatusBadge :value="value" />
+      <template #cell(active)="{ value, item }">
+            <StatusBadge
+              v-if="Number(item.failed_attempts ?? item.failed_attemps) >= 5"
+              label="Bloqueado"
+              variant="badge bg-secondary-subtle text-white fw-medium border border-secondary"
+            />
+            <StatusBadge v-else :value="value" />
           </template>
         </CustomTable>
       </div>

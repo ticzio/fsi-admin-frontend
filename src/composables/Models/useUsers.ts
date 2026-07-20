@@ -334,6 +334,47 @@ export function useUsers() {
     }
   }
 
+  /**
+   * Desbloquea un usuario.
+   */
+  const unlockUser = async (item: UserInterface) => {
+    const result = await swal.showConfirm(
+      `¿Estás seguro de desbloquear al usuario ${item.first_name} ${item.last_name}?`,
+      `Esta acción permitirá al usuario volver a acceder a su cuenta.`,
+      {
+        confirmButtonText: 'Desbloquear',
+        cancelButtonText: 'Cancelar',
+      },
+    )
+
+    if (!result) return false
+
+    loading.value = true
+    try {
+      const response = await store.dispatch('updateData', {
+        url: 'user/unlock',
+        id: item.id!,
+        data: {},
+      })
+      if (response.code === 200 || response.code === 201) {
+        logger.logRequest('user/unlock', {}, response)
+        swal.showSuccess('Usuario desbloqueado exitosamente')
+        if (user.value && String(user.value.id) === String(item.id)) {
+          await getUser(item.id!, true)
+        }
+        await getDataUsers(pagination.currentPage, currentSearch.value, currentExtraParams.value)
+        return true
+      }
+      return false
+    } catch (error: any) {
+      logger.logRequest('user/unlock', {}, error)
+      handleErrorResponse(error, `Error al desbloquear a ${item.first_name}`)
+      return false
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     loading,
     users,
@@ -347,5 +388,6 @@ export function useUsers() {
     saveUser,
     deactivateUser,
     deleteUser,
+    unlockUser,
   }
 }

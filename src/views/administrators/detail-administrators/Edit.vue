@@ -2,7 +2,16 @@
   <div class="container-fluid p-0">
     <div class="card border-0 shadow-sm">
       <div class="card-body p-4">
-        <div class="mb-4 d-flex justify-content-end" v-if="!loading">
+        <div class="mb-4 d-flex justify-content-end align-items-center gap-3" v-if="!loading">
+          <button
+            type="button"
+            :class="isBlocked ? BUTTONS.unlock.class : 'btn btn-outline-secondary rounded-3'"
+            :disabled="loading || !isBlocked"
+            @click="handleUnlock"
+          >
+            <i :class="isBlocked ? BUTTONS.unlock.icon : 'bi bi-lock-fill'" class="me-1"></i>
+            Desbloquear
+          </button>
           <DateTimeBadges
             :createdAt="form.created_at || form.timestamp"
             :updatedAt="form.updated_at"
@@ -48,6 +57,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner.vue'
 import DateTimeBadges from '@/components/common/DateTimeBadges.vue'
 import { BUTTONS } from '@/const/buttonConst'
 import { provideFormValidation } from '@/composables/useFormValidation'
+import { useSwalToast } from '@/composables/useSwalToast'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,8 +65,9 @@ const store = useStore()
 
 const isMobile = computed(() => store.getters.isMobile)
 
-const { loading, roles, getRoles, getUser, saveUser } = useUsers()
+const { loading, roles, getRoles, getUser, saveUser, unlockUser } = useUsers()
 const { isFormValid } = provideFormValidation()
+const swalToast = useSwalToast()
 
 const form = ref({
   id: '',
@@ -76,6 +87,17 @@ const form = ref({
 const filteredRoles = computed(() => {
   return roles.value.filter((role: any) => role.id !== 3)
 })
+
+const isBlocked = computed(() => {
+  const attempts = (form.value as any)?.failed_attempts
+  return Number(attempts) >= 5
+})
+
+const handleUnlock = async () => {
+  if (!form.value?.id) return
+  await unlockUser(form.value as any)
+  await fetchAdminData()
+}
 
 const fetchAdminData = async () => {
   const adminId = route.params.id as string
