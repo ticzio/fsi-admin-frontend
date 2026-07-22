@@ -63,6 +63,7 @@ export function useNewsModel() {
       const formDataToSend = new FormData()
       formDataToSend.append('title', data.title)
       formDataToSend.append('body', data.content)
+      formDataToSend.append('url_link', data.url_link || '')
 
       if (data.imageFile) {
         formDataToSend.append('url_image', data.imageFile)

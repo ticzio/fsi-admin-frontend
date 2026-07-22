@@ -10,6 +10,7 @@ interface NewsData {
   id?: number | string
   title: string
   url_image?: string
+  url_link?: string
   content: string
   active: boolean
   created_at?: string | null
@@ -34,6 +35,7 @@ const formData = ref<NewsData>({
   content: '',
   active: true,
   url_image: '',
+  url_link: '',
 })
 
 const imageFile = ref<File | null>(null)
@@ -60,6 +62,7 @@ const initForm = () => {
       content: props.initialData.body_only_text || props.initialData.content || '',
       active: props.initialData.active !== undefined ? props.initialData.active : true,
       url_image: props.initialData.url_image || '',
+      url_link: props.initialData.url_link || '',
     }
     previewImageUrl.value = formData.value.url_image || ''
   } else {
@@ -69,6 +72,7 @@ const initForm = () => {
       content: '',
       active: true,
       url_image: '',
+      url_link: '',
     }
     imageFile.value = null
     previewImageUrl.value = ''
@@ -167,26 +171,15 @@ defineExpose({
               :rules="[(v) => !!v || 'El título es obligatorio']"
             />
           </div>
-          <div
-            v-if="isEditing"
-            class="col-12 col-md-4 d-flex align-items-center pt-md-3 mb-3 mb-md-0"
-            style="transform: translateY(-4px)"
-          >
-            <div class="form-check form-switch d-flex align-items-center ps-0 mb-0">
-              <input
-                class="form-check-input ms-0 me-2 shadow-none mt-0"
-                type="checkbox"
-                id="activeStatus"
-                v-model="formData.active"
-                style="cursor: pointer"
-              />
-              <label class="form-check-label mb-0" for="activeStatus" style="cursor: pointer">
-                <span :class="formData.active ? 'text-success fw-bold' : 'text-secondary fw-bold'">
-                  {{ formData.active ? 'Publicada' : 'Oculta' }}
-                </span>
-              </label>
-            </div>
-          </div>
+        </div>
+
+        <div class="mb-3">
+          <BaseInput
+            id="urlLink"
+            v-model="formData.url_link"
+            label="Enlace de la Noticia (URL)"
+            placeholder="Ej: https://ejemplo.com/noticia"
+          />
         </div>
 
         <div class="mt-1 flex-grow-1 d-flex flex-column">
@@ -219,12 +212,6 @@ defineExpose({
           style="font-size: 1rem; letter-spacing: 0.5px"
         >
           <span>Vista Previa en Tiempo Real</span>
-          <span
-            v-if="isEditing"
-            class="badge"
-            :class="formData.active ? 'bg-success' : 'bg-secondary'"
-            >{{ formData.active ? 'Visible' : 'Oculta' }}</span
-          >
         </h6>
 
         <div
@@ -253,15 +240,28 @@ defineExpose({
             </div>
 
             <div class="p-4">
-              <div class="d-flex align-items-center gap-2 mb-3 text-muted" style="font-size: 1rem">
-                <i class="bi bi-calendar3 fs-5"></i>
-                <span>{{
-                  new Date().toLocaleDateString('es-ES', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })
-                }}</span>
+              <div class="d-flex align-items-center justify-content-between mb-3 text-muted" style="font-size: 1rem">
+                <div class="d-flex align-items-center gap-2">
+                  <i class="bi bi-calendar3 fs-5"></i>
+                  <span>{{
+                    new Date().toLocaleDateString('es-ES', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  }}</span>
+                </div>
+                <a
+                  v-if="formData.url_link"
+                  :href="formData.url_link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="btn btn-sm btn-primary d-inline-flex align-items-center gap-1"
+                  style="border-radius: 8px; font-size: 0.8rem;"
+                >
+                  <i class="bi bi-box-arrow-up-right"></i>
+                  <span>Ir a la Noticia</span>
+                </a>
               </div>
               <h3 class="fw-bold mb-3" style="font-size: 1.8rem; color: #1a1a1a; line-height: 1.2">
                 {{ displayTitle }}

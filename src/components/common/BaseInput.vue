@@ -4,7 +4,7 @@ import { useFormValidation } from '@/composables/useFormValidation'
 import EmojiPicker from './EmojiPicker.vue'
 
 interface Props {
-  modelValue: string | number
+  modelValue?: string | number
   type?: string
   label?: string
   id: string
@@ -17,6 +17,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
+  modelValue: '',
   type: 'text',
   label: '',
   placeholder: '',
