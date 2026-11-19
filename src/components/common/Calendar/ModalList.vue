@@ -1,96 +1,98 @@
 <template>
-  <div class="modal fade" id="dayEventsModal" tabindex="-1" ref="dayEventsModalRef">
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
-      <div class="modal-content border-0 shadow-lg">
-        <div class="modal-header bg-light-subtle border-bottom py-3">
-          <div class="d-flex flex-column">
-            <h5 class="modal-title mb-0 fw-bold text-dark">
-              <i class="bi bi-calendar-event me-2 text-primary"></i>
-              Citas del
-              {{
-                selectedDayForModal
-                  ? new Date(selectedDayForModal + 'T00:00:00').toLocaleDateString('es-ES', {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                    })
-                  : ''
-              }}
-            </h5>
-            <small v-if="selectedDayForModal" class="text-muted fw-medium mt-1">
-              <i class="bi bi-collection-fill me-1 opacity-50"></i>
-              {{ getEventsForDay(selectedDayForModal).length }}
-              {{ getEventsForDay(selectedDayForModal).length === 1 ? 'bloque' : 'bloques' }}
-              programados
-            </small>
-          </div>
+  <Teleport to="body">
+    <div class="modal fade" id="dayEventsModal" tabindex="-1" ref="dayEventsModalRef">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
+        <div class="modal-content border-0 shadow-lg">
+          <div class="modal-header bg-light-subtle border-bottom py-3">
+            <div class="d-flex flex-column">
+              <h5 class="modal-title mb-0 fw-bold text-dark">
+                <i class="bi bi-calendar-event me-2 text-primary"></i>
+                Citas del
+                {{
+                  selectedDayForModal
+                    ? new Date(selectedDayForModal + 'T00:00:00').toLocaleDateString('es-ES', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                      })
+                    : ''
+                }}
+              </h5>
+              <small v-if="selectedDayForModal" class="text-muted fw-medium mt-1">
+                <i class="bi bi-collection-fill me-1 opacity-50"></i>
+                {{ getEventsForDay(selectedDayForModal).length }}
+                {{ getEventsForDay(selectedDayForModal).length === 1 ? 'bloque' : 'bloques' }}
+                programados
+              </small>
+            </div>
 
-          <button
-            type="button"
-            class="btn-close shadow-none"
-            data-bs-dismiss="modal"
-            aria-label="Cerrar"
-          ></button>
-        </div>
-
-        <div class="modal-body p-3 bg-light-subtle">
-          <div
-            v-if="getEventsForDay(selectedDayForModal).length === 0"
-            class="text-center py-5 m-3 rounded-4 text-muted bg-white shadow-sm"
-          >
-            <i class="bi bi-calendar2-x-fill display-4 opacity-25 d-block mb-3"></i>
-            <h5 class="fw-bold mb-1">No hay actividades para este día</h5>
-            <p class="small mb-0">No se encontraron eventos programados en esta fecha.</p>
-          </div>
-
-          <div v-else class="list-container d-flex flex-column gap-2 p-1">
             <button
-              v-for="(event, idx) in getEventsForDay(selectedDayForModal)"
-              :key="event.id !== null ? event.id : `modal-event-${idx}`"
               type="button"
-              class="list-event-card p-3 border-0 shadow-sm text-start transition-all"
-              :class="`event-${event.color || 'primary'}`"
-              @click="selectActivityAtendee(event)"
+              class="btn-close shadow-none"
+              data-bs-dismiss="modal"
+              aria-label="Cerrar"
+            ></button>
+          </div>
+
+          <div class="modal-body p-3 bg-light-subtle">
+            <div
+              v-if="getEventsForDay(selectedDayForModal).length === 0"
+              class="text-center py-5 m-3 rounded-4 text-muted bg-white shadow-sm"
             >
-              <div class="d-flex flex-column w-100">
-                <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
-                  <div class="time-tag-sm px-2 py-1 rounded-2 fw-bold">
-                    <i class="bi bi-clock-fill me-1 opacity-75"></i>
-                    {{ formatTime(event.time || '') }}
+              <i class="bi bi-calendar2-x-fill display-4 opacity-25 d-block mb-3"></i>
+              <h5 class="fw-bold mb-1">No hay actividades para este día</h5>
+              <p class="small mb-0">No se encontraron eventos programados en esta fecha.</p>
+            </div>
+
+            <div v-else class="list-container d-flex flex-column gap-2 p-1">
+              <button
+                v-for="(event, idx) in getEventsForDay(selectedDayForModal)"
+                :key="event.id !== null ? event.id : `modal-event-${idx}`"
+                type="button"
+                class="list-event-card p-3 border-0 shadow-sm text-start transition-all"
+                :class="`event-${event.color || 'primary'}`"
+                @click="selectActivityAtendee(event)"
+              >
+                <div class="d-flex flex-column w-100">
+                  <div class="d-flex align-items-center flex-wrap gap-2 mb-2">
+                    <div class="time-tag-sm px-2 py-1 rounded-2 fw-bold">
+                      <i class="bi bi-clock-fill me-1 opacity-75"></i>
+                      {{ formatTime(event.time || '') }}
+                    </div>
+                    <span class="opacity-25 text-white">|</span>
+                    <span class="small text-uppercase fw-bold text-white opacity-75">
+                      {{
+                        event.type === 'activity_block'
+                          ? 'Actividad'
+                          : event.type === 'appointment'
+                            ? 'Cita'
+                            : 'Evento'
+                      }}:
+                    </span>
+                    <span class="fw-bold text-white fs-6">{{ event.title }}</span>
                   </div>
-                  <span class="opacity-25 text-white">|</span>
-                  <span class="small text-uppercase fw-bold text-white opacity-75">
-                    {{
-                      event.type === 'activity_block'
-                        ? 'Actividad'
-                        : event.type === 'appointment'
-                          ? 'Cita'
-                          : 'Evento'
-                    }}:
-                  </span>
-                  <span class="fw-bold text-white fs-6">{{ event.title }}</span>
-                </div>
 
-                <div v-if="event.info" class="mt-1 ps-1">
-                  <span class="small opacity-75 fw-bold text-white">Detalle:</span>
-                  <p class="mb-0 small opacity-75 d-inline ms-1 text-white">
-                    {{ event.info }}
-                  </p>
-                </div>
+                  <div v-if="event.info" class="mt-1 ps-1">
+                    <span class="small opacity-75 fw-bold text-white">Detalle:</span>
+                    <p class="mb-0 small opacity-75 d-inline ms-1 text-white">
+                      {{ event.info }}
+                    </p>
+                  </div>
 
-                <div v-if="event.attendees_count" class="mt-2 text-end">
-                  <span class="attendee-count">
-                    <i class="bi bi-people-fill me-1"></i>
-                    {{ event.attendees_count }} asistentes
-                  </span>
+                  <div v-if="event.attendees_count" class="mt-2 text-end">
+                    <span class="attendee-count">
+                      <i class="bi bi-people-fill me-1"></i>
+                      {{ event.attendees_count }} asistentes
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </button>
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </Teleport>
 </template>
 
 <script setup lang="ts">

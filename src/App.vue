@@ -240,16 +240,4 @@ body {
 body.modal-open [data-title]:after {
   display: none !important;
 }
-
-.modal-backdrop {
-  zoom: 1 !important;
-}
-
-.modal {
-  zoom: 1 !important;
-}
-
-.modal-dialog {
-  zoom: var(--app-zoom);
-}
 </style>
